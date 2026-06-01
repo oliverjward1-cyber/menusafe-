@@ -11,10 +11,14 @@ import {
   Users,
   QrCode,
   LogOut,
+  Package,
+  BookOpen,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/owner', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
+  { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
   { href: '/owner/allergen-matrix', label: 'Allergen Matrix', icon: ShieldCheck },
   { href: '/owner/staff-quiz', label: 'Staff Quiz', icon: Users },
   { href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode },
@@ -62,7 +66,6 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
             </Link>
           )
         })}
-
       </nav>
 
       <div className="p-4 border-t border-gray-700">
