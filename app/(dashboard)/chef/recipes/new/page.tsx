@@ -237,7 +237,7 @@ export default function NewRecipePage() {
     (s, l) => (l.kcalPer100 ? s + Math.round((l.kcalPer100 * l.qtyG) / 100) : s),
     0
   )
-  const allAllergens = [...new Set(lines.flatMap((l) => l.allergenDbKeys))]
+  const allAllergens = Array.from(new Set(lines.flatMap((l) => l.allergenDbKeys)))
   const hasOff = lines.some((l) => l.source === 'off')
 
   async function handleSave() {
