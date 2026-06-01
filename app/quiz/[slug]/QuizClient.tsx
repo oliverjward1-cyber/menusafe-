@@ -14,6 +14,8 @@ interface Question {
 interface Props {
   restaurantId: string
   restaurantName: string
+  quizType: 'front_of_house' | 'kitchen'
+  quizLabel: string
   questions: Question[]
 }
 
@@ -21,17 +23,14 @@ type Stage = 'name' | 'quiz' | 'result'
 
 const PASS_SCORE = 0.8
 
-export default function QuizClient({ restaurantId, restaurantName, questions }: Props) {
+export default function QuizClient({ restaurantId, restaurantName, quizType, quizLabel, questions }: Props) {
   const supabase = createClient()
   const [stage, setStage] = useState<Stage>('name')
   const [staffName, setStaffName] = useState('')
   const [current, setCurrent] = useState(0)
-  const [answers, setAnswers] = useState<(number | null)[]>(
-    new Array(questions.length).fill(null)
-  )
+  const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null))
   const [selected, setSelected] = useState<number | null>(null)
   const [showAnswer, setShowAnswer] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
   const [score, setScore] = useState(0)
 
   const question = questions[current]
@@ -64,16 +63,14 @@ export default function QuizClient({ restaurantId, restaurantName, questions }: 
     const passed = correct / questions.length >= PASS_SCORE
     setScore(correct)
     setStage('result')
-
-    setSubmitting(true)
     await supabase.from('staff_quiz_attempts').insert({
       restaurant_id: restaurantId,
       staff_name: staffName.trim(),
       score: correct,
       total_questions: questions.length,
       passed,
+      quiz_type: quizType,
     })
-    setSubmitting(false)
   }
 
   if (stage === 'name') {
@@ -85,7 +82,7 @@ export default function QuizClient({ restaurantId, restaurantName, questions }: 
               <UtensilsCrossed className="h-6 w-6 text-white" />
             </div>
             <h1 className="text-xl font-bold text-gray-900">{restaurantName}</h1>
-            <p className="text-gray-500 mt-1">Allergen awareness quiz</p>
+            <p className="text-gray-500 mt-1">{quizLabel} allergen quiz</p>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
             <div>
@@ -100,15 +97,9 @@ export default function QuizClient({ restaurantId, restaurantName, questions }: 
               />
             </div>
             <p className="text-xs text-gray-500">
-              You&apos;ll answer {questions.length} questions about allergens in our dishes. You need{' '}
-              {Math.ceil(questions.length * PASS_SCORE)}/{questions.length} to pass.
+              {questions.length} questions &mdash; need {Math.ceil(questions.length * PASS_SCORE)}/{questions.length} to pass
             </p>
-            <Button
-              onClick={() => setStage('quiz')}
-              disabled={!staffName.trim()}
-              size="lg"
-              className="w-full"
-            >
+            <Button onClick={() => setStage('quiz')} disabled={!staffName.trim()} size="lg" className="w-full">
               Start quiz
             </Button>
           </div>
@@ -120,7 +111,6 @@ export default function QuizClient({ restaurantId, restaurantName, questions }: 
   if (stage === 'result') {
     const correct = score
     const passed = correct / questions.length >= PASS_SCORE
-
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="w-full max-w-sm text-center">
@@ -130,20 +120,14 @@ export default function QuizClient({ restaurantId, restaurantName, questions }: 
             ) : (
               <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             )}
-            <h2 className="text-2xl font-bold text-gray-900">
-              {passed ? 'Quiz passed!' : 'Not quite'}
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">{passed ? 'Quiz passed!' : 'Not quite'}</h2>
             <p className="text-gray-500 mt-2">
               {staffName}, you scored {correct} out of {questions.length}
             </p>
-            <div
-              className={`mt-6 rounded-lg px-4 py-3 text-sm font-medium ${
-                passed ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-              }`}
-            >
+            <div className={`mt-6 rounded-lg px-4 py-3 text-sm font-medium ${passed ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
               {passed
                 ? 'Well done! Your result has been recorded.'
-                : `You need ${Math.ceil(questions.length * PASS_SCORE)} correct answers to pass. Please try again.`}
+                : `You need ${Math.ceil(questions.length * PASS_SCORE)} correct to pass. Please try again.`}
             </div>
             {!passed && (
               <Button
@@ -165,19 +149,15 @@ export default function QuizClient({ restaurantId, restaurantName, questions }: 
     )
   }
 
-  // Quiz stage
   const isCorrect = showAnswer && selected === question.correctIndex
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-lg mx-auto pt-8">
-        {/* Progress */}
         <div className="mb-6">
           <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-            <span>{restaurantName}</span>
-            <span>
-              {current + 1} / {questions.length}
-            </span>
+            <span>{restaurantName} &middot; {quizLabel}</span>
+            <span>{current + 1} / {questions.length}</span>
           </div>
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
@@ -188,19 +168,14 @@ export default function QuizClient({ restaurantId, restaurantName, questions }: 
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <p className="font-semibold text-gray-900 text-lg leading-snug mb-6">
-            {question.question}
-          </p>
-
+          <p className="font-semibold text-gray-900 text-lg leading-snug mb-6">{question.question}</p>
           <div className="space-y-3">
             {question.options.map((option, i) => {
-              let style =
-                'flex items-center gap-3 w-full rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors text-left '
+              let style = 'flex items-center gap-3 w-full rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors text-left '
               if (!showAnswer) {
-                style +=
-                  selected === i
-                    ? 'border-brand-500 bg-brand-50 text-brand-700'
-                    : 'border-gray-200 text-gray-700 hover:border-gray-300 cursor-pointer'
+                style += selected === i
+                  ? 'border-brand-500 bg-brand-50 text-brand-700'
+                  : 'border-gray-200 text-gray-700 hover:border-gray-300 cursor-pointer'
               } else {
                 if (i === question.correctIndex) {
                   style += 'border-green-500 bg-green-50 text-green-700'
@@ -210,7 +185,6 @@ export default function QuizClient({ restaurantId, restaurantName, questions }: 
                   style += 'border-gray-200 text-gray-400'
                 }
               }
-
               return (
                 <button key={i} className={style} onClick={() => selectOption(i)} disabled={showAnswer}>
                   <span className="h-6 w-6 rounded-full border-2 border-current flex items-center justify-center shrink-0 text-xs font-bold">
@@ -223,29 +197,19 @@ export default function QuizClient({ restaurantId, restaurantName, questions }: 
           </div>
 
           {showAnswer && (
-            <div
-              className={`mt-4 rounded-lg px-4 py-3 text-sm font-medium ${
-                isCorrect ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-              }`}
-            >
-              {isCorrect
-                ? '✓ Correct!'
-                : `✗ The correct answer is: ${question.options[question.correctIndex]}`}
+            <div className={`mt-4 rounded-lg px-4 py-3 text-sm font-medium ${isCorrect ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+              {isCorrect ? 'Correct!' : `The correct answer is: ${question.options[question.correctIndex]}`}
             </div>
           )}
 
           <div className="mt-6">
             {!showAnswer ? (
-              <Button
-                onClick={confirmAnswer}
-                disabled={selected === null}
-                className="w-full"
-              >
+              <Button onClick={confirmAnswer} disabled={selected === null} className="w-full">
                 Confirm answer
               </Button>
             ) : (
               <Button onClick={nextQuestion} className="w-full">
-                {current + 1 < questions.length ? 'Next question →' : 'See results'}
+                {current + 1 < questions.length ? 'Next question' : 'See results'}
               </Button>
             )}
           </div>

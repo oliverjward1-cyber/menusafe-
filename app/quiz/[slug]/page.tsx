@@ -1,14 +1,143 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import QuizClient from './QuizClient'
-import { ALLERGENS } from '@/lib/constants/allergens'
 
 interface Props {
   params: { slug: string }
+  searchParams: { type?: string }
 }
 
-export default async function StaffQuizPage({ params }: Props) {
+const DEFAULT_QUESTIONS: Record<string, { question: string; options: string[]; correctIndex: number }[]> = {
+  front_of_house: [
+    {
+      question: 'How many allergens must UK food businesses declare by law under the Food Information Regulations?',
+      options: ['8', '12', '14', '16'],
+      correctIndex: 2,
+    },
+    {
+      question: 'A guest tells you they have a nut allergy. What is the most appropriate first step?',
+      options: [
+        "Recommend dishes that don't list nuts on the menu",
+        'Inform the kitchen immediately and flag the table',
+        'Advise the restaurant cannot accommodate allergies',
+        'Point them to the allergen menu board and let them decide',
+      ],
+      correctIndex: 1,
+    },
+    {
+      question: "Which of these is a legal requirement introduced by Natasha's Law in October 2021?",
+      options: [
+        'Full ingredient lists printed on all menus',
+        'Allergen labelling on all pre-packed for direct sale (PPDS) foods',
+        'A dedicated allergen menu in every restaurant',
+        'Training certificates displayed for all food handlers',
+      ],
+      correctIndex: 1,
+    },
+    {
+      question: 'A customer says they are intolerant to lactose. Which allergen category does this fall under?',
+      options: ['Sulphites', 'Soybeans', 'Milk', 'It is not one of the 14 allergens'],
+      correctIndex: 2,
+    },
+    {
+      question: 'A customer asks if a dish is gluten-free. What is the correct response?',
+      options: [
+        "Confirm it is gluten-free if wheat isn't listed in the menu description",
+        "Tell them you'll check with the kitchen before taking their order",
+        "Say you can't guarantee anything and leave it at that",
+        'Point to the GF symbol if it appears on the menu',
+      ],
+      correctIndex: 1,
+    },
+    {
+      question: 'Which of the following is classified as a tree nut under UK allergen law?',
+      options: ['Peanut', 'Coconut', 'Almond', 'Sesame'],
+      correctIndex: 2,
+    },
+    {
+      question: 'A customer tells you mid-meal that they forgot to mention a fish allergy. What should you do?',
+      options: [
+        'Explain the dish has already been prepared so nothing can be done',
+        'Check the dish ingredients and escalate to the manager or kitchen immediately',
+        'Tell them to avoid the fish portion of the dish',
+        'Offer a complimentary dessert as an apology',
+      ],
+      correctIndex: 1,
+    },
+    {
+      question: 'Above what concentration must sulphur dioxide (sulphites) be declared as an allergen?',
+      options: ['5mg/kg or litre', '10mg/kg or litre', '25mg/kg or litre', '50mg/kg or litre'],
+      correctIndex: 1,
+    },
+  ],
+  kitchen: [
+    {
+      question: 'What is cross-contamination in the context of food allergens?',
+      options: [
+        'Mixing two sauces in the same pan',
+        'When an allergen is unintentionally transferred to a dish it should not be in',
+        'Using the same oil to fry different menu items',
+        'Storing raw and cooked meat on adjacent shelves',
+      ],
+      correctIndex: 1,
+    },
+    {
+      question: 'A ticket arrives marked with a peanut allergy. What should you do before preparing the dish?',
+      options: [
+        'Remove any visible peanuts from the dish after plating',
+        'Clean the prep area, use separate utensils, and verify every ingredient',
+        'Put on gloves and proceed as normal',
+        'Ask front of house to re-take the order to be sure',
+      ],
+      correctIndex: 1,
+    },
+    {
+      question: 'Which of the following should typically be treated as containing gluten in a UK kitchen?',
+      options: ['Rice', 'Oats', 'Buckwheat', 'Potato starch'],
+      correctIndex: 1,
+    },
+    {
+      question: 'A customer has a sesame allergy. Which of these kitchen ingredients should you check first?',
+      options: ['Soy sauce', 'Tahini', 'Oyster sauce', 'All of the above'],
+      correctIndex: 1,
+    },
+    {
+      question: 'Can oil used to fry battered fish (containing gluten) also be used to fry chips for a coeliac customer?',
+      options: [
+        'Yes, if the chips are cooked quickly',
+        'Yes, if the oil is filtered first',
+        'No — the oil becomes contaminated with gluten',
+        'Only if the oil is at a very high temperature',
+      ],
+      correctIndex: 2,
+    },
+    {
+      question: 'Which kitchen practice best reduces allergen cross-contamination risk?',
+      options: [
+        'Wearing gloves for all food preparation',
+        'Using colour-coded boards and utensils dedicated to allergen-free dishes',
+        'Washing all equipment with hot water between uses',
+        'Storing allergen-containing ingredients on the top shelf',
+      ],
+      correctIndex: 1,
+    },
+    {
+      question: 'Lupin is one of the 14 allergens. Where is it most commonly found in a restaurant kitchen?',
+      options: [
+        'Pasta and wheat-based bread',
+        'Some flour blends and pastry products',
+        'Salad dressings and vinaigrettes',
+        'Soft cheeses and dairy',
+      ],
+      correctIndex: 1,
+    },
+  ],
+}
+
+export default async function StaffQuizPage({ params, searchParams }: Props) {
   const supabase = createClient()
+  const quizType = searchParams.type === 'front_of_house' ? 'front_of_house' : 'kitchen'
+  const quizLabel = quizType === 'front_of_house' ? 'Front of House' : 'Kitchen Staff'
 
   const { data: restaurant } = await supabase
     .from('restaurants')
@@ -18,108 +147,29 @@ export default async function StaffQuizPage({ params }: Props) {
 
   if (!restaurant) notFound()
 
-  // Load approved dishes with allergens
-  const { data: recipes } = await supabase
-    .from('recipes')
-    .select(`
-      id, name,
-      recipe_ingredients (
-        ingredients ( allergen_celery, allergen_cereals_gluten, allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin, allergen_milk, allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites )
-      )
-    `)
+  const { data: dbQuestions } = await supabase
+    .from('quiz_questions')
+    .select('question, options, correct_index')
     .eq('restaurant_id', restaurant.id)
-    .eq('status', 'approved')
-    .eq('is_active', true)
+    .eq('quiz_type', quizType)
+    .order('created_at')
 
-  if (!recipes || recipes.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <h1 className="text-xl font-bold text-gray-900">{restaurant.name}</h1>
-          <p className="text-gray-500 mt-2">No quiz questions available yet.</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Build questions from recipe data
-  type Question = {
-    question: string
-    options: string[]
-    correctIndex: number
-  }
-
-  const questions: Question[] = []
-
-  for (const recipe of recipes) {
-    const presentAllergens = ALLERGENS.filter((a) =>
-      recipe.recipe_ingredients?.some(
-        (ri: any) => ri.ingredients?.[a.key]
-      )
-    )
-
-    if (presentAllergens.length === 0) continue
-
-    // Question: which allergen is in this dish?
-    const correct = presentAllergens[Math.floor(Math.random() * presentAllergens.length)]
-    const wrongOptions = ALLERGENS.filter((a) => !presentAllergens.find((p) => p.key === a.key))
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3)
-      .map((a) => a.label)
-
-    const allOptions = [correct.label, ...wrongOptions].sort(() => Math.random() - 0.5)
-    const correctIndex = allOptions.indexOf(correct.label)
-
-    questions.push({
-      question: `Which of the following allergens is present in "${recipe.name}"?`,
-      options: allOptions,
-      correctIndex,
-    })
-  }
-
-  // Also add "which dish contains X" questions
-  const allergenDishes: Record<string, string[]> = {}
-  for (const recipe of recipes) {
-    for (const allergen of ALLERGENS) {
-      if (recipe.recipe_ingredients?.some((ri: any) => ri.ingredients?.[allergen.key])) {
-        if (!allergenDishes[allergen.key]) allergenDishes[allergen.key] = []
-        allergenDishes[allergen.key].push(recipe.name)
-      }
-    }
-  }
-
-  for (const [allergenKey, dishes] of Object.entries(allergenDishes)) {
-    if (dishes.length === 0 || recipes.length < 4) continue
-    const allergen = ALLERGENS.find((a) => a.key === allergenKey)
-    if (!allergen) continue
-
-    const correctDish = dishes[Math.floor(Math.random() * dishes.length)]
-    const wrongDishes = recipes
-      .map((r) => r.name)
-      .filter((n) => !dishes.includes(n))
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3)
-
-    if (wrongDishes.length < 3) continue
-
-    const allOptions = [correctDish, ...wrongDishes].sort(() => Math.random() - 0.5)
-    const correctIndex = allOptions.indexOf(correctDish)
-
-    questions.push({
-      question: `Which dish on our menu contains ${allergen.label.toLowerCase()}?`,
-      options: allOptions,
-      correctIndex,
-    })
-  }
-
-  // Shuffle and limit to 10 questions
-  const shuffled = questions.sort(() => Math.random() - 0.5).slice(0, 10)
+  const questions =
+    dbQuestions && dbQuestions.length > 0
+      ? dbQuestions.map((q) => ({
+          question: q.question,
+          options: q.options as string[],
+          correctIndex: q.correct_index,
+        }))
+      : DEFAULT_QUESTIONS[quizType]
 
   return (
     <QuizClient
       restaurantId={restaurant.id}
       restaurantName={restaurant.name}
-      questions={shuffled}
+      quizType={quizType}
+      quizLabel={quizLabel}
+      questions={questions}
     />
   )
 }
