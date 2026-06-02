@@ -1,0 +1,312 @@
+'use client'
+
+import { useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import { ChevronLeft, Camera, Upload, Loader2, CheckCircle2, AlertTriangle, X, Pencil } from 'lucide-react'
+import { ALLERGENS } from '@/lib/constants/allergens'
+import type { InvoiceItem } from '@/app/api/invoice/route'
+
+type EditableItem = InvoiceItem & { id: number; selected: boolean; saving?: boolean; saved?: boolean }
+
+const UNIT_TYPES = ['kg', 'g', 'litre', 'ml', 'each'] as const
+
+export default function ScanInvoicePage() {
+  const router = useRouter()
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
+
+  const fileRef = useRef<HTMLInputElement>(null)
+  const cameraRef = useRef<HTMLInputElement>(null)
+
+  const [preview, setPreview] = useState<string | null>(null)
+  const [fileName, setFileName] = useState('')
+  const [scanning, setScanning] = useState(false)
+  const [items, setItems] = useState<EditableItem[]>([])
+  const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [savedCount, setSavedCount] = useState(0)
+  const [done, setDone] = useState(false)
+
+  async function handleFile(file: File) {
+    setFileName(file.name)
+    setError('')
+    setItems([])
+    setDone(false)
+
+    // Show image preview
+    const reader = new FileReader()
+    reader.onload = (e) => setPreview(e.target?.result as string)
+    reader.readAsDataURL(file)
+
+    // Send to API
+    setScanning(true)
+    try {
+      const fd = new FormData()
+      fd.append('invoice', file)
+      const res = await fetch('/api/invoice', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error ?? 'Scan failed'); setScanning(false); return }
+      if (data.items.length === 0) {
+        setError('No ingredients found. Try a clearer photo or different angle.')
+        setScanning(false)
+        return
+      }
+      setItems(data.items.map((item: InvoiceItem, i: number) => ({ ...item, id: i, selected: true })))
+    } catch {
+      setError('Network error — please try again')
+    }
+    setScanning(false)
+  }
+
+  function updateItem(id: number, field: keyof EditableItem, value: unknown) {
+    setItems((prev) => prev.map((item) => item.id === id ? { ...item, [field]: value } : item))
+  }
+
+  async function handleSave() {
+    const selected = items.filter((i) => i.selected)
+    if (selected.length === 0) return
+    setSaving(true)
+
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data: profile } = await supabase
+      .from('profiles').select('restaurant_id').eq('id', user?.id ?? '').single()
+
+    // Cookie fallback for testing
+    const rid = profile?.restaurant_id
+      ?? document.cookie.split('; ').find((r) => r.startsWith('msafe_rid='))?.split('=')[1]
+
+    if (!rid) { setError('No restaurant found'); setSaving(false); return }
+
+    const allergenDefaults = Object.fromEntries(ALLERGENS.map((a) => [a.key, false]))
+    const { data: existing } = await supabase
+      .from('ingredients').select('id, name').eq('restaurant_id', rid)
+    const existingMap = new Map((existing ?? []).map((i) => [i.name.toLowerCase(), i.id]))
+
+    let count = 0
+    for (const item of selected) {
+      const name = item.name.trim()
+      const existingId = existingMap.get(name.toLowerCase())
+      if (existingId) {
+        await supabase.from('ingredients').update({
+          cost_per_unit: item.unitPrice,
+          unit_type: item.unitType,
+        }).eq('id', existingId)
+      } else {
+        await supabase.from('ingredients').insert({
+          restaurant_id: rid,
+          name,
+          cost_per_unit: item.unitPrice,
+          unit_type: item.unitType,
+          ...allergenDefaults,
+        })
+      }
+      count++
+      setItems((prev) => prev.map((i) => i.id === item.id ? { ...i, saved: true } : i))
+    }
+
+    setSavedCount(count)
+    setSaving(false)
+    setDone(true)
+  }
+
+  const selectedCount = items.filter((i) => i.selected).length
+
+  return (
+    <div className="space-y-5 max-w-3xl">
+      <div className="flex items-center gap-3">
+        <Link href="/chef/ingredients" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+          <ChevronLeft className="h-4 w-4" /> Back
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-900">Scan invoice</h1>
+      </div>
+
+      {/* Upload area */}
+      {!scanning && items.length === 0 && !done && (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide">Upload your invoice</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Photo, scan or screenshot of any supplier invoice — Brakes, Bidfood, local suppliers, handwritten notes.</p>
+          </div>
+          <div className="p-5 space-y-3">
+            {/* Camera button — mobile primary */}
+            <button
+              onClick={() => cameraRef.current?.click()}
+              className="w-full flex items-center justify-center gap-3 py-4 rounded-xl border-2 border-green-200 bg-green-50 text-green-800 font-medium hover:bg-green-100 transition-colors"
+            >
+              <Camera className="h-5 w-5" />
+              Take a photo of your invoice
+            </button>
+
+            <div className="relative flex items-center gap-3">
+              <div className="flex-1 border-t border-gray-100" />
+              <span className="text-xs text-gray-400">or</span>
+              <div className="flex-1 border-t border-gray-100" />
+            </div>
+
+            {/* File upload */}
+            <button
+              onClick={() => fileRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
+              className="w-full flex items-center justify-center gap-3 py-4 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              <Upload className="h-4 w-4" />
+              Upload image or PDF
+            </button>
+
+            <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
+            <input ref={fileRef} type="file" accept="image/*,.pdf" className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
+
+            <p className="text-xs text-center text-gray-400">
+              Supports JPG, PNG, WebP. AI reads the invoice and extracts all ingredient prices automatically.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Scanning state */}
+      {scanning && (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-10 text-center">
+          {preview && (
+            <img src={preview} alt="Invoice" className="max-h-48 mx-auto rounded-lg object-contain mb-6 border border-gray-100" />
+          )}
+          <Loader2 className="h-8 w-8 text-green-600 animate-spin mx-auto mb-3" />
+          <p className="text-sm font-medium text-gray-900">Reading your invoice…</p>
+          <p className="text-xs text-gray-400 mt-1">Claude AI is extracting ingredient names and prices</p>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="rounded-xl bg-red-50 border border-red-200 px-5 py-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-red-800">{error}</p>
+            <button onClick={() => { setError(''); setPreview(null); setFileName('') }}
+              className="text-xs text-red-600 underline mt-1">Try again</button>
+          </div>
+        </div>
+      )}
+
+      {/* Results */}
+      {items.length > 0 && !done && (
+        <>
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide">Extracted ingredients</h2>
+                <p className="text-xs text-gray-400 mt-0.5">{items.length} items found from {fileName}. Edit anything that looks wrong, then save.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setItems((prev) => prev.map((i) => ({ ...i, selected: true })))}
+                  className="text-xs text-green-700 hover:underline">Select all</button>
+                <button onClick={() => setItems((prev) => prev.map((i) => ({ ...i, selected: false })))}
+                  className="text-xs text-gray-400 hover:underline">Deselect all</button>
+              </div>
+            </div>
+
+            {/* Invoice preview thumbnail */}
+            {preview && (
+              <div className="px-5 py-3 border-b border-gray-50 bg-gray-50/50 flex items-center gap-3">
+                <img src={preview} alt="Invoice" className="h-14 w-14 rounded-lg object-cover border border-gray-200 shrink-0" />
+                <div>
+                  <p className="text-xs font-medium text-gray-700">{fileName}</p>
+                  <button onClick={() => { setPreview(null); setItems([]); setFileName('') }}
+                    className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 mt-0.5">
+                    <X className="h-3 w-3" /> Remove and scan again
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50">
+                    <th className="px-4 py-2.5 w-8" />
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wide">Ingredient</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wide">Price / unit</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wide">Unit</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wide">Qty ordered</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {items.map((item) => (
+                    <tr key={item.id} className={`hover:bg-gray-50/50 ${!item.selected ? 'opacity-40' : ''}`}>
+                      <td className="px-4 py-3">
+                        <input type="checkbox" checked={item.selected}
+                          onChange={(e) => updateItem(item.id, 'selected', e.target.checked)}
+                          className="rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <input
+                          type="text" value={item.name}
+                          onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                          className="w-full rounded-lg border border-transparent hover:border-gray-200 focus:border-green-400 px-2 py-1 text-sm font-medium text-gray-900 focus:outline-none bg-transparent focus:bg-white"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          <span className="text-gray-400 text-sm">£</span>
+                          <input
+                            type="number" step="0.01" min="0" value={item.unitPrice}
+                            onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
+                            className="w-20 rounded-lg border border-transparent hover:border-gray-200 focus:border-green-400 px-2 py-1 text-sm focus:outline-none bg-transparent focus:bg-white"
+                          />
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <select value={item.unitType}
+                          onChange={(e) => updateItem(item.id, 'unitType', e.target.value)}
+                          className="rounded-lg border border-transparent hover:border-gray-200 focus:border-green-400 px-2 py-1 text-sm focus:outline-none bg-transparent focus:bg-white">
+                          {UNIT_TYPES.map((u) => <option key={u}>{u}</option>)}
+                        </select>
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 text-sm">{item.quantity}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <button onClick={() => { setItems([]); setPreview(null); setFileName('') }}
+              className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              Cancel
+            </button>
+            <button onClick={handleSave} disabled={saving || selectedCount === 0}
+              className="px-5 py-2.5 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              {saving ? 'Saving…' : `Save ${selectedCount} ingredient${selectedCount !== 1 ? 's' : ''} to library`}
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Done */}
+      {done && (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
+          <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
+          <h2 className="text-lg font-bold text-gray-900 mb-1">{savedCount} ingredient{savedCount !== 1 ? 's' : ''} saved</h2>
+          <p className="text-sm text-gray-500 mb-6">
+            Prices are now in your ingredient library. Existing ingredients were updated, new ones were added.
+          </p>
+          <div className="flex gap-3 justify-center">
+            <button onClick={() => { setItems([]); setPreview(null); setFileName(''); setDone(false) }}
+              className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              Scan another invoice
+            </button>
+            <button onClick={() => router.push('/chef/ingredients')}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 transition-colors">
+              View ingredient library →
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
