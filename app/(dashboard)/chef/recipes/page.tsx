@@ -10,7 +10,29 @@ import { ALLERGENS } from '@/lib/constants/allergens'
 import { AllergenBadge } from '@/components/allergen/AllergenBadge'
 import { Plus, BookOpen, Pencil, Trash2, Eye, EyeOff } from 'lucide-react'
 
-type RecipeRow = Record<string, unknown>
+interface IngRow {
+  cost_per_unit: number
+  unit_type: string
+  kcal_per_100g?: number | null
+  [key: string]: unknown
+}
+
+interface RiRow {
+  quantity: number
+  ingredients: IngRow | null
+}
+
+interface RecipeRow {
+  id: string
+  name: string
+  description?: string | null
+  category?: string | null
+  sell_price?: number | null
+  status: string
+  is_active: boolean
+  recipe_ingredients: RiRow[]
+  [key: string]: unknown
+}
 
 export default function RecipesPage() {
   const supabaseRef = useRef(createClient())
@@ -42,11 +64,10 @@ export default function RecipesPage() {
   useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function calcFoodCost(recipe: RecipeRow): number {
-    const ris = (recipe.recipe_ingredients as RecipeRow[]) ?? []
-    return ris.reduce((sum, ri) => {
-      const ing = ri.ingredients as RecipeRow | null
+    return (recipe.recipe_ingredients ?? []).reduce((sum, ri) => {
+      const ing = ri.ingredients
       if (!ing) return sum
-      return sum + (ri.quantity as number) * (ing.cost_per_unit as number)
+      return sum + ri.quantity * ing.cost_per_unit
     }, 0)
   }
 
@@ -94,16 +115,16 @@ export default function RecipesPage() {
       ) : (
         <div className="space-y-3">
           {recipes.map((recipe) => {
-            const id = recipe.id as string
-            const name = recipe.name as string
-            const isActive = recipe.is_active as boolean
+            const id = recipe.id
+            const name = recipe.name
+            const isActive = recipe.is_active
+            const category = recipe.category
             const foodCost = calcFoodCost(recipe)
-            const sellPrice = (recipe.sell_price as number) ?? 0
+            const sellPrice = recipe.sell_price ?? 0
             const gp = sellPrice > 0 ? calcGpPercent(foodCost, sellPrice) : null
             const suggested = calcSuggestedPrice(foodCost, targetGp)
-            const ris = (recipe.recipe_ingredients as RecipeRow[]) ?? []
             const recipeAllergens = ALLERGENS.filter((a) =>
-              ris.some((ri) => (ri.ingredients as RecipeRow | null)?.[a.key])
+              recipe.recipe_ingredients?.some((ri) => ri.ingredients?.[a.key])
             )
 
             return (
@@ -112,14 +133,14 @@ export default function RecipesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold text-gray-900">{name}</h3>
-                      {recipe.category && <Badge variant="gray">{recipe.category as string}</Badge>}
+                      {category && <Badge variant="gray">{category}</Badge>}
                       <Badge variant={recipe.status === 'approved' ? 'green' : recipe.status === 'rejected' ? 'red' : 'yellow'}>
-                        {recipe.status as string}
+                        {recipe.status}
                       </Badge>
                       {!isActive && <Badge variant="gray">Inactive</Badge>}
                     </div>
                     {recipe.description && (
-                      <p className="text-sm text-gray-500 mt-1">{recipe.description as string}</p>
+                      <p className="text-sm text-gray-500 mt-1">{recipe.description}</p>
                     )}
                     {recipeAllergens.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
