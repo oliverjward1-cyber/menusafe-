@@ -24,7 +24,7 @@ export default async function DashboardLayout({
   const menuUrl = restaurant?.slug ? `/menu/${restaurant.slug}` : '/menu'
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen overflow-x-hidden">
       <ViewSwitcher menuUrl={menuUrl} />
       <div className="flex flex-col md:flex-row flex-1">
         {profile?.role === 'chef' ? (
@@ -32,7 +32,7 @@ export default async function DashboardLayout({
         ) : (
           <OwnerNav restaurantName={restaurant?.name ?? ''} restaurantSlug={restaurant?.slug ?? ''} />
         )}
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 min-w-0">
           <div className="p-6 max-w-5xl mx-auto">{children}</div>
         </main>
       </div>
