@@ -193,18 +193,33 @@ function cpg(ing: typeof INGREDIENTS[number]): number {
   }
 }
 
-export async function POST(_req: NextRequest) {
+export async function POST(req: NextRequest) {
   const rid = cookies().get('msafe_rid')?.value
   if (!rid) return NextResponse.json({ error: 'No restaurant found. Complete onboarding first.' }, { status: 400 })
 
   const supabase = createClient()
 
+  // Allow force reset via query param
+  const { searchParams } = new URL(req.url)
+  const force = searchParams.get('force') === 'true'
+
   // Check for existing data
   const { count } = await supabase
     .from('ingredients').select('id', { count: 'exact', head: true }).eq('restaurant_id', rid)
-  if ((count ?? 0) > 0) {
+  if ((count ?? 0) > 0 && !force) {
     return NextResponse.json({ error: 'Sample data already loaded.' }, { status: 409 })
   }
+
+  // Wipe existing data if force reset
+  if (force) {
+    await supabase.from('recipe_ingredients').delete().in(
+      'recipe_id',
+      (await supabase.from('recipes').select('id').eq('restaurant_id', rid)).data?.map(r => r.id) ?? []
+    )
+    await supabase.from('recipes').delete().eq('restaurant_id', rid)
+    await supabase.from('ingredients').delete().eq('restaurant_id', rid)
+  }
+
 
   // Insert ingredients
   const allergenDefaults = {

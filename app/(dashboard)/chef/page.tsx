@@ -111,11 +111,9 @@ export default async function ChefDashboard() {
               </div>
             ))}
           </div>
-          {isNewUser && (
-            <div className="mt-5 pt-5 border-t border-gray-100">
-              <SeedButton />
-            </div>
-          )}
+          <div className="mt-5 pt-5 border-t border-gray-100">
+            <SeedButton hasData={!isNewUser} />
+          </div>
         </Card>
       )}
 
