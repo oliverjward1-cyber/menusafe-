@@ -1,0 +1,151 @@
+import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
+import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { ALLERGENS } from '@/lib/constants/allergens'
+import { ChevronLeft, Printer } from 'lucide-react'
+
+interface Props { params: { id: string } }
+
+export default async function AllergenMatrixPage({ params }: Props) {
+  const supabase = createClient()
+
+  const { data: menu } = await supabase
+    .from('menus')
+    .select('id, name')
+    .eq('id', params.id)
+    .single()
+
+  if (!menu) notFound()
+
+  const { data: menuRecipes } = await supabase
+    .from('menu_recipes')
+    .select(`
+      recipes (
+        id, name, category,
+        recipe_ingredients (
+          ingredients (
+            allergen_celery, allergen_cereals_gluten, allergen_crustaceans,
+            allergen_eggs, allergen_fish, allergen_lupin, allergen_milk,
+            allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts,
+            allergen_sesame, allergen_soya, allergen_sulphites
+          )
+        )
+      )
+    `)
+    .eq('menu_id', params.id)
+
+  const recipes = (menuRecipes ?? [])
+    .map(mr => (mr.recipes as any))
+    .filter(Boolean)
+    .sort((a: any, b: any) => (a.category ?? '').localeCompare(b.category ?? ''))
+
+  function hasAllergen(recipe: any, key: string): boolean {
+    return recipe.recipe_ingredients?.some((ri: any) => ri.ingredients?.[key]) ?? false
+  }
+
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between gap-3 flex-wrap print:hidden">
+        <div className="flex items-center gap-3">
+          <Link href={`/chef/menus/${params.id}`} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+            <ChevronLeft className="h-4 w-4" /> Back
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900">Allergen matrix — {menu.name}</h1>
+        </div>
+        <button
+          onClick={() => {}}
+          className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+          id="print-btn"
+        >
+          <Printer className="h-4 w-4" /> Print / save PDF
+        </button>
+      </div>
+
+      <PrintButton />
+
+      {/* Printable matrix */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden print:border-0 print:shadow-none print:rounded-none">
+        <div className="px-5 py-4 border-b border-gray-200 print:border-gray-300">
+          <h2 className="text-base font-bold text-gray-900">{menu.name} — Allergen Information Matrix</h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            UK Food Information Regulations 2014 — 14 Major Allergens · Printed {today}
+          </p>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="sticky left-0 bg-gray-50 text-left px-4 py-3 text-xs font-semibold text-gray-700 border-b border-r border-gray-200 min-w-[160px]">
+                  Dish
+                </th>
+                {ALLERGENS.map(a => (
+                  <th key={a.key} className="px-2 py-3 text-center border-b border-gray-200 min-w-[52px]">
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="font-semibold text-gray-700 leading-tight text-center" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', height: '80px', whiteSpace: 'nowrap' }}>
+                        {a.shortLabel}
+                      </span>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {recipes.length === 0 ? (
+                <tr>
+                  <td colSpan={ALLERGENS.length + 1} className="px-4 py-8 text-center text-gray-400">
+                    No dishes on this menu yet.
+                  </td>
+                </tr>
+              ) : (
+                recipes.map((recipe: any) => (
+                  <tr key={recipe.id} className="hover:bg-gray-50 print:hover:bg-transparent">
+                    <td className="sticky left-0 bg-white px-4 py-3 font-medium text-gray-900 border-r border-gray-100">
+                      <div>{recipe.name}</div>
+                      {recipe.category && <div className="text-gray-400 font-normal">{recipe.category}</div>}
+                    </td>
+                    {ALLERGENS.map(a => {
+                      const present = hasAllergen(recipe, a.key)
+                      return (
+                        <td key={a.key} className="px-2 py-3 text-center">
+                          {present ? (
+                            <span className="inline-flex items-center justify-center h-6 w-6 rounded bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300 mx-auto">
+                              ✓
+                            </span>
+                          ) : (
+                            <span className="text-gray-200">—</span>
+                          )}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="px-5 py-3 bg-gray-50 border-t border-gray-200 print:bg-white">
+          <p className="text-xs text-gray-500 leading-relaxed">
+            <strong>Disclaimer:</strong> This matrix is provided for information purposes. Allergen information is based on
+            declared ingredients. Cross-contamination may occur during preparation. Always inform staff of allergies before ordering.
+            This document should be reviewed and updated whenever recipes or ingredients change.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function PrintButton() {
+  return (
+    <script dangerouslySetInnerHTML={{
+      __html: `
+        document.getElementById('print-btn')?.addEventListener('click', () => window.print());
+      `
+    }} />
+  )
+}

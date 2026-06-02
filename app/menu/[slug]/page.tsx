@@ -2,9 +2,12 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ALLERGENS } from '@/lib/constants/allergens'
 import { AllergenBadge } from '@/components/allergen/AllergenBadge'
-import { formatCurrency } from '@/lib/utils'
+import { DishCard } from './DishCard'
+import { MenuTabs } from './MenuTabs'
 import type { Metadata } from 'next'
 import { UtensilsCrossed } from 'lucide-react'
+
+type AllergenKey = (typeof ALLERGENS)[number]['key']
 
 interface Props {
   params: { slug: string }
@@ -35,34 +38,104 @@ export default async function PublicMenuPage({ params }: Props) {
 
   if (!restaurant) notFound()
 
-  const { data: recipes } = await supabase
-    .from('recipes')
-    .select(`
-      id, name, description, category, sell_price,
-      recipe_ingredients (
-        ingredients ( allergen_celery, allergen_cereals_gluten, allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin, allergen_milk, allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites )
-      )
-    `)
+  // Get all published menus for this restaurant
+  const { data: publishedMenus } = await supabase
+    .from('menus')
+    .select('id, name, description, daypart')
     .eq('restaurant_id', restaurant.id)
-    .eq('status', 'approved')
-    .eq('is_active', true)
-    .order('category')
+    .eq('is_published', true)
+    .order('created_at')
 
-  // Group by category
-  const byCategory: Record<string, typeof recipes> = {}
-  for (const recipe of recipes ?? []) {
-    const cat = recipe.category ?? 'Menu'
-    if (!byCategory[cat]) byCategory[cat] = []
-    byCategory[cat]!.push(recipe)
+  // For each menu, get its recipes with ingredients
+  const menusWithDishes = await Promise.all(
+    (publishedMenus ?? []).map(async (menu) => {
+      const { data: menuRecipes } = await supabase
+        .from('menu_recipes')
+        .select(`
+          recipes (
+            id, name, description, category, sell_price, may_contain_allergens,
+            recipe_ingredients (
+              quantity, unit_type,
+              ingredients (
+                name, kcal_per_100g, allergen_celery, allergen_cereals_gluten,
+                allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin,
+                allergen_milk, allergen_molluscs, allergen_mustard, allergen_nuts,
+                allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites
+              )
+            )
+          )
+        `)
+        .eq('menu_id', menu.id)
+
+      const recipes = (menuRecipes ?? [])
+        .map(mr => (mr.recipes as any))
+        .filter(Boolean)
+
+      return { ...menu, recipes }
+    })
+  )
+
+  // Fallback: if no published menus exist, show approved active recipes directly
+  const { data: fallbackRecipes } = publishedMenus?.length === 0
+    ? await supabase
+        .from('recipes')
+        .select(`
+          id, name, description, category, sell_price,
+          recipe_ingredients (
+            ingredients (
+              name, allergen_celery, allergen_cereals_gluten, allergen_crustaceans,
+              allergen_eggs, allergen_fish, allergen_lupin, allergen_milk,
+              allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts,
+              allergen_sesame, allergen_soya, allergen_sulphites
+            )
+          )
+        `)
+        .eq('restaurant_id', restaurant.id)
+        .eq('status', 'approved')
+        .eq('is_active', true)
+        .order('category')
+    : { data: null }
+
+  function getDishAllergens(recipe: any): AllergenKey[] {
+    return ALLERGENS
+      .filter(a => recipe.recipe_ingredients?.some((ri: any) => ri.ingredients?.[a.key]))
+      .map(a => a.key)
   }
 
-  function getDishAllergens(recipe: NonNullable<typeof recipes>[number]) {
-    return ALLERGENS.filter((a) =>
-      recipe.recipe_ingredients?.some(
-        (ri: any) => ri.ingredients?.[a.key]
-      )
-    )
+  function getIngredients(recipe: any) {
+    return (recipe.recipe_ingredients ?? []).map((ri: any) => {
+      const ing = ri.ingredients
+      if (!ing) return null
+      const kcal = ing.kcal_per_100g && ri.unit_type !== 'each'
+        ? Math.round((ri.quantity / 100) * ing.kcal_per_100g) : null
+      return {
+        name: ing.name as string,
+        allergens: ALLERGENS.filter(a => ing[a.key]).map(a => a.key as AllergenKey),
+        kcal,
+      }
+    }).filter(Boolean) as { name: string; allergens: AllergenKey[]; kcal: number | null }[]
   }
+
+  function getKcal(recipe: any): number | null {
+    const total = (recipe.recipe_ingredients ?? []).reduce((sum: number, ri: any) => {
+      const ing = ri.ingredients
+      if (!ing?.kcal_per_100g || ri.unit_type === 'each') return sum
+      return sum + (ri.quantity / 100) * ing.kcal_per_100g
+    }, 0)
+    return total > 0 ? Math.round(total) : null
+  }
+
+  function groupByCategory(recipes: any[]) {
+    const map: Record<string, any[]> = {}
+    for (const r of recipes) {
+      const cat = r.category ?? 'Menu'
+      if (!map[cat]) map[cat] = []
+      map[cat].push(r)
+    }
+    return map
+  }
+
+  const hasMenus = menusWithDishes.length > 0
 
   return (
     <div className="min-h-screen bg-white">
@@ -70,81 +143,95 @@ export default async function PublicMenuPage({ params }: Props) {
       <div className="bg-gray-900 text-white px-6 py-8">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center gap-2 mb-2">
-            <UtensilsCrossed className="h-5 w-5 text-brand-400" />
-            <span className="text-sm font-medium text-brand-400">MenuSafe</span>
+            <UtensilsCrossed className="h-5 w-5 text-green-400" />
+            <span className="text-sm font-medium text-green-400">MenuSafe</span>
           </div>
           <h1 className="text-3xl font-bold">{restaurant.name}</h1>
           <p className="text-gray-400 mt-1 text-sm">
-            Tap any dish to see full allergen information
+            Tap any dish to see full ingredients and allergen information
           </p>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-10">
-        {Object.keys(byCategory).length === 0 ? (
-          <div className="text-center py-16 text-gray-500">
-            <UtensilsCrossed className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-            <p>No menu items available yet.</p>
-          </div>
-        ) : (
-          Object.entries(byCategory).map(([category, dishes]) => (
-            <section key={category}>
-              <h2 className="text-lg font-bold text-gray-900 pb-3 border-b border-gray-200 mb-4">
-                {category}
-              </h2>
-              <div className="space-y-4">
-                {dishes?.map((dish) => {
-                  const dishAllergens = getDishAllergens(dish)
-                  return (
-                    <div
+      {hasMenus ? (
+        // Multiple published menus — show tabs
+        <MenuTabs menus={menusWithDishes.map(menu => ({
+          id: menu.id,
+          name: menu.name,
+          description: menu.description,
+          daypart: menu.daypart,
+          categories: Object.entries(groupByCategory(menu.recipes)).map(([cat, dishes]) => ({
+            name: cat,
+            dishes: dishes.map(dish => ({
+              id: dish.id,
+              name: dish.name,
+              description: dish.description,
+              sellPrice: dish.sell_price,
+              dishAllergens: getDishAllergens(dish),
+              ingredients: getIngredients(dish),
+              kcalPerPortion: getKcal(dish),
+              mayContain: (dish.may_contain_allergens ?? []) as AllergenKey[],
+            })),
+          })),
+        }))} />
+      ) : fallbackRecipes ? (
+        // No menus configured — show all approved recipes
+        <div className="max-w-2xl mx-auto px-4 py-8 space-y-10">
+          {fallbackRecipes.length === 0 ? (
+            <div className="text-center py-16 text-gray-500">
+              <UtensilsCrossed className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p>No menu items available yet.</p>
+            </div>
+          ) : (
+            Object.entries(groupByCategory(fallbackRecipes)).map(([category, dishes]) => (
+              <section key={category}>
+                <h2 className="text-lg font-bold text-gray-900 pb-3 border-b border-gray-200 mb-4">{category}</h2>
+                <div className="space-y-4">
+                  {dishes.map((dish: any) => (
+                    <DishCard
                       key={dish.id}
-                      className="border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">{dish.name}</h3>
-                          {dish.description && (
-                            <p className="text-sm text-gray-500 mt-0.5">{dish.description}</p>
-                          )}
-                        </div>
-                        {dish.sell_price && (
-                          <p className="font-semibold text-gray-900 shrink-0">
-                            {formatCurrency(dish.sell_price)}
-                          </p>
-                        )}
-                      </div>
+                      id={dish.id}
+                      name={dish.name}
+                      description={dish.description}
+                      sellPrice={dish.sell_price}
+                      dishAllergens={getDishAllergens(dish)}
+                      ingredients={getIngredients(dish)}
+                      kcalPerPortion={getKcal(dish)}
+                      mayContain={(dish.may_contain_allergens ?? []) as AllergenKey[]}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))
+          )}
+        </div>
+      ) : (
+        <div className="max-w-2xl mx-auto px-4 py-16 text-center text-gray-400">
+          <UtensilsCrossed className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+          <p>No menu available right now.</p>
+        </div>
+      )}
 
-                      {dishAllergens.length > 0 ? (
-                        <div className="mt-3">
-                          <p className="text-xs text-gray-500 mb-1.5">Contains:</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {dishAllergens.map((a) => (
-                              <span
-                                key={a.key}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-medium border border-amber-200"
-                                title={a.description}
-                              >
-                                {a.shortLabel}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-green-700 mt-2">No regulated allergens</p>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </section>
-          ))
-        )}
+      {/* Allergen notice */}
+      <div className="bg-amber-50 border-t border-amber-200 px-4 py-5">
+        <div className="max-w-2xl mx-auto flex items-start gap-3">
+          <span className="text-amber-500 text-lg shrink-0">⚠️</span>
+          <div>
+            <p className="text-sm font-semibold text-amber-900">Important allergen information</p>
+            <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+              Allergen information is provided by the restaurant and is for guidance only.
+              Dishes may be prepared in a kitchen where allergens are present and cross-contamination is possible.
+              <strong> Always inform a member of staff of any allergy or dietary requirement before ordering.</strong>
+              {' '}Do not rely solely on this menu if you have a severe allergy.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Footer allergen key */}
       <div className="border-t border-gray-200 bg-gray-50 px-4 py-6">
         <div className="max-w-2xl mx-auto">
-          <p className="text-xs font-semibold text-gray-700 mb-3">Allergen key (UK FIR 2014)</p>
+          <p className="text-xs font-semibold text-gray-700 mb-3">Allergen key (UK Food Information Regulations 2014)</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
             {ALLERGENS.map((a) => (
               <div key={a.key} className="flex items-center gap-2 text-xs text-gray-600">
@@ -153,9 +240,13 @@ export default async function PublicMenuPage({ params }: Props) {
               </div>
             ))}
           </div>
-          <p className="text-xs text-gray-400 mt-4">
-            Always inform staff of any allergies before ordering. Dishes may be prepared in an
-            environment where allergens are present. This menu is for information only.
+          <p className="text-xs text-gray-400 mt-4 leading-relaxed">
+            This allergen information is provided by {restaurant.name} in good faith. MenuSafe is a
+            management tool — the accuracy of allergen data is the sole responsibility of the
+            restaurant operator. Always speak to staff before ordering if you have an allergy.
+          </p>
+          <p className="text-xs text-gray-300 mt-2">
+            <a href="/terms" className="underline hover:text-gray-500">MenuSafe Terms of Service</a>
           </p>
         </div>
       </div>

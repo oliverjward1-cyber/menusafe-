@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { ChefNav } from '@/components/nav/ChefNav'
 import { OwnerNav } from '@/components/nav/OwnerNav'
@@ -9,22 +10,29 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const { data: profile } = user
     ? await supabase.from('profiles').select('role, restaurant_id').eq('id', user.id).single()
     : { data: null }
 
-  const { data: restaurant } = profile?.restaurant_id
-    ? await supabase.from('restaurants').select('id, name, slug').eq('id', profile.restaurant_id).single()
+  // Fall back to cookie-based restaurant (testing / no-auth mode)
+  const restaurantId = profile?.restaurant_id ?? cookies().get('msafe_rid')?.value ?? null
+
+  const { data: restaurant } = restaurantId
+    ? await supabase.from('restaurants').select('id, name, slug').eq('id', restaurantId).single()
     : { data: null }
 
   const menuUrl = restaurant?.slug ? `/menu/${restaurant.slug}` : '/menu'
 
+  // No restaurant set up at all — send to onboarding
+  if (!restaurantId) {
+    const { redirect } = await import('next/navigation')
+    redirect('/onboarding')
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen overflow-x-hidden">
       <ViewSwitcher menuUrl={menuUrl} />
       <div className="flex flex-col md:flex-row flex-1">
         {profile?.role === 'chef' ? (
@@ -32,7 +40,7 @@ export default async function DashboardLayout({
         ) : (
           <OwnerNav restaurantName={restaurant?.name ?? ''} restaurantSlug={restaurant?.slug ?? ''} />
         )}
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 min-w-0">
           <div className="p-6 max-w-5xl mx-auto">{children}</div>
         </main>
       </div>

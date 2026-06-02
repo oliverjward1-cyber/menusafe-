@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { AllergenBadge } from '@/components/allergen/AllergenBadge'
 import { ALLERGENS } from '@/lib/constants/allergens'
 import { formatCurrency } from '@/lib/utils'
-import { Plus, Package } from 'lucide-react'
+import { Plus, Package, Upload, Pencil, Camera } from 'lucide-react'
 
 export default async function IngredientsPage() {
   const supabase = createClient()
@@ -35,13 +35,29 @@ export default async function IngredientsPage() {
             {ingredients?.length ?? 0} ingredient{ingredients?.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Link
-          href="/chef/ingredients/new"
-          className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Add ingredient
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/chef/ingredients/scan"
+            className="inline-flex items-center gap-2 border border-green-200 text-green-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-50 transition-colors"
+          >
+            <Camera className="h-4 w-4" />
+            Scan invoice
+          </Link>
+          <Link
+            href="/chef/ingredients/upload"
+            className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            <Upload className="h-4 w-4" />
+            Upload costing sheet
+          </Link>
+          <Link
+            href="/chef/ingredients/new"
+            className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Add ingredient
+          </Link>
+        </div>
       </div>
 
       {!ingredients || ingredients.length === 0 ? (
@@ -69,6 +85,7 @@ export default async function IngredientsPage() {
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Cost / unit</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Unit</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Allergens</th>
+                  <th className="px-4 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -89,6 +106,15 @@ export default async function IngredientsPage() {
                             <span className="text-gray-400 text-xs">None</span>
                           )}
                         </div>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Link
+                          href={`/chef/ingredients/${ing.id}/edit`}
+                          className="inline-flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                          aria-label={`Edit ${ing.name}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Link>
                       </td>
                     </tr>
                   )

@@ -24,6 +24,7 @@ export default function NewIngredientPage() {
   const [name, setName] = useState('')
   const [costPerUnit, setCostPerUnit] = useState('')
   const [unitType, setUnitType] = useState<UnitType>('kg')
+  const [kcalPer100g, setKcalPer100g] = useState('')
   const [allergens, setAllergens] = useState<AllergenState>(emptyAllergens())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -51,6 +52,7 @@ export default function NewIngredientPage() {
       name: name.trim(),
       cost_per_unit: parseFloat(costPerUnit),
       unit_type: unitType,
+      kcal_per_100g: kcalPer100g !== '' ? parseFloat(kcalPer100g) : null,
       ...allergens,
     })
 
@@ -100,24 +102,35 @@ export default function NewIngredientPage() {
             />
           </div>
 
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Unit type</label>
-            <div className="flex flex-wrap gap-2">
-              {UNIT_TYPES.map((unit) => (
-                <button
-                  key={unit}
-                  type="button"
-                  onClick={() => setUnitType(unit)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                    unitType === unit
-                      ? 'border-brand-600 bg-brand-50 text-brand-700'
-                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
-                  }`}
-                >
-                  {unit}
-                </button>
-              ))}
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Unit type</label>
+              <div className="flex flex-wrap gap-2">
+                {UNIT_TYPES.map((unit) => (
+                  <button
+                    key={unit}
+                    type="button"
+                    onClick={() => setUnitType(unit)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                      unitType === unit
+                        ? 'border-brand-600 bg-brand-50 text-brand-700'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {unit}
+                  </button>
+                ))}
+              </div>
             </div>
+            <Input
+              label="Kcal per 100g (optional)"
+              type="number"
+              step="1"
+              min="0"
+              value={kcalPer100g}
+              onChange={(e) => setKcalPer100g(e.target.value)}
+              placeholder="e.g. 364"
+            />
           </div>
         </Card>
 

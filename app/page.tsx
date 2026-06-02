@@ -1,26 +1,25 @@
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createBrowserClient } from '@/lib/supabase/client'
 
 export default async function Home() {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // Check for bypass-mode restaurant cookie first
+  const rid = cookies().get('msafe_rid')?.value
 
-  if (!user) {
-    redirect('/login')
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  if (profile?.role === 'owner') {
-    redirect('/owner')
-  } else {
+  if (rid) {
     redirect('/chef')
   }
+
+  // Auth mode: check logged-in user
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles').select('role').eq('id', user.id).single()
+    redirect(profile?.role === 'owner' ? '/owner' : '/chef')
+  }
+
+  // No cookie, no user — go to onboarding
+  redirect('/onboarding')
 }

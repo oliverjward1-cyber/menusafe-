@@ -36,6 +36,7 @@ export interface Ingredient {
   allergen_sesame: boolean
   allergen_soya: boolean
   allergen_sulphites: boolean
+  kcal_per_100g: number | null
   created_at: string
   updated_at: string
 }
