@@ -2,9 +2,11 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ALLERGENS } from '@/lib/constants/allergens'
 import { AllergenBadge } from '@/components/allergen/AllergenBadge'
-import { formatCurrency } from '@/lib/utils'
+import { DishCard } from './DishCard'
 import type { Metadata } from 'next'
 import { UtensilsCrossed } from 'lucide-react'
+
+type AllergenKey = (typeof ALLERGENS)[number]['key']
 
 interface Props {
   params: { slug: string }
@@ -40,7 +42,13 @@ export default async function PublicMenuPage({ params }: Props) {
     .select(`
       id, name, description, category, sell_price,
       recipe_ingredients (
-        ingredients ( allergen_celery, allergen_cereals_gluten, allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin, allergen_milk, allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites )
+        ingredients (
+          name,
+          allergen_celery, allergen_cereals_gluten, allergen_crustaceans,
+          allergen_eggs, allergen_fish, allergen_lupin, allergen_milk,
+          allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts,
+          allergen_sesame, allergen_soya, allergen_sulphites
+        )
       )
     `)
     .eq('restaurant_id', restaurant.id)
@@ -48,7 +56,6 @@ export default async function PublicMenuPage({ params }: Props) {
     .eq('is_active', true)
     .order('category')
 
-  // Group by category
   const byCategory: Record<string, typeof recipes> = {}
   for (const recipe of recipes ?? []) {
     const cat = recipe.category ?? 'Menu'
@@ -56,12 +63,21 @@ export default async function PublicMenuPage({ params }: Props) {
     byCategory[cat]!.push(recipe)
   }
 
-  function getDishAllergens(recipe: NonNullable<typeof recipes>[number]) {
-    return ALLERGENS.filter((a) =>
-      recipe.recipe_ingredients?.some(
-        (ri: any) => ri.ingredients?.[a.key]
-      )
-    )
+  function getDishAllergens(recipe: NonNullable<typeof recipes>[number]): AllergenKey[] {
+    return ALLERGENS
+      .filter((a) => recipe.recipe_ingredients?.some((ri: any) => ri.ingredients?.[a.key]))
+      .map((a) => a.key)
+  }
+
+  function getIngredients(recipe: NonNullable<typeof recipes>[number]) {
+    return (recipe.recipe_ingredients ?? []).map((ri: any) => {
+      const ing = ri.ingredients
+      if (!ing) return null
+      const allergens = ALLERGENS
+        .filter((a) => ing[a.key])
+        .map((a) => a.key as AllergenKey)
+      return { name: ing.name as string, allergens }
+    }).filter(Boolean) as { name: string; allergens: AllergenKey[] }[]
   }
 
   return (
@@ -75,7 +91,7 @@ export default async function PublicMenuPage({ params }: Props) {
           </div>
           <h1 className="text-3xl font-bold">{restaurant.name}</h1>
           <p className="text-gray-400 mt-1 text-sm">
-            Tap any dish to see full allergen information
+            Tap any dish to see full ingredients and allergen information
           </p>
         </div>
       </div>
@@ -93,48 +109,17 @@ export default async function PublicMenuPage({ params }: Props) {
                 {category}
               </h2>
               <div className="space-y-4">
-                {dishes?.map((dish) => {
-                  const dishAllergens = getDishAllergens(dish)
-                  return (
-                    <div
-                      key={dish.id}
-                      className="border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">{dish.name}</h3>
-                          {dish.description && (
-                            <p className="text-sm text-gray-500 mt-0.5">{dish.description}</p>
-                          )}
-                        </div>
-                        {dish.sell_price && (
-                          <p className="font-semibold text-gray-900 shrink-0">
-                            {formatCurrency(dish.sell_price)}
-                          </p>
-                        )}
-                      </div>
-
-                      {dishAllergens.length > 0 ? (
-                        <div className="mt-3">
-                          <p className="text-xs text-gray-500 mb-1.5">Contains:</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {dishAllergens.map((a) => (
-                              <span
-                                key={a.key}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-medium border border-amber-200"
-                                title={a.description}
-                              >
-                                {a.shortLabel}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-green-700 mt-2">No regulated allergens</p>
-                      )}
-                    </div>
-                  )
-                })}
+                {dishes?.map((dish) => (
+                  <DishCard
+                    key={dish.id}
+                    id={dish.id}
+                    name={dish.name}
+                    description={dish.description}
+                    sellPrice={dish.sell_price}
+                    dishAllergens={getDishAllergens(dish)}
+                    ingredients={getIngredients(dish)}
+                  />
+                ))}
               </div>
             </section>
           ))
