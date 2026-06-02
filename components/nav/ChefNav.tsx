@@ -10,12 +10,14 @@ import {
   BookOpen,
   LogOut,
   ChefHat,
+  MenuSquare,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/chef', label: 'Dashboard', icon: ChefHat, exact: true },
   { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
   { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
+  { href: '/chef/menus', label: 'Menus', icon: MenuSquare },
 ]
 
 export function ChefNav({ restaurantName }: { restaurantName: string }) {
