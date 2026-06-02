@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { AllergenBadge } from '@/components/allergen/AllergenBadge'
 import { ALLERGENS } from '@/lib/constants/allergens'
 import { formatCurrency } from '@/lib/utils'
-import { Plus, Package } from 'lucide-react'
+import { Plus, Package, Upload } from 'lucide-react'
 
 export default async function IngredientsPage() {
   const supabase = createClient()
@@ -35,13 +35,22 @@ export default async function IngredientsPage() {
             {ingredients?.length ?? 0} ingredient{ingredients?.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Link
-          href="/chef/ingredients/new"
-          className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Add ingredient
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/chef/ingredients/upload"
+            className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            <Upload className="h-4 w-4" />
+            Upload costing sheet
+          </Link>
+          <Link
+            href="/chef/ingredients/new"
+            className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Add ingredient
+          </Link>
+        </div>
       </div>
 
       {!ingredients || ingredients.length === 0 ? (
