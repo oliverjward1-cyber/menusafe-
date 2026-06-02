@@ -194,10 +194,13 @@ function cpg(ing: typeof INGREDIENTS[number]): number {
 }
 
 export async function POST(req: NextRequest) {
-  const rid = cookies().get('msafe_rid')?.value
-  if (!rid) return NextResponse.json({ error: 'No restaurant found. Complete onboarding first.' }, { status: 400 })
-
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data: profile } = user
+    ? await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
+    : { data: null }
+  const rid = profile?.restaurant_id ?? cookies().get('msafe_rid')?.value
+  if (!rid) return NextResponse.json({ error: 'No restaurant found. Complete onboarding first.' }, { status: 400 })
 
   // Allow force reset via query param
   const { searchParams } = new URL(req.url)
