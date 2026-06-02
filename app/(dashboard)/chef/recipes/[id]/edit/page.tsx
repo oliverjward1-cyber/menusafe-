@@ -106,17 +106,18 @@ interface Line {
   qtyG: number
   kcalPer100?: number
   allergenDbKeys: string[]
-  cpg: number          // cost per gram (£)
-  costPerKg?: number   // display value for user reference
+  cpg: number
+  costPerKg?: number
 }
 
 let uidCounter = 0
 
-export default function NewRecipePage() {
+export default function EditRecipePage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const supabaseRef = useRef(createClient())
   const supabase = supabaseRef.current
 
+  const [loading, setLoading] = useState(true)
   const [recipeName, setRecipeName] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('')
@@ -134,7 +135,7 @@ export default function NewRecipePage() {
   const [showDrop, setShowDrop] = useState(false)
   const [pending, setPending] = useState<Result | null>(null)
   const [qtyInput, setQtyInput] = useState('')
-  const [costInput, setCostInput] = useState('')  // £/kg for OFF items
+  const [costInput, setCostInput] = useState('')
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [dropRect, setDropRect] = useState<{ top: number; left: number; width: number } | null>(null)
@@ -151,25 +152,68 @@ export default function NewRecipePage() {
   }, [showDrop, updateDropRect])
 
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
 
+  // Load profile, library, restaurant settings, and the recipe to edit
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) { router.push('/login'); return }
+
       const { data: profile } = await supabase
         .from('profiles').select('restaurant_id').eq('id', user.id).single()
       if (!profile?.restaurant_id) return
       setRestaurantId(profile.restaurant_id)
-      const [ingRes, restRes] = await Promise.all([
+
+      const [ingRes, restRes, recipeRes] = await Promise.all([
         supabase.from('ingredients').select('*').eq('restaurant_id', profile.restaurant_id).order('name'),
         supabase.from('restaurants').select('target_gp').eq('id', profile.restaurant_id).single(),
+        supabase
+          .from('recipes')
+          .select('*, recipe_ingredients(*, ingredients(*))')
+          .eq('id', params.id)
+          .single(),
       ])
+
       setLibrary((ingRes.data ?? []) as Record<string, unknown>[])
       setTargetGp((restRes.data?.target_gp as number) ?? 70)
+
+      const recipe = recipeRes.data
+      if (!recipe) {
+        setError('Recipe not found')
+        setLoading(false)
+        return
+      }
+
+      setRecipeName(recipe.name ?? '')
+      setDescription(recipe.description ?? '')
+      setCategory(recipe.category ?? '')
+      setPortionSize(recipe.portion_size ?? '')
+      setSellPrice(recipe.sell_price != null ? String(recipe.sell_price) : '')
+
+      const loadedLines: Line[] = (recipe.recipe_ingredients ?? []).map(
+        (ri: Record<string, unknown>) => {
+          const ing = ri.ingredients as Record<string, unknown>
+          const cpg = costPerGram(ing)
+          return {
+            uid: uidCounter++,
+            source: 'library' as const,
+            ingredientId: ri.ingredient_id as string,
+            name: ing.name as string,
+            qtyG: ri.quantity as number,
+            allergenDbKeys: allergensFromRow(ing),
+            cpg,
+            costPerKg: cpg * 1000,
+            kcalPer100: (ing.kcal_per_100g as number | undefined) ?? undefined,
+          }
+        }
+      )
+      setLines(loadedLines)
+      setLoading(false)
     }
     load()
-  }, [supabase])
+  }, [supabase, params.id, router])
 
   useEffect(() => {
     clearTimeout(timer.current)
@@ -197,7 +241,6 @@ export default function NewRecipePage() {
       }))
 
     try {
-      // USDA FoodData Central — Foundation + SR Legacy = raw/basic ingredients only
       const url =
         `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(q)}` +
         `&dataType=Foundation,SR%20Legacy&pageSize=8&api_key=DEMO_KEY`
@@ -307,6 +350,7 @@ export default function NewRecipePage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
 
+      // Resolve ingredient IDs (same logic as new page)
       const resolved: { line: Line; ingredientId: string }[] = []
       for (const line of lines) {
         if (line.source === 'library' && line.ingredientId) {
@@ -339,27 +383,32 @@ export default function NewRecipePage() {
         resolved.push({ line, ingredientId: newIng.id as string })
       }
 
-      const { data: recipe, error: recipeErr } = await supabase
+      // Update the recipe row
+      const { error: recipeErr } = await supabase
         .from('recipes')
-        .insert({
-          restaurant_id: restaurantId,
+        .update({
           name: recipeName.trim(),
           description: description.trim() || null,
           category: category || null,
           portion_size: portionSize.trim() || null,
           sell_price: sellPrice ? parseFloat(sellPrice) : null,
-          status: 'draft',
-          created_by: user.id,
         })
-        .select('id')
-        .single()
+        .eq('id', params.id)
 
-      if (recipeErr || !recipe) throw new Error(recipeErr?.message ?? 'Failed to save recipe')
+      if (recipeErr) throw new Error(recipeErr.message)
+
+      // Delete existing recipe_ingredients then re-insert
+      const { error: delErr } = await supabase
+        .from('recipe_ingredients')
+        .delete()
+        .eq('recipe_id', params.id)
+
+      if (delErr) throw new Error(delErr.message)
 
       if (resolved.length > 0) {
         const { error: riErr } = await supabase.from('recipe_ingredients').insert(
           resolved.map(({ line, ingredientId }) => ({
-            recipe_id: recipe.id,
+            recipe_id: params.id,
             ingredient_id: ingredientId,
             quantity: line.qtyG,
             unit_type: 'g',
@@ -372,6 +421,20 @@ export default function NewRecipePage() {
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!confirm('Delete this recipe? This cannot be undone.')) return
+    setDeleting(true)
+    setError('')
+    try {
+      const { error: err } = await supabase.from('recipes').delete().eq('id', params.id)
+      if (err) throw new Error(err.message)
+      router.push('/chef/recipes')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete recipe')
+      setDeleting(false)
     }
   }
 
@@ -409,6 +472,14 @@ export default function NewRecipePage() {
     </div>
   ) : null
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <p className="text-sm text-gray-400">Loading recipe…</p>
+      </div>
+    )
+  }
+
   return (
     <>
     {dropdownEl}
@@ -417,7 +488,7 @@ export default function NewRecipePage() {
         <Link href="/chef/recipes" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Add recipe</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Edit recipe</h1>
       </div>
 
       {/* Recipe details */}
@@ -508,19 +579,8 @@ export default function NewRecipePage() {
                       <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
                         {itemKcal !== null ? `${itemKcal} kcal` : '—'}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        {l.cpg > 0 ? (
-                          <span className="text-gray-500 text-xs">{formatCurrency(itemCost)}</span>
-                        ) : (
-                          <input
-                            type="number" step="0.01" min="0" placeholder="£/kg"
-                            className="w-20 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-xs text-amber-800 focus:outline-none focus:border-amber-400"
-                            onBlur={(e) => {
-                              const val = parseFloat(e.target.value)
-                              if (val > 0) setLines((prev) => prev.map((i) => i.uid === l.uid ? { ...i, cpg: val / 1000, costPerKg: val } : i))
-                            }}
-                          />
-                        )}
+                      <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
+                        {itemCost > 0 ? formatCurrency(itemCost) : <span className="text-gray-300">—</span>}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
@@ -658,15 +718,25 @@ export default function NewRecipePage() {
         <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
-      <div className="flex gap-3 justify-end">
-        <button type="button" onClick={() => router.push('/chef/recipes')}
-          className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-          Cancel
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={deleting || saving}
+          className="px-5 py-2.5 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          {deleting ? 'Deleting…' : 'Delete recipe'}
         </button>
-        <button onClick={handleSave} disabled={saving || !recipeName.trim()}
-          className="px-5 py-2.5 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-          {saving ? 'Saving…' : 'Save recipe'}
-        </button>
+        <div className="flex gap-3">
+          <button type="button" onClick={() => router.push('/chef/recipes')}
+            className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button onClick={handleSave} disabled={saving || !recipeName.trim()}
+            className="px-5 py-2.5 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+            {saving ? 'Saving…' : 'Save changes'}
+          </button>
+        </div>
       </div>
     </div>
     </>

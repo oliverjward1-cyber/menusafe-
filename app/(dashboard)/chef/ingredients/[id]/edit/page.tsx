@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Input from '@/components/ui/Input'
@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { AllergenSelector } from '@/components/allergen/AllergenSelector'
 import { ALLERGENS, UNIT_TYPES, type AllergenKey, type UnitType } from '@/lib/constants/allergens'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 
 type AllergenState = Record<AllergenKey, boolean>
@@ -17,17 +17,50 @@ function emptyAllergens(): AllergenState {
   return Object.fromEntries(ALLERGENS.map((a) => [a.key, false])) as AllergenState
 }
 
-export default function NewIngredientPage() {
+export default function EditIngredientPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const supabase = createClient()
 
   const [name, setName] = useState('')
   const [costPerUnit, setCostPerUnit] = useState('')
   const [unitType, setUnitType] = useState<UnitType>('kg')
-  const [kcalPer100g, setKcalPer100g] = useState('')
   const [allergens, setAllergens] = useState<AllergenState>(emptyAllergens())
+  const [kcalPer100g, setKcalPer100g] = useState('')
   const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    async function loadIngredient() {
+      const { data, error: fetchError } = await supabase
+        .from('ingredients')
+        .select('*')
+        .eq('id', params.id)
+        .single()
+
+      if (fetchError || !data) {
+        setError('Ingredient not found.')
+        setFetching(false)
+        return
+      }
+
+      setName(data.name ?? '')
+      setCostPerUnit(data.cost_per_unit != null ? String(data.cost_per_unit) : '')
+      setUnitType((data.unit_type as UnitType) ?? 'kg')
+      setKcalPer100g(data.kcal_per_100g != null ? String(data.kcal_per_100g) : '')
+      const allergenState = emptyAllergens()
+      for (const a of ALLERGENS) {
+        if (data[a.key] != null) {
+          allergenState[a.key] = Boolean(data[a.key])
+        }
+      }
+      setAllergens(allergenState)
+      setFetching(false)
+    }
+
+    loadIngredient()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id])
 
   function handleAllergenChange(key: AllergenKey, value: boolean) {
     setAllergens((prev) => ({ ...prev, [key]: value }))
@@ -38,31 +71,51 @@ export default function NewIngredientPage() {
     setLoading(true)
     setError('')
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
+    const { error: updateError } = await supabase
+      .from('ingredients')
+      .update({
+        name: name.trim(),
+        cost_per_unit: parseFloat(costPerUnit),
+        unit_type: unitType,
+        kcal_per_100g: kcalPer100g !== '' ? parseFloat(kcalPer100g) : null,
+        ...allergens,
+      })
+      .eq('id', params.id)
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('restaurant_id')
-      .eq('id', user.id)
-      .single()
-
-    const { error: insertError } = await supabase.from('ingredients').insert({
-      restaurant_id: profile?.restaurant_id,
-      name: name.trim(),
-      cost_per_unit: parseFloat(costPerUnit),
-      unit_type: unitType,
-      kcal_per_100g: kcalPer100g !== '' ? parseFloat(kcalPer100g) : null,
-      ...allergens,
-    })
-
-    if (insertError) {
-      setError(insertError.message)
+    if (updateError) {
+      setError(updateError.message)
       setLoading(false)
       return
     }
 
     router.push('/chef/ingredients')
+  }
+
+  async function handleDelete() {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${name}"? This cannot be undone.`
+    )
+    if (!confirmed) return
+
+    const { error: deleteError } = await supabase
+      .from('ingredients')
+      .delete()
+      .eq('id', params.id)
+
+    if (deleteError) {
+      setError(deleteError.message)
+      return
+    }
+
+    router.push('/chef/ingredients')
+  }
+
+  if (fetching) {
+    return (
+      <div className="flex items-center justify-center py-24 text-gray-400 text-sm">
+        Loading…
+      </div>
+    )
   }
 
   return (
@@ -74,7 +127,7 @@ export default function NewIngredientPage() {
         >
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Add ingredient</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Edit ingredient</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -135,10 +188,7 @@ export default function NewIngredientPage() {
         </Card>
 
         <Card>
-          <AllergenSelector
-            selected={allergens}
-            onChange={handleAllergenChange}
-          />
+          <AllergenSelector selected={allergens} onChange={handleAllergenChange} />
         </Card>
 
         {error && (
@@ -147,17 +197,30 @@ export default function NewIngredientPage() {
           </div>
         )}
 
-        <div className="flex gap-3">
-          <Button type="submit" loading={loading} size="lg">
-            Save ingredient
-          </Button>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex gap-3">
+            <Button type="submit" loading={loading} size="lg">
+              Save changes
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              onClick={() => router.push('/chef/ingredients')}
+            >
+              Cancel
+            </Button>
+          </div>
+
           <Button
             type="button"
             variant="secondary"
             size="lg"
-            onClick={() => router.push('/chef/ingredients')}
+            onClick={handleDelete}
+            className="text-red-600 border-red-200 hover:bg-red-50"
           >
-            Cancel
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete ingredient
           </Button>
         </div>
       </form>
