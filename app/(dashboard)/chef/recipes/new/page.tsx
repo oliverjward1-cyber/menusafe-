@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -111,6 +112,15 @@ export default function NewRecipePage() {
   const [qtyInput, setQtyInput] = useState('')
   const [costInput, setCostInput] = useState('')  // £/kg for OFF items
   const timer = useRef<ReturnType<typeof setTimeout>>()
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const [dropRect, setDropRect] = useState<{ top: number; left: number; width: number } | null>(null)
+
+  const updateDropRect = useCallback(() => {
+    if (searchInputRef.current) {
+      const r = searchInputRef.current.getBoundingClientRect()
+      setDropRect({ top: r.bottom + 4, left: r.left, width: r.width })
+    }
+  }, [])
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -145,6 +155,7 @@ export default function NewRecipePage() {
 
   async function search(q: string) {
     setSearching(true)
+    updateDropRect()
     setShowDrop(true)
 
     const libHits: Result[] = library
@@ -462,14 +473,17 @@ export default function NewRecipePage() {
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Search ingredient</label>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
-                <input type="text" value={query}
+                <input ref={searchInputRef} type="text" value={query}
                   onChange={(e) => { setQuery(e.target.value); setPending(null) }}
-                  onFocus={() => { if (results.length > 0) setShowDrop(true) }}
+                  onFocus={() => { if (results.length > 0) { updateDropRect(); setShowDrop(true) } }}
                   onBlur={() => setTimeout(() => setShowDrop(false), 150)}
                   placeholder="e.g. chicken breast, cheddar..."
                   className="w-full rounded-lg border border-gray-200 pl-8 pr-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
-                {showDrop && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                {showDrop && dropRect && typeof window !== 'undefined' && createPortal(
+                  <div
+                    style={{ position: 'fixed', top: dropRect.top, left: dropRect.left, width: dropRect.width, zIndex: 9999 }}
+                    className="bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-y-auto"
+                  >
                     {searching && <div className="px-3 py-2 text-xs text-gray-400">Searching…</div>}
                     {!searching && results.length === 0 && (
                       <div className="px-3 py-2 text-xs text-gray-400">No results found</div>
@@ -496,7 +510,8 @@ export default function NewRecipePage() {
                         </div>
                       </button>
                     ))}
-                  </div>
+                  </div>,
+                  document.body
                 )}
               </div>
             </div>
