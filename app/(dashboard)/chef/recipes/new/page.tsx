@@ -81,7 +81,8 @@ interface Line {
   qtyG: number
   kcalPer100?: number
   allergenDbKeys: string[]
-  cpg: number
+  cpg: number          // cost per gram (£)
+  costPerKg?: number   // display value for user reference
 }
 
 let uidCounter = 0
@@ -108,6 +109,7 @@ export default function NewRecipePage() {
   const [showDrop, setShowDrop] = useState(false)
   const [pending, setPending] = useState<Result | null>(null)
   const [qtyInput, setQtyInput] = useState('')
+  const [costInput, setCostInput] = useState('')  // £/kg for OFF items
   const timer = useRef<ReturnType<typeof setTimeout>>()
 
   const [saving, setSaving] = useState(false)
@@ -190,6 +192,12 @@ export default function NewRecipePage() {
     setQuery(r.name)
     setShowDrop(false)
     setQtyInput('')
+    if (r.type === 'library' && r.row) {
+      const cpg = costPerGram(r.row)
+      setCostInput(cpg > 0 ? (cpg * 1000).toFixed(2) : '')
+    } else {
+      setCostInput('')
+    }
   }
 
   function addLine() {
@@ -199,16 +207,20 @@ export default function NewRecipePage() {
 
     let line: Line
     if (pending.type === 'library' && pending.row) {
+      const cpg = costPerGram(pending.row)
       line = {
         uid: uidCounter++,
         name: pending.name,
         source: 'library',
         ingredientId: pending.row.id as string,
         qtyG: qty,
+        kcalPer100: (pending.row.kcal_per_100g as number | undefined) ?? pending.kcal,
         allergenDbKeys: allergensFromRow(pending.row),
-        cpg: costPerGram(pending.row),
+        cpg,
+        costPerKg: cpg * 1000,
       }
     } else {
+      const costPerKg = costInput ? parseFloat(costInput) : 0
       line = {
         uid: uidCounter++,
         name: pending.name,
@@ -218,7 +230,8 @@ export default function NewRecipePage() {
         qtyG: qty,
         kcalPer100: pending.kcal,
         allergenDbKeys: pending.allergens,
-        cpg: 0,
+        cpg: costPerKg / 1000,
+        costPerKg,
       }
     }
 
@@ -226,6 +239,7 @@ export default function NewRecipePage() {
     setQuery('')
     setPending(null)
     setQtyInput('')
+    setCostInput('')
   }
 
   const foodCost = lines.reduce((s, l) => s + l.qtyG * l.cpg, 0)
@@ -364,6 +378,7 @@ export default function NewRecipePage() {
             <input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)}
               placeholder="0.00" step="0.01" min="0"
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
+            <p className="mt-1 text-xs text-gray-400">Used to calculate gross profit % in the summary below.</p>
           </div>
         </div>
       </div>
@@ -390,6 +405,7 @@ export default function NewRecipePage() {
                   <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wide">Ingredient</th>
                   <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wide">Qty</th>
                   <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wide">Kcal</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wide">Cost</th>
                   <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 uppercase tracking-wide">Allergens</th>
                   <th />
                 </tr>
@@ -397,16 +413,22 @@ export default function NewRecipePage() {
               <tbody className="divide-y divide-gray-50">
                 {lines.map((l) => {
                   const itemKcal = l.kcalPer100 ? Math.round((l.kcalPer100 * l.qtyG) / 100) : null
+                  const itemCost = l.cpg * l.qtyG
                   return (
                     <tr key={l.uid} className="hover:bg-gray-50/50">
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">{l.name}</div>
                         {l.brand && <div className="text-xs text-gray-400">{l.brand}</div>}
-                        {l.source === 'library' && <div className="text-xs text-green-600 mt-0.5">From your library</div>}
+                        {l.source === 'library'
+                          ? <div className="text-xs text-green-600 mt-0.5">From your library</div>
+                          : l.kcalPer100 && <div className="text-xs text-gray-400 mt-0.5">{l.kcalPer100} kcal/100g</div>}
                       </td>
                       <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{l.qtyG}g</td>
                       <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
                         {itemKcal !== null ? `${itemKcal} kcal` : '—'}
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
+                        {itemCost > 0 ? formatCurrency(itemCost) : <span className="text-gray-300">—</span>}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
@@ -434,55 +456,83 @@ export default function NewRecipePage() {
         )}
 
         {/* Search row */}
-        <div className="p-4 border-t border-gray-100 bg-gray-50 grid grid-cols-1 sm:grid-cols-[1fr_110px_auto] gap-3 items-end">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Search ingredient</label>
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
-              <input type="text" value={query}
-                onChange={(e) => { setQuery(e.target.value); setPending(null) }}
-                onFocus={() => { if (results.length > 0) setShowDrop(true) }}
-                onBlur={() => setTimeout(() => setShowDrop(false), 150)}
-                placeholder="e.g. chicken breast, cheddar..."
-                className="w-full rounded-lg border border-gray-200 pl-8 pr-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
-              {showDrop && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto">
-                  {searching && <div className="px-3 py-2 text-xs text-gray-400">Searching…</div>}
-                  {!searching && results.length === 0 && (
-                    <div className="px-3 py-2 text-xs text-gray-400">No results found</div>
-                  )}
-                  {results.map((r, i) => (
-                    <button key={i} onMouseDown={() => selectResult(r)}
-                      className="w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                      <div className="text-sm font-medium text-gray-900">{r.name}</div>
-                      <div className="text-xs text-gray-400 flex items-center gap-2 mt-0.5 flex-wrap">
-                        {r.type === 'library'
-                          ? <span className="text-green-600">In your library</span>
-                          : <>
-                              {r.brand && <span>{r.brand}</span>}
-                              {r.kcal && <span>{r.kcal} kcal/100g</span>}
-                              {r.allergens.length > 0 && (
-                                <span className="text-amber-600">{r.allergens.length} allergen{r.allergens.length !== 1 ? 's' : ''}</span>
-                              )}
-                            </>}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+        <div className="p-4 border-t border-gray-100 bg-gray-50 space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_110px_130px_auto] gap-3 items-end">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Search ingredient</label>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                <input type="text" value={query}
+                  onChange={(e) => { setQuery(e.target.value); setPending(null) }}
+                  onFocus={() => { if (results.length > 0) setShowDrop(true) }}
+                  onBlur={() => setTimeout(() => setShowDrop(false), 150)}
+                  placeholder="e.g. chicken breast, cheddar..."
+                  className="w-full rounded-lg border border-gray-200 pl-8 pr-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
+                {showDrop && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                    {searching && <div className="px-3 py-2 text-xs text-gray-400">Searching…</div>}
+                    {!searching && results.length === 0 && (
+                      <div className="px-3 py-2 text-xs text-gray-400">No results found</div>
+                    )}
+                    {results.map((r, i) => (
+                      <button key={i} onMouseDown={() => selectResult(r)}
+                        className="w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-900">{r.name}</span>
+                          {r.type === 'library' && (
+                            <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">Library</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-400 flex items-center gap-2 mt-0.5 flex-wrap">
+                          {r.type === 'library'
+                            ? <span className="text-green-600">Cost from your library</span>
+                            : <>
+                                {r.brand && <span>{r.brand}</span>}
+                                {r.kcal != null && <span className="text-amber-600 font-medium">{r.kcal} kcal/100g</span>}
+                                {r.allergens.length > 0 && (
+                                  <span className="text-red-500">{r.allergens.length} allergen{r.allergens.length !== 1 ? 's' : ''}</span>
+                                )}
+                              </>}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Qty (g)</label>
+              <input type="number" value={qtyInput} onChange={(e) => setQtyInput(e.target.value)}
+                placeholder="0" min="0" step="1"
+                onKeyDown={(e) => e.key === 'Enter' && addLine()}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+                Cost (£/kg)
+                {pending?.type === 'library' && <span className="ml-1 text-green-600 normal-case font-normal">auto</span>}
+              </label>
+              <input
+                type="number"
+                value={costInput}
+                onChange={(e) => setCostInput(e.target.value)}
+                placeholder="e.g. 3.50"
+                step="0.01" min="0"
+                disabled={pending?.type === 'library'}
+                onKeyDown={(e) => e.key === 'Enter' && addLine()}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+              />
+            </div>
+            <button onClick={addLine} disabled={!pending || !qtyInput}
+              className="h-[38px] px-4 bg-green-800 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap">
+              + Add
+            </button>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Qty (g)</label>
-            <input type="number" value={qtyInput} onChange={(e) => setQtyInput(e.target.value)}
-              placeholder="0" min="0" step="1"
-              onKeyDown={(e) => e.key === 'Enter' && addLine()}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
-          </div>
-          <button onClick={addLine} disabled={!pending || !qtyInput}
-            className="h-[38px] px-4 bg-green-800 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap">
-            + Add
-          </button>
+          {pending?.type === 'off' && (
+            <p className="text-xs text-gray-400">
+              Enter cost price per kg so food cost and GP can be calculated accurately.
+            </p>
+          )}
         </div>
       </div>
 
@@ -495,6 +545,9 @@ export default function NewRecipePage() {
           <div className="p-4">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Food cost</p>
             <p className="text-xl font-semibold text-gray-900 mt-1">{formatCurrency(foodCost)}</p>
+            {foodCost === 0 && lines.length > 0 && (
+              <p className="text-xs text-amber-600 mt-0.5">Add cost prices above</p>
+            )}
           </div>
           <div className="p-4">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Suggested ({targetGp}% GP)</p>
@@ -505,10 +558,16 @@ export default function NewRecipePage() {
             <p className={`text-xl font-semibold mt-1 ${currentGp === null ? 'text-gray-300' : currentGp >= targetGp ? 'text-green-700' : 'text-red-600'}`}>
               {currentGp !== null ? `${currentGp.toFixed(1)}%` : '—'}
             </p>
+            {currentGp !== null && (
+              <p className={`text-xs mt-0.5 ${currentGp >= targetGp ? 'text-green-600' : 'text-red-500'}`}>
+                {currentGp >= targetGp ? `↑ ${(currentGp - targetGp).toFixed(1)}% above target` : `↓ ${(targetGp - currentGp).toFixed(1)}% below target`}
+              </p>
+            )}
           </div>
           <div className="p-4">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Total kcal</p>
             <p className="text-xl font-semibold text-amber-700 mt-1">{totalKcal > 0 ? totalKcal : '—'}</p>
+            {totalKcal > 0 && <p className="text-xs text-gray-400 mt-0.5">per portion</p>}
           </div>
         </div>
         {allAllergens.length > 0 && (
