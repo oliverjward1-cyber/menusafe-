@@ -134,8 +134,22 @@ export function MenuEditor({
 
   async function handlePublishToggle() {
     setPublishing(true)
-    await supabase.from('menus').update({ is_published: !published }).eq('id', menuId)
-    setPublished(!published)
+    const nowPublished = !published
+    await supabase.from('menus').update({ is_published: nowPublished }).eq('id', menuId)
+    setPublished(nowPublished)
+    // Fire email notification when publishing (not unpublishing)
+    if (nowPublished) {
+      const { data: { user } } = await supabase.auth.getUser()
+      const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user?.id ?? '').single()
+      const { data: restaurant } = profile?.restaurant_id
+        ? await supabase.from('restaurants').select('name').eq('id', profile.restaurant_id).single()
+        : { data: null }
+      fetch('/api/notify-publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ menuName: name, menuId, restaurantName: restaurant?.name ?? '' }),
+      })
+    }
     setPublishing(false)
     router.refresh()
   }

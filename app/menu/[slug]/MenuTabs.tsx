@@ -12,7 +12,9 @@ interface Dish {
   description?: string | null
   sellPrice?: number | null
   dishAllergens: AllergenKey[]
-  ingredients: { name: string; allergens: AllergenKey[] }[]
+  ingredients: { name: string; allergens: AllergenKey[]; kcal?: number | null }[]
+  kcalPerPortion?: number | null
+  mayContain?: AllergenKey[]
 }
 
 interface Category {
@@ -97,6 +99,8 @@ export function MenuTabs({ menus }: { menus: Menu[] }) {
                     sellPrice={dish.sellPrice}
                     dishAllergens={dish.dishAllergens}
                     ingredients={dish.ingredients}
+                    kcalPerPortion={dish.kcalPerPortion}
+                    mayContain={dish.mayContain}
                   />
                 ))}
               </div>

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, QrCode, TableProperties } from 'lucide-react'
+import { ChevronLeft, QrCode, TableProperties, Eye } from 'lucide-react'
 import { MenuEditor } from './MenuEditor'
 
 interface Props { params: { id: string } }
@@ -63,6 +63,12 @@ export default async function MenuEditPage({ params }: Props) {
           <h1 className="text-2xl font-bold text-gray-900">{menu.name}</h1>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            href={`/chef/menus/${params.id}/preview`}
+            className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            <Eye className="h-4 w-4" /> Preview
+          </Link>
           <Link
             href={`/chef/menus/${params.id}/allergens`}
             className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"

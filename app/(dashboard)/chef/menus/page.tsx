@@ -2,8 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
-import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode } from 'lucide-react'
+import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye } from 'lucide-react'
 import { PublishToggle } from './PublishToggle'
+import { DuplicateMenuButton } from './DuplicateMenuButton'
 
 const DAYPART_LABELS: Record<string, string> = {
   'all-day': 'All day',
@@ -114,7 +115,14 @@ export default async function MenusPage() {
                     )}
                     <p className="text-xs text-gray-400 mt-1">{count} dish{count !== 1 ? 'es' : ''}</p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                    <Link
+                      href={`/chef/menus/${menu.id}/preview`}
+                      className="inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      <Eye className="h-3.5 w-3.5" /> Preview
+                    </Link>
+                    <DuplicateMenuButton menuId={menu.id} />
                     <PublishToggle menuId={menu.id} isPublished={menu.is_published} />
                     <Link
                       href={`/chef/menus/${menu.id}`}

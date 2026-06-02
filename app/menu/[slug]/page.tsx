@@ -53,8 +53,9 @@ export default async function PublicMenuPage({ params }: Props) {
         .from('menu_recipes')
         .select(`
           recipes (
-            id, name, description, category, sell_price, kcal_per_portion,
+            id, name, description, category, sell_price, may_contain_allergens,
             recipe_ingredients (
+              quantity, unit_type,
               ingredients (
                 name, kcal_per_100g, allergen_celery, allergen_cereals_gluten,
                 allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin,
@@ -105,11 +106,23 @@ export default async function PublicMenuPage({ params }: Props) {
     return (recipe.recipe_ingredients ?? []).map((ri: any) => {
       const ing = ri.ingredients
       if (!ing) return null
+      const kcal = ing.kcal_per_100g && ri.unit_type !== 'each'
+        ? Math.round((ri.quantity / 100) * ing.kcal_per_100g) : null
       return {
         name: ing.name as string,
         allergens: ALLERGENS.filter(a => ing[a.key]).map(a => a.key as AllergenKey),
+        kcal,
       }
-    }).filter(Boolean) as { name: string; allergens: AllergenKey[] }[]
+    }).filter(Boolean) as { name: string; allergens: AllergenKey[]; kcal: number | null }[]
+  }
+
+  function getKcal(recipe: any): number | null {
+    const total = (recipe.recipe_ingredients ?? []).reduce((sum: number, ri: any) => {
+      const ing = ri.ingredients
+      if (!ing?.kcal_per_100g || ri.unit_type === 'each') return sum
+      return sum + (ri.quantity / 100) * ing.kcal_per_100g
+    }, 0)
+    return total > 0 ? Math.round(total) : null
   }
 
   function groupByCategory(recipes: any[]) {
@@ -156,6 +169,8 @@ export default async function PublicMenuPage({ params }: Props) {
               sellPrice: dish.sell_price,
               dishAllergens: getDishAllergens(dish),
               ingredients: getIngredients(dish),
+              kcalPerPortion: getKcal(dish),
+              mayContain: (dish.may_contain_allergens ?? []) as AllergenKey[],
             })),
           })),
         }))} />
@@ -181,6 +196,8 @@ export default async function PublicMenuPage({ params }: Props) {
                       sellPrice={dish.sell_price}
                       dishAllergens={getDishAllergens(dish)}
                       ingredients={getIngredients(dish)}
+                      kcalPerPortion={getKcal(dish)}
+                      mayContain={(dish.may_contain_allergens ?? []) as AllergenKey[]}
                     />
                   ))}
                 </div>

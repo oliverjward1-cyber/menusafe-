@@ -25,6 +25,8 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
   const [costPerUnit, setCostPerUnit] = useState('')
   const [unitType, setUnitType] = useState<UnitType>('kg')
   const [allergens, setAllergens] = useState<AllergenState>(emptyAllergens())
+  const [originalAllergens, setOriginalAllergens] = useState<AllergenState>(emptyAllergens())
+  const [restaurantId, setRestaurantId] = useState('')
   const [kcalPer100g, setKcalPer100g] = useState('')
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
@@ -55,6 +57,11 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
         }
       }
       setAllergens(allergenState)
+      setOriginalAllergens({ ...allergenState })
+      const { data: { user } } = await supabase.auth.getUser()
+      const { data: profile } = user ? await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single() : { data: null }
+      const rid = profile?.restaurant_id ?? document.cookie.split('; ').find(r => r.startsWith('msafe_rid='))?.split('=')[1] ?? ''
+      setRestaurantId(rid)
       setFetching(false)
     }
 
@@ -86,6 +93,20 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
       setError(updateError.message)
       setLoading(false)
       return
+    }
+
+    // Check if any allergens changed and create an alert if so
+    const changedAllergens = ALLERGENS.filter(a => allergens[a.key] !== originalAllergens[a.key])
+    if (changedAllergens.length > 0 && restaurantId) {
+      const changes = changedAllergens.map(a =>
+        `${a.shortLabel}: ${originalAllergens[a.key] ? 'removed' : 'added'}`
+      ).join(', ')
+      await supabase.from('allergen_alerts').insert({
+        restaurant_id: restaurantId,
+        ingredient_id: params.id,
+        ingredient_name: name.trim(),
+        changed_allergens: changes,
+      })
     }
 
     router.push('/chef/ingredients')

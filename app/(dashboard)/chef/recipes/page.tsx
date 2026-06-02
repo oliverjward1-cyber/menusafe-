@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/Badge'
 import { formatCurrency, formatPercent, calcGpPercent, calcSuggestedPrice } from '@/lib/utils'
 import { ALLERGENS } from '@/lib/constants/allergens'
 import { AllergenBadge } from '@/components/allergen/AllergenBadge'
-import { Plus, BookOpen, Pencil, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Plus, BookOpen, Pencil, Trash2, Eye, EyeOff, Copy, Loader2 } from 'lucide-react'
 
 interface IngRow {
   cost_per_unit: number
@@ -80,6 +80,23 @@ export default function RecipesPage() {
     if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return
     setRecipes((prev) => prev.filter((r) => r.id !== id))
     await supabase.from('recipes').delete().eq('id', id)
+  }
+
+  const [duplicating, setDuplicating] = useState<string | null>(null)
+
+  async function handleDuplicate(id: string) {
+    setDuplicating(id)
+    const res = await fetch('/api/duplicate-recipe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recipeId: id }),
+    })
+    const data = await res.json()
+    setDuplicating(null)
+    if (data.id) {
+      // Reload recipes to show the duplicate
+      load()
+    }
   }
 
   if (loading) {
@@ -176,6 +193,14 @@ export default function RecipesPage() {
                         className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                       >
                         {isActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                      </button>
+                      <button
+                        onClick={() => handleDuplicate(id)}
+                        title="Duplicate recipe"
+                        disabled={duplicating === id}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40"
+                      >
+                        {duplicating === id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
                       </button>
                       <Link href={`/chef/recipes/${id}/edit`}
                         className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">

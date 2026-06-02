@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/Badge'
 import Link from 'next/link'
 import { Package, BookOpen, Plus, Upload, ArrowRight, CheckCircle2, Circle } from 'lucide-react'
 import { SeedButton } from '@/components/SeedButton'
+import { AllergenAlertBanner } from '@/components/AllergenAlertBanner'
 
 export default async function ChefDashboard() {
   const supabase = createClient()
@@ -16,16 +17,22 @@ export default async function ChefDashboard() {
 
   const restaurantId = profile?.restaurant_id ?? cookies().get('msafe_rid')?.value ?? null
 
-  const [ingredientsRes, recipesRes] = await Promise.all([
+  const [ingredientsRes, recipesRes, alertsRes] = await Promise.all([
     supabase.from('ingredients').select('id', { count: 'exact' }).eq('restaurant_id', restaurantId ?? ''),
     supabase.from('recipes').select('id, name, status, updated_at')
       .eq('restaurant_id', restaurantId ?? '')
       .order('updated_at', { ascending: false })
       .limit(5),
+    supabase.from('allergen_alerts')
+      .select('id, ingredient_name, changed_allergens, created_at')
+      .eq('restaurant_id', restaurantId ?? '')
+      .eq('dismissed', false)
+      .order('created_at', { ascending: false }),
   ])
 
   const ingredientCount = ingredientsRes.count ?? 0
   const recentRecipes = recipesRes.data ?? []
+  const allergenAlerts = alertsRes.data ?? []
   const isNewUser = ingredientCount === 0 && recentRecipes.length === 0
 
   const checklist = [
@@ -59,6 +66,8 @@ export default async function ChefDashboard() {
 
   return (
     <div className="space-y-6">
+      {allergenAlerts.length > 0 && <AllergenAlertBanner alerts={allergenAlerts} />}
+
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
           {isNewUser ? 'Welcome to MenuSafe 👋' : `Good day, ${profile?.full_name?.split(' ')[0] ?? 'Chef'} 👋`}

@@ -151,6 +151,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
     if (showDrop) updateDropRect()
   }, [showDrop, updateDropRect])
 
+  const [mayContain, setMayContain] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
@@ -191,6 +192,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
       setCategory(recipe.category ?? '')
       setPortionSize(recipe.portion_size ?? '')
       setSellPrice(recipe.sell_price != null ? String(recipe.sell_price) : '')
+      setMayContain(recipe.may_contain_allergens ?? [])
 
       const loadedLines: Line[] = (recipe.recipe_ingredients ?? []).map(
         (ri: Record<string, unknown>) => {
@@ -392,6 +394,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
           category: category || null,
           portion_size: portionSize.trim() || null,
           sell_price: sellPrice ? parseFloat(sellPrice) : null,
+          may_contain_allergens: mayContain,
         })
         .eq('id', params.id)
 
@@ -532,6 +535,33 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
             <p className="mt-1 text-xs text-gray-400">Used to calculate gross profit % in the summary below.</p>
           </div>
+        </div>
+      </div>
+
+      {/* May contain allergens */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+        <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide mb-1">May contain</h2>
+        <p className="text-xs text-gray-400 mb-4">
+          Tick any allergens that may be present due to kitchen cross-contamination — even if not in the recipe ingredients.
+          These appear as a separate "may contain" warning on the customer menu.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {ALLERGEN_MAP.filter((a, i, arr) => arr.findIndex(b => b.dbKey === a.dbKey) === i).map((a) => {
+            const checked = mayContain.includes(a.dbKey)
+            return (
+              <label key={a.dbKey} className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${checked ? 'border-orange-300 bg-orange-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={(e) => {
+                    setMayContain(prev => e.target.checked ? [...prev, a.dbKey] : prev.filter(k => k !== a.dbKey))
+                  }}
+                  className="rounded border-gray-300 text-orange-500 focus:ring-orange-400"
+                />
+                <span className="text-sm text-gray-700">{a.label}</span>
+              </label>
+            )
+          })}
         </div>
       </div>
 
