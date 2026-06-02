@@ -87,11 +87,29 @@ export default function ScanInvoicePage() {
     let count = 0
     for (const item of selected) {
       const name = item.name.trim()
+      const allergenData = {
+        allergen_cereals_gluten: item.allergenCerealsGluten ?? false,
+        allergen_crustaceans: item.allergenCrustaceans ?? false,
+        allergen_eggs: item.allergenEggs ?? false,
+        allergen_fish: item.allergenFish ?? false,
+        allergen_peanuts: item.allergenPeanuts ?? false,
+        allergen_nuts: item.allergenNuts ?? false,
+        allergen_soya: item.allergenSoya ?? false,
+        allergen_milk: item.allergenMilk ?? false,
+        allergen_celery: item.allergenCelery ?? false,
+        allergen_mustard: item.allergenMustard ?? false,
+        allergen_sesame: item.allergenSesame ?? false,
+        allergen_sulphites: item.allergenSulphites ?? false,
+        allergen_lupin: item.allergenLupin ?? false,
+        allergen_molluscs: item.allergenMolluscs ?? false,
+      }
       const existingId = existingMap.get(name.toLowerCase())
       if (existingId) {
         await supabase.from('ingredients').update({
           cost_per_unit: item.unitPrice,
           unit_type: item.unitType,
+          kcal_per_100g: item.kcalPer100g ?? null,
+          ...allergenData,
         }).eq('id', existingId)
       } else {
         await supabase.from('ingredients').insert({
@@ -99,7 +117,9 @@ export default function ScanInvoicePage() {
           name,
           cost_per_unit: item.unitPrice,
           unit_type: item.unitType,
+          kcal_per_100g: item.kcalPer100g ?? null,
           ...allergenDefaults,
+          ...allergenData,
         })
       }
       count++
@@ -176,7 +196,7 @@ export default function ScanInvoicePage() {
           )}
           <Loader2 className="h-8 w-8 text-green-600 animate-spin mx-auto mb-3" />
           <p className="text-sm font-medium text-gray-900">Reading your invoice…</p>
-          <p className="text-xs text-gray-400 mt-1">Claude AI is extracting ingredient names and prices</p>
+          <p className="text-xs text-gray-400 mt-1">Claude AI is extracting ingredient names, prices, allergens and calories</p>
         </div>
       )}
 
