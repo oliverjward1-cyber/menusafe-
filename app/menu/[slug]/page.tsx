@@ -126,10 +126,27 @@ export default async function PublicMenuPage({ params }: Props) {
         )}
       </div>
 
+      {/* Allergen notice */}
+      <div className="bg-amber-50 border-t border-amber-200 px-4 py-5">
+        <div className="max-w-2xl mx-auto flex items-start gap-3">
+          <span className="text-amber-500 text-lg shrink-0">⚠️</span>
+          <div>
+            <p className="text-sm font-semibold text-amber-900">Important allergen information</p>
+            <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+              Allergen information is provided by the restaurant and is for guidance only.
+              Ingredients and recipes may change. Dishes may be prepared in a kitchen where
+              allergens are present, and cross-contamination is possible.
+              <strong> Always inform a member of staff of any allergy or dietary requirement before ordering.</strong>
+              {' '}Do not rely solely on this menu if you have a severe allergy.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Footer allergen key */}
       <div className="border-t border-gray-200 bg-gray-50 px-4 py-6">
         <div className="max-w-2xl mx-auto">
-          <p className="text-xs font-semibold text-gray-700 mb-3">Allergen key (UK FIR 2014)</p>
+          <p className="text-xs font-semibold text-gray-700 mb-3">Allergen key (UK Food Information Regulations 2014)</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
             {ALLERGENS.map((a) => (
               <div key={a.key} className="flex items-center gap-2 text-xs text-gray-600">
@@ -138,9 +155,13 @@ export default async function PublicMenuPage({ params }: Props) {
               </div>
             ))}
           </div>
-          <p className="text-xs text-gray-400 mt-4">
-            Always inform staff of any allergies before ordering. Dishes may be prepared in an
-            environment where allergens are present. This menu is for information only.
+          <p className="text-xs text-gray-400 mt-4 leading-relaxed">
+            This allergen information is provided by {restaurant.name} in good faith. MenuSafe is a
+            management tool — the accuracy of allergen data is the sole responsibility of the
+            restaurant operator. Always speak to staff before ordering if you have an allergy.
+          </p>
+          <p className="text-xs text-gray-300 mt-2">
+            <a href="/terms" className="underline hover:text-gray-500">MenuSafe Terms of Service</a>
           </p>
         </div>
       </div>

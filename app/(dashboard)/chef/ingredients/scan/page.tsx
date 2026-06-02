@@ -28,6 +28,7 @@ export default function ScanInvoicePage() {
   const [saving, setSaving] = useState(false)
   const [savedCount, setSavedCount] = useState(0)
   const [done, setDone] = useState(false)
+  const [allergensVerified, setAllergensVerified] = useState(false)
 
   async function handleFile(file: File) {
     setFileName(file.name)
@@ -53,6 +54,7 @@ export default function ScanInvoicePage() {
         setScanning(false)
         return
       }
+      setAllergensVerified(false)
       setItems(data.items.map((item: InvoiceItem, i: number) => ({ ...item, id: i, selected: true })))
     } catch {
       setError('Network error — please try again')
@@ -215,6 +217,20 @@ export default function ScanInvoicePage() {
       {/* Results */}
       {items.length > 0 && !done && (
         <>
+          {/* AI allergen warning */}
+          <div className="rounded-xl bg-amber-50 border border-amber-200 px-5 py-4 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-amber-900">Review AI-suggested allergens before saving</p>
+              <p className="text-xs text-amber-700 mt-1">
+                Allergen and calorie data below has been estimated by AI based on ingredient names.
+                It may not be accurate. You are legally responsible for the allergen information
+                displayed to customers. Please check each ingredient carefully and correct any errors
+                before saving.
+              </p>
+            </div>
+          </div>
+
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
               <div>
@@ -294,12 +310,26 @@ export default function ScanInvoicePage() {
             </div>
           </div>
 
+          {/* Verification checkbox */}
+          <label className="flex items-start gap-3 px-1 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={allergensVerified}
+              onChange={(e) => setAllergensVerified(e.target.checked)}
+              className="mt-0.5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+            />
+            <span className="text-sm text-gray-700">
+              I have reviewed the allergen information above and confirm it is correct to the best of my knowledge.
+              I understand that I am legally responsible for the accuracy of allergen data displayed to customers.
+            </span>
+          </label>
+
           <div className="flex gap-3 justify-end">
-            <button onClick={() => { setItems([]); setPreview(null); setFileName('') }}
+            <button onClick={() => { setItems([]); setPreview(null); setFileName(''); setAllergensVerified(false) }}
               className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
               Cancel
             </button>
-            <button onClick={handleSave} disabled={saving || selectedCount === 0}
+            <button onClick={handleSave} disabled={saving || selectedCount === 0 || !allergensVerified}
               className="px-5 py-2.5 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
               {saving ? 'Saving…' : `Save ${selectedCount} ingredient${selectedCount !== 1 ? 's' : ''} to library`}
             </button>
