@@ -67,7 +67,14 @@ export default function RecipesPage() {
     return (recipe.recipe_ingredients ?? []).reduce((sum, ri) => {
       const ing = ri.ingredients
       if (!ing) return sum
-      return sum + ri.quantity * ing.cost_per_unit
+      let costPerG: number
+      switch (ing.unit_type) {
+        case 'kg': costPerG = ing.cost_per_unit / 1000; break
+        case 'litre': costPerG = ing.cost_per_unit / 1000; break
+        case 'each': return sum + ri.quantity * ing.cost_per_unit
+        default: costPerG = ing.cost_per_unit
+      }
+      return sum + ri.quantity * costPerG
     }, 0)
   }
 
