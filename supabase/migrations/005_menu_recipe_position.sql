@@ -1,0 +1,2 @@
+ALTER TABLE public.menu_recipes
+  ADD COLUMN IF NOT EXISTS position INTEGER DEFAULT 0;

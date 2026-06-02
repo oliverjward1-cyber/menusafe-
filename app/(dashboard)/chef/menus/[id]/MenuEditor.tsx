@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency } from '@/lib/utils'
-import { Globe, GlobeLock, Plus, X, Loader2, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Globe, GlobeLock, Loader2, TrendingUp, AlertTriangle, CheckCircle2, GripVertical, X, Search, ChevronDown, ChevronRight } from 'lucide-react'
 
 type Recipe = {
   id: string
@@ -73,38 +73,87 @@ export function MenuEditor({
   const [description, setDescription] = useState(menuDescription ?? '')
   const [daypart, setDaypart] = useState(menuDaypart)
   const [published, setPublished] = useState(isPublished)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(initialSelectedIds))
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const [collapsedCats, setCollapsedCats] = useState<Set<string>>(new Set())
 
-  const byCategory = allRecipes.reduce<Record<string, Recipe[]>>((acc, r) => {
+  // Ordered list of selected recipe ids for the menu
+  const [menuOrder, setMenuOrder] = useState<string[]>(() =>
+    initialSelectedIds.filter(id => allRecipes.some(r => r.id === id))
+  )
+
+  // Drag state
+  const dragIndex = useRef<number | null>(null)
+  const dragOverIndex = useRef<number | null>(null)
+
+  const selectedSet = new Set(menuOrder)
+  const menuRecipes = menuOrder.map(id => allRecipes.find(r => r.id === id)).filter(Boolean) as Recipe[]
+
+  const available = allRecipes.filter(r => !selectedSet.has(r.id))
+  const filtered = search.trim()
+    ? available.filter(r => r.name.toLowerCase().includes(search.toLowerCase()))
+    : available
+
+  const byCategory = filtered.reduce<Record<string, Recipe[]>>((acc, r) => {
     const cat = r.category ?? 'Other'
     if (!acc[cat]) acc[cat] = []
     acc[cat].push(r)
     return acc
   }, {})
 
-  const selectedRecipes = allRecipes.filter(r => selectedIds.has(r.id))
+  const categories = ['Starters', 'Mains', 'Desserts', 'Other'].filter(c => byCategory[c]?.length)
+    .concat(Object.keys(byCategory).filter(c => !['Starters', 'Mains', 'Desserts', 'Other'].includes(c)))
+
+  function addToMenu(id: string) {
+    setMenuOrder(prev => [...prev, id])
+    setSaved(false)
+  }
+
+  function removeFromMenu(id: string) {
+    setMenuOrder(prev => prev.filter(x => x !== id))
+    setSaved(false)
+  }
+
+  function toggleCategory(cat: string) {
+    setCollapsedCats(prev => {
+      const n = new Set(prev)
+      n.has(cat) ? n.delete(cat) : n.add(cat)
+      return n
+    })
+  }
+
+  // Drag-to-reorder handlers for the menu list
+  function onDragStart(index: number) {
+    dragIndex.current = index
+  }
+
+  function onDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault()
+    dragOverIndex.current = index
+  }
+
+  function onDrop() {
+    if (dragIndex.current === null || dragOverIndex.current === null) return
+    if (dragIndex.current === dragOverIndex.current) return
+    const reordered = [...menuOrder]
+    const [moved] = reordered.splice(dragIndex.current, 1)
+    reordered.splice(dragOverIndex.current, 0, moved)
+    setMenuOrder(reordered)
+    setSaved(false)
+    dragIndex.current = null
+    dragOverIndex.current = null
+  }
 
   // GP summary
-  const recipesWithPrice = selectedRecipes.filter(r => r.sell_price)
+  const recipesWithPrice = menuRecipes.filter(r => r.sell_price)
   const avgGp = recipesWithPrice.length
     ? recipesWithPrice.reduce((sum, r) => sum + (gpPct(r) ?? 0), 0) / recipesWithPrice.length
     : null
-  const totalMenuRevenue = selectedRecipes.reduce((s, r) => s + (r.sell_price ?? 0), 0)
-  const totalMenuCost = selectedRecipes.reduce((s, r) => s + foodCost(r), 0)
-
-  function toggle(id: string) {
-    setSelectedIds(prev => {
-      const n = new Set(prev)
-      n.has(id) ? n.delete(id) : n.add(id)
-      return n
-    })
-    setSaved(false)
-  }
+  const totalMenuRevenue = menuRecipes.reduce((s, r) => s + (r.sell_price ?? 0), 0)
+  const totalMenuCost = menuRecipes.reduce((s, r) => s + foodCost(r), 0)
 
   async function handleSave() {
     if (!name.trim()) { setError('Menu name is required'); return }
@@ -118,11 +167,10 @@ export function MenuEditor({
       updated_at: new Date().toISOString(),
     }).eq('id', menuId)
 
-    // Replace all menu_recipes
     await supabase.from('menu_recipes').delete().eq('menu_id', menuId)
-    if (selectedIds.size > 0) {
+    if (menuOrder.length > 0) {
       await supabase.from('menu_recipes').insert(
-        Array.from(selectedIds).map(recipe_id => ({ menu_id: menuId, recipe_id }))
+        menuOrder.map((recipe_id, position) => ({ menu_id: menuId, recipe_id, position }))
       )
     }
 
@@ -137,7 +185,6 @@ export function MenuEditor({
     const nowPublished = !published
     await supabase.from('menus').update({ is_published: nowPublished }).eq('id', menuId)
     setPublished(nowPublished)
-    // Fire email notification when publishing (not unpublishing)
     if (nowPublished) {
       const { data: { user } } = await supabase.auth.getUser()
       const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user?.id ?? '').single()
@@ -153,10 +200,6 @@ export function MenuEditor({
     setPublishing(false)
     router.refresh()
   }
-
-  const filtered = search.trim()
-    ? allRecipes.filter(r => r.name.toLowerCase().includes(search.toLowerCase()))
-    : null
 
   return (
     <div className="space-y-5">
@@ -185,8 +228,136 @@ export function MenuEditor({
         </div>
       </div>
 
+      {/* Two-panel builder */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        {/* Left: available dishes */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Available dishes</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Click a dish to add it to your menu</p>
+            <div className="relative mt-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search dishes…"
+                className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          <div className="overflow-y-auto flex-1" style={{ maxHeight: 420 }}>
+            {filtered.length === 0 ? (
+              <div className="px-5 py-8 text-center text-sm text-gray-400">
+                {search ? 'No dishes match your search.' : 'All dishes are already on this menu.'}
+              </div>
+            ) : (
+              categories.map(cat => (
+                <div key={cat}>
+                  <button
+                    onClick={() => toggleCategory(cat)}
+                    className="w-full flex items-center justify-between px-5 py-2 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{cat}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400">{byCategory[cat]?.length}</span>
+                      {collapsedCats.has(cat)
+                        ? <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+                        : <ChevronDown className="h-3.5 w-3.5 text-gray-400" />}
+                    </div>
+                  </button>
+                  {!collapsedCats.has(cat) && byCategory[cat]?.map(r => {
+                    const gp = gpPct(r)
+                    return (
+                      <button
+                        key={r.id}
+                        onClick={() => addToMenu(r.id)}
+                        className="w-full flex items-center justify-between px-5 py-3 text-left border-b border-gray-50 hover:bg-green-50 hover:border-green-100 transition-colors group"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 group-hover:text-green-800">{r.name}</p>
+                          {r.sell_price && (
+                            <p className="text-xs text-gray-400 mt-0.5">{formatCurrency(r.sell_price)}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {gp != null && (
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${gp >= 65 ? 'bg-green-100 text-green-700' : gp >= 55 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-600'}`}>
+                              {gp.toFixed(0)}% GP
+                            </span>
+                          )}
+                          <span className="text-xs text-green-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">+ Add</span>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Right: menu order */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">On this menu</h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {menuOrder.length === 0 ? 'No dishes added yet' : `${menuOrder.length} dish${menuOrder.length === 1 ? '' : 'es'} — drag to reorder`}
+            </p>
+          </div>
+
+          <div className="overflow-y-auto flex-1" style={{ maxHeight: 420 }}>
+            {menuOrder.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-48 text-center px-5">
+                <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                  <GripVertical className="h-5 w-5 text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-400">Click dishes on the left to add them here</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {menuRecipes.map((r, index) => {
+                  const gp = gpPct(r)
+                  return (
+                    <div
+                      key={r.id}
+                      draggable
+                      onDragStart={() => onDragStart(index)}
+                      onDragOver={e => onDragOver(e, index)}
+                      onDrop={onDrop}
+                      className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 transition-colors cursor-grab active:cursor-grabbing active:bg-green-50 active:shadow-sm"
+                    >
+                      <GripVertical className="h-4 w-4 text-gray-300 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{r.name}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{r.category ?? 'Uncategorised'}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {r.sell_price && <span className="text-xs text-gray-500">{formatCurrency(r.sell_price)}</span>}
+                        {gp != null && (
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${gp >= 65 ? 'bg-green-100 text-green-700' : gp >= 55 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-600'}`}>
+                            {gp.toFixed(0)}%
+                          </span>
+                        )}
+                        <button
+                          onClick={() => removeFromMenu(r.id)}
+                          className="h-6 w-6 rounded-full flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* GP Summary */}
-      {selectedRecipes.length > 0 && (
+      {menuRecipes.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="h-4 w-4 text-green-700" />
@@ -195,7 +366,7 @@ export function MenuEditor({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
             <div>
               <p className="text-xs text-gray-500">Dishes</p>
-              <p className="text-2xl font-bold text-gray-900">{selectedRecipes.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{menuRecipes.length}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500">Avg GP%</p>
@@ -223,7 +394,7 @@ export function MenuEditor({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {selectedRecipes.map(r => {
+              {menuRecipes.map(r => {
                 const cost = foodCost(r)
                 const gp = gpPct(r)
                 return (
@@ -249,68 +420,6 @@ export function MenuEditor({
         </div>
       )}
 
-      {/* Recipe picker */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Dishes on this menu</h2>
-          <p className="text-xs text-gray-400 mt-0.5">{selectedIds.size} selected — only approved recipes are shown</p>
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search recipes…"
-            className="mt-3 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          />
-        </div>
-
-        <div className="divide-y divide-gray-50 max-h-96 overflow-y-auto">
-          {(filtered ?? allRecipes).length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm text-gray-400">
-              No approved recipes yet.{' '}
-              <a href="/chef/recipes" className="text-green-700 underline">Add recipes first →</a>
-            </div>
-          ) : (
-            Object.entries(
-              (filtered ?? allRecipes).reduce<Record<string, Recipe[]>>((acc, r) => {
-                const cat = r.category ?? 'Other'
-                if (!acc[cat]) acc[cat] = []
-                acc[cat].push(r)
-                return acc
-              }, {})
-            ).map(([cat, recipes]) => (
-              <div key={cat}>
-                <p className="px-5 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-50">{cat}</p>
-                {recipes.map(r => {
-                  const on = selectedIds.has(r.id)
-                  const gp = gpPct(r)
-                  return (
-                    <button
-                      key={r.id}
-                      onClick={() => toggle(r.id)}
-                      className={`w-full flex items-center justify-between px-5 py-3 text-left hover:bg-gray-50 transition-colors ${on ? 'bg-green-50/40' : ''}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`h-5 w-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${on ? 'border-green-600 bg-green-600' : 'border-gray-300'}`}>
-                          {on && <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                        </div>
-                        <span className="text-sm font-medium text-gray-900">{r.name}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-xs text-gray-400">
-                        {r.sell_price && <span>{formatCurrency(r.sell_price)}</span>}
-                        {gp != null && (
-                          <span className={`font-medium ${gp >= 65 ? 'text-green-700' : gp >= 55 ? 'text-amber-600' : 'text-red-600'}`}>
-                            {gp.toFixed(0)}% GP
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {/* Actions */}
@@ -334,7 +443,7 @@ export function MenuEditor({
           className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <CheckCircle2 className="h-4 w-4" /> : null}
-          {saving ? 'Saving…' : saved ? 'Saved!' : 'Save changes'}
+          {saving ? 'Saving…' : saved ? 'Saved!' : 'Save menu'}
         </button>
       </div>
     </div>
