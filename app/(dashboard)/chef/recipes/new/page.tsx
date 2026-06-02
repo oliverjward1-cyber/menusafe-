@@ -384,8 +384,8 @@ export default function NewRecipePage() {
       </div>
 
       {/* Ingredients */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between rounded-t-xl">
           <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide">Ingredients</h2>
           <span className="text-xs text-gray-400 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
@@ -456,7 +456,7 @@ export default function NewRecipePage() {
         )}
 
         {/* Search row */}
-        <div className="p-4 border-t border-gray-100 bg-gray-50 space-y-3">
+        <div className="p-4 border-t border-gray-100 bg-gray-50 space-y-3 rounded-b-xl">
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_110px_130px_auto] gap-3 items-end">
             <div>
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Search ingredient</label>
