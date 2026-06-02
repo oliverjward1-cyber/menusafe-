@@ -43,9 +43,15 @@ export default async function OwnerDashboard() {
 
   function calcFoodCost(recipe: NonNullable<typeof recipes>[number]): number {
     if (!recipe?.recipe_ingredients) return 0
-    return recipe.recipe_ingredients.reduce((sum: number, ri: { quantity: number; ingredients: { cost_per_unit: number } | null }) => {
+    return recipe.recipe_ingredients.reduce((sum: number, ri: { quantity: number; ingredients: { cost_per_unit: number; unit_type: string } | null }) => {
       if (!ri.ingredients) return sum
-      return sum + ri.quantity * ri.ingredients.cost_per_unit
+      const { cost_per_unit, unit_type } = ri.ingredients
+      switch (unit_type) {
+        case 'kg': return sum + (ri.quantity / 1000) * cost_per_unit
+        case 'litre': return sum + (ri.quantity / 1000) * cost_per_unit
+        case 'each': return sum + ri.quantity * cost_per_unit
+        default: return sum + ri.quantity * cost_per_unit
+      }
     }, 0)
   }
 
