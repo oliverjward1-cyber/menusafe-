@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import Link from 'next/link'
 import { Package, BookOpen, Plus, Upload, ArrowRight, CheckCircle2, Circle } from 'lucide-react'
+import { SeedButton } from '@/components/SeedButton'
 
 export default async function ChefDashboard() {
   const supabase = createClient()
@@ -101,6 +102,11 @@ export default async function ChefDashboard() {
               </div>
             ))}
           </div>
+          {isNewUser && (
+            <div className="mt-5 pt-5 border-t border-gray-100">
+              <SeedButton />
+            </div>
+          )}
         </Card>
       )}
 
