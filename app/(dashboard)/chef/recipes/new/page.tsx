@@ -30,6 +30,31 @@ function allergenLabel(dbKey: string) {
   return ALLERGEN_MAP.find((a) => a.dbKey === dbKey)?.label ?? dbKey
 }
 
+function detectAllergensFromName(name: string): string[] {
+  const n = name.toLowerCase()
+  const found = new Set<string>()
+  const checks: [string[], string][] = [
+    [['milk', 'cream', 'butter', 'cheese', 'yogurt', 'dairy', 'whey', 'lactose', 'cheddar', 'mozzarella', 'parmesan'], 'allergen_milk'],
+    [['egg'], 'allergen_eggs'],
+    [['wheat', 'flour', 'bread', 'gluten', 'barley', 'rye', 'oat', 'pasta', 'noodle', 'semolina', 'spelt'], 'allergen_cereals_gluten'],
+    [['peanut', 'groundnut'], 'allergen_peanuts'],
+    [['almond', 'cashew', 'walnut', 'pecan', 'hazelnut', 'pistachio', 'macadamia', 'brazil nut', 'pine nut'], 'allergen_nuts'],
+    [['soy', 'soya', 'tofu', 'edamame', 'miso', 'tempeh'], 'allergen_soya'],
+    [['fish', 'salmon', 'tuna', 'cod', 'haddock', 'trout', 'sardine', 'anchovy', 'bass', 'halibut', 'tilapia', 'mackerel', 'herring'], 'allergen_fish'],
+    [['prawn', 'shrimp', 'crab', 'lobster', 'crayfish', 'langoustine', 'scampi'], 'allergen_crustaceans'],
+    [['mussel', 'oyster', 'scallop', 'squid', 'octopus', 'clam', 'mollusc'], 'allergen_molluscs'],
+    [['celery', 'celeriac'], 'allergen_celery'],
+    [['mustard'], 'allergen_mustard'],
+    [['sesame', 'tahini'], 'allergen_sesame'],
+    [['lupin'], 'allergen_lupin'],
+    [['sulphite', 'sulfite', 'wine', 'vinegar', 'dried fruit'], 'allergen_sulphites'],
+  ]
+  checks.forEach(([keywords, dbKey]) => {
+    if (keywords.some((k) => n.includes(k))) found.add(dbKey)
+  })
+  return Array.from(found)
+}
+
 function detectAllergensFromOFF(product: Record<string, unknown>): string[] {
   const tags = ((product.allergens_tags as string[]) ?? []).map((t) =>
     t.toLowerCase().replace('en:', '')
@@ -172,29 +197,35 @@ export default function NewRecipePage() {
       }))
 
     try {
+      // USDA FoodData Central — Foundation + SR Legacy = raw/basic ingredients only
       const url =
-        `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}` +
-        `&search_simple=1&action=process&json=1&page_size=6` +
-        `&fields=product_name,brands,nutriments,allergens_tags,allergens,ingredients_text&lc=en&cc=gb`
+        `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(q)}` +
+        `&dataType=Foundation,SR%20Legacy&pageSize=8&api_key=DEMO_KEY`
       const res = await fetch(url)
-      const data = await res.json() as { products?: Record<string, unknown>[] }
-      const offHits: Result[] = (data.products ?? [])
-        .filter((p) => p.product_name)
-        .slice(0, 5)
-        .map((p) => {
-          const nutriments = p.nutriments as Record<string, number> | undefined
+      const data = await res.json() as { foods?: Record<string, unknown>[] }
+      const usdaHits: Result[] = (data.foods ?? [])
+        .filter((f) => f.description)
+        .slice(0, 6)
+        .map((f) => {
+          const nutrients = (f.foodNutrients as Record<string, unknown>[] | undefined) ?? []
+          const kcalEntry = nutrients.find(
+            (n) => (n.nutrientName as string)?.toLowerCase().includes('energy') && (n.unitName as string) === 'kcal'
+          )
+          const kcal = kcalEntry?.value ? Math.round(kcalEntry.value as number) : undefined
+          const name = (f.description as string)
+            .toLowerCase()
+            .replace(/,\s*raw$/i, '')
+            .replace(/\b\w/g, (c) => c.toUpperCase())
+            .trim()
           return {
             type: 'off' as const,
-            name: p.product_name as string,
-            brand: p.brands ? (p.brands as string).split(',')[0].trim() : undefined,
-            kcal: nutriments?.['energy-kcal_100g']
-              ? Math.round(nutriments['energy-kcal_100g'])
-              : undefined,
-            allergens: detectAllergensFromOFF(p),
-            product: p,
+            name,
+            kcal,
+            allergens: detectAllergensFromName(name),
+            product: f,
           }
         })
-      setResults([...libHits, ...offHits])
+      setResults([...libHits, ...usdaHits])
     } catch {
       setResults(libHits)
     }
