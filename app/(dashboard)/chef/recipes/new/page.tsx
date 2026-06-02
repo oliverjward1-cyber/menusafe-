@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -121,6 +120,10 @@ export default function NewRecipePage() {
       setDropRect({ top: r.bottom + 4, left: r.left, width: r.width })
     }
   }, [])
+
+  useEffect(() => {
+    if (showDrop) updateDropRect()
+  }, [showDrop, updateDropRect])
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -341,7 +344,43 @@ export default function NewRecipePage() {
     }
   }
 
+  const dropdownEl = showDrop && dropRect ? (
+    <div
+      style={{ position: 'fixed', top: dropRect.top, left: dropRect.left, width: dropRect.width, zIndex: 9999 }}
+      className="bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-y-auto"
+    >
+      {searching && <div className="px-3 py-2 text-xs text-gray-400">Searching…</div>}
+      {!searching && results.length === 0 && (
+        <div className="px-3 py-2 text-xs text-gray-400">No results found</div>
+      )}
+      {results.map((r, i) => (
+        <button key={i} onMouseDown={() => selectResult(r)}
+          className="w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-900">{r.name}</span>
+            {r.type === 'library' && (
+              <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">Library</span>
+            )}
+          </div>
+          <div className="text-xs text-gray-400 flex items-center gap-2 mt-0.5 flex-wrap">
+            {r.type === 'library'
+              ? <span className="text-green-600">Cost from your library</span>
+              : <>
+                  {r.brand && <span>{r.brand}</span>}
+                  {r.kcal != null && <span className="text-amber-600 font-medium">{r.kcal} kcal/100g</span>}
+                  {r.allergens.length > 0 && (
+                    <span className="text-red-500">{r.allergens.length} allergen{r.allergens.length !== 1 ? 's' : ''}</span>
+                  )}
+                </>}
+          </div>
+        </button>
+      ))}
+    </div>
+  ) : null
+
   return (
+    <>
+    {dropdownEl}
     <div className="space-y-5 max-w-3xl">
       <div className="flex items-center gap-3">
         <Link href="/chef/recipes" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
@@ -479,40 +518,6 @@ export default function NewRecipePage() {
                   onBlur={() => setTimeout(() => setShowDrop(false), 150)}
                   placeholder="e.g. chicken breast, cheddar..."
                   className="w-full rounded-lg border border-gray-200 pl-8 pr-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
-                {showDrop && dropRect && typeof window !== 'undefined' && createPortal(
-                  <div
-                    style={{ position: 'fixed', top: dropRect.top, left: dropRect.left, width: dropRect.width, zIndex: 9999 }}
-                    className="bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-y-auto"
-                  >
-                    {searching && <div className="px-3 py-2 text-xs text-gray-400">Searching…</div>}
-                    {!searching && results.length === 0 && (
-                      <div className="px-3 py-2 text-xs text-gray-400">No results found</div>
-                    )}
-                    {results.map((r, i) => (
-                      <button key={i} onMouseDown={() => selectResult(r)}
-                        className="w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900">{r.name}</span>
-                          {r.type === 'library' && (
-                            <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">Library</span>
-                          )}
-                        </div>
-                        <div className="text-xs text-gray-400 flex items-center gap-2 mt-0.5 flex-wrap">
-                          {r.type === 'library'
-                            ? <span className="text-green-600">Cost from your library</span>
-                            : <>
-                                {r.brand && <span>{r.brand}</span>}
-                                {r.kcal != null && <span className="text-amber-600 font-medium">{r.kcal} kcal/100g</span>}
-                                {r.allergens.length > 0 && (
-                                  <span className="text-red-500">{r.allergens.length} allergen{r.allergens.length !== 1 ? 's' : ''}</span>
-                                )}
-                              </>}
-                        </div>
-                      </button>
-                    ))}
-                  </div>,
-                  document.body
-                )}
               </div>
             </div>
             <div>
@@ -622,5 +627,6 @@ export default function NewRecipePage() {
         </button>
       </div>
     </div>
+    </>
   )
 }
