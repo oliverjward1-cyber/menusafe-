@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { ChefNav } from '@/components/nav/ChefNav'
 import { OwnerNav } from '@/components/nav/OwnerNav'
+import { ViewSwitcher } from '@/components/nav/ViewSwitcher'
 
 export default async function DashboardLayout({
   children,
@@ -20,16 +21,21 @@ export default async function DashboardLayout({
     ? await supabase.from('restaurants').select('id, name, slug').eq('id', profile.restaurant_id).single()
     : { data: null }
 
+  const menuUrl = restaurant?.slug ? `/menu/${restaurant.slug}` : '/menu'
+
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      {profile?.role === 'chef' ? (
-        <ChefNav restaurantName={restaurant?.name ?? ''} />
-      ) : (
-        <OwnerNav restaurantName={restaurant?.name ?? ''} restaurantSlug={restaurant?.slug ?? ''} />
-      )}
-      <main className="flex-1 overflow-auto">
-        <div className="p-6 max-w-5xl mx-auto">{children}</div>
-      </main>
+    <div className="flex flex-col min-h-screen">
+      <ViewSwitcher menuUrl={menuUrl} />
+      <div className="flex flex-col md:flex-row flex-1">
+        {profile?.role === 'chef' ? (
+          <ChefNav restaurantName={restaurant?.name ?? ''} />
+        ) : (
+          <OwnerNav restaurantName={restaurant?.name ?? ''} restaurantSlug={restaurant?.slug ?? ''} />
+        )}
+        <main className="flex-1 overflow-auto">
+          <div className="p-6 max-w-5xl mx-auto">{children}</div>
+        </main>
+      </div>
     </div>
   )
 }
