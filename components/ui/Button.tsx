@@ -19,14 +19,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed',
+          'inline-flex items-center justify-center font-semibold font-sans rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mise-gold focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed',
           {
-            'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800': variant === 'primary',
-            'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300': variant === 'secondary',
+            'bg-mise-gold text-white hover:bg-yellow-600 active:bg-yellow-700': variant === 'primary',
+            'bg-white text-mise-ink border border-gray-200 hover:bg-gray-50 active:bg-gray-100': variant === 'secondary',
             'bg-red-600 text-white hover:bg-red-700': variant === 'danger',
-            'text-gray-700 hover:bg-gray-100': variant === 'ghost',
-            'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50': variant === 'outline',
-            'px-2.5 py-1.5 text-sm gap-1.5': size === 'sm',
+            'text-mise-ink hover:bg-black/5': variant === 'ghost',
+            'border border-mise-ink bg-transparent text-mise-ink hover:bg-mise-ink hover:text-white': variant === 'outline',
+            'px-2.5 py-1.5 text-xs gap-1.5': size === 'sm',
             'px-4 py-2 text-sm gap-2': size === 'md',
             'px-6 py-3 text-base gap-2': size === 'lg',
           },

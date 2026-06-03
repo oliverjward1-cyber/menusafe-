@@ -16,18 +16,18 @@ export function ViewSwitcher({ menuUrl }: { menuUrl: string }) {
   ]
 
   return (
-    <div className="bg-white border-b border-gray-200 px-4 flex items-center gap-1 h-11 shrink-0">
+    <div className="bg-white border-b border-black/[0.06] px-4 flex items-center gap-1 h-10 shrink-0">
       {tabs.map(({ label, icon: Icon, href, active }) => (
         <button
           key={href}
           onClick={() => router.push(href)}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-sans transition-colors ${
             active
-              ? 'bg-gray-900 text-white'
-              : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+              ? 'bg-mise-ink text-white'
+              : 'text-mise-ink/50 hover:text-mise-ink hover:bg-black/5'
           }`}
         >
-          <Icon className="h-3.5 w-3.5" />
+          <Icon className="h-3 w-3" />
           {label}
         </button>
       ))}
@@ -35,11 +35,11 @@ export function ViewSwitcher({ menuUrl }: { menuUrl: string }) {
         href={menuUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors ml-1"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-sans text-mise-ink/50 hover:text-mise-ink hover:bg-black/5 transition-colors ml-1"
       >
-        <Users className="h-3.5 w-3.5" />
-        Customer View
-        <span className="text-xs text-gray-400">↗</span>
+        <Users className="h-3 w-3" />
+        Customer view
+        <span className="text-xs text-mise-gold">↗</span>
       </a>
     </div>
   )

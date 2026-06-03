@@ -53,16 +53,16 @@ export default async function AllergenMatrixPage({ params }: Props) {
           <Link href={`/chef/menus/${params.id}`} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
             <ChevronLeft className="h-4 w-4" /> Back
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Allergen matrix — {menu.name}</h1>
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">Allergen matrix — {menu.name}</h1>
         </div>
         <PrintButton />
       </div>
 
       {/* Printable matrix */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden print:border-0 print:shadow-none print:rounded-none">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden print:border-0 print:shadow-none print:rounded-none">
         <div className="px-5 py-4 border-b border-gray-200 print:border-gray-300">
           <h2 className="text-base font-bold text-gray-900">{menu.name} — Allergen Information Matrix</h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-mise-ink/50 mt-0.5">
             UK Food Information Regulations 2014 — 14 Major Allergens · Printed {today}
           </p>
         </div>
@@ -86,7 +86,7 @@ export default async function AllergenMatrixPage({ params }: Props) {
             <tbody className="divide-y divide-gray-100">
               {recipes.length === 0 ? (
                 <tr>
-                  <td colSpan={ALLERGENS.length + 1} className="px-4 py-8 text-center text-gray-400">
+                  <td colSpan={ALLERGENS.length + 1} className="px-4 py-8 text-center text-mise-ink/40">
                     No dishes on this menu yet.
                   </td>
                 </tr>

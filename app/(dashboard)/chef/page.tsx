@@ -85,19 +85,19 @@ export default async function ChefDashboard() {
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-display font-semibold text-mise-ink">
           {isNewUser ? 'Welcome to mise' : `Good day, ${firstName}`}
         </h1>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <p className="text-sm text-mise-ink/50 mt-0.5">
           {isNewUser ? "Let's get your kitchen set up." : "Here's what's happening in your kitchen."}
         </p>
       </div>
 
       {/* Getting started checklist */}
       {completedSteps < checklist.length && (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-gray-900">Getting started</h2>
+            <h2 className="text-sm font-semibold text-mise-ink">Getting started</h2>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{completedSteps} / {checklist.length}</span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-1.5 mb-5">
@@ -137,28 +137,28 @@ export default async function ChefDashboard() {
       {!isNewUser && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <Link href="/chef/ingredients/new"
-            className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50/40 transition-colors group shadow-sm">
+            className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-black/[0.06] hover:border-green-300 hover:bg-green-50/40 transition-colors group shadow-sm">
             <div className="h-10 w-10 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
               <Package className="h-5 w-5 text-green-700" />
             </div>
             <span className="text-xs font-medium text-gray-700 text-center">Add ingredient</span>
           </Link>
           <Link href="/chef/ingredients/scan"
-            className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-300 hover:bg-purple-50/40 transition-colors group shadow-sm">
+            className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-black/[0.06] hover:border-purple-300 hover:bg-purple-50/40 transition-colors group shadow-sm">
             <div className="h-10 w-10 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
               <Sparkles className="h-5 w-5 text-purple-700" />
             </div>
             <span className="text-xs font-medium text-gray-700 text-center">Scan invoice</span>
           </Link>
           <Link href="/chef/recipes/new"
-            className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/40 transition-colors group shadow-sm">
+            className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-black/[0.06] hover:border-blue-300 hover:bg-blue-50/40 transition-colors group shadow-sm">
             <div className="h-10 w-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
               <BookOpen className="h-5 w-5 text-blue-700" />
             </div>
             <span className="text-xs font-medium text-gray-700 text-center">New recipe</span>
           </Link>
           <Link href="/chef/menus/new"
-            className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-orange-300 hover:bg-orange-50/40 transition-colors group shadow-sm">
+            className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-black/[0.06] hover:border-orange-300 hover:bg-orange-50/40 transition-colors group shadow-sm">
             <div className="h-10 w-10 bg-orange-100 rounded-xl flex items-center justify-center group-hover:bg-orange-200 transition-colors">
               <MenuSquare className="h-5 w-5 text-orange-700" />
             </div>
@@ -170,26 +170,26 @@ export default async function ChefDashboard() {
       {/* Stats row */}
       {!isNewUser && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Ingredients</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">{ingredientCount}</p>
-            <Link href="/chef/ingredients" className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 mt-2 font-medium">
+          <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
+            <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Ingredients</p>
+            <p className="text-3xl font-display font-semibold text-mise-ink mt-1">{ingredientCount}</p>
+            <Link href="/chef/ingredients" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
               View library <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Recipes</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">{recentRecipes.length}</p>
-            <Link href="/chef/recipes" className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 mt-2 font-medium">
+          <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
+            <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Recipes</p>
+            <p className="text-3xl font-display font-semibold text-mise-ink mt-1">{recentRecipes.length}</p>
+            <Link href="/chef/recipes" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
               View all <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm col-span-2 sm:col-span-1">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Live menus</p>
+          <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm col-span-2 sm:col-span-1">
+            <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Live menus</p>
             <p className={`text-3xl font-bold mt-1 ${publishedMenus.length > 0 ? 'text-green-700' : 'text-gray-300'}`}>
               {publishedMenus.length}
             </p>
-            <Link href="/chef/menus" className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 mt-2 font-medium">
+            <Link href="/chef/menus" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
               Manage menus <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -198,19 +198,19 @@ export default async function ChefDashboard() {
 
       {/* Published menus */}
       {publishedMenus.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-green-600" />
-              <h2 className="text-sm font-semibold text-gray-900">Currently live</h2>
+              <h2 className="text-sm font-semibold text-mise-ink">Currently live</h2>
             </div>
-            <Link href="/chef/menus" className="text-xs text-green-700 hover:text-green-800 font-medium">Manage →</Link>
+            <Link href="/chef/menus" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Manage →</Link>
           </div>
           <div className="divide-y divide-gray-50">
             {publishedMenus.map(menu => (
               <div key={menu.id} className="flex items-center justify-between px-5 py-3">
-                <p className="text-sm font-medium text-gray-900">{menu.name}</p>
-                <span className="text-xs text-gray-400">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</span>
+                <p className="text-sm font-medium text-mise-ink">{menu.name}</p>
+                <span className="text-xs text-mise-ink/40">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</span>
               </div>
             ))}
           </div>
@@ -219,14 +219,14 @@ export default async function ChefDashboard() {
 
       {/* Recent recipes */}
       {recentRecipes.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-gray-400" />
-              <h2 className="text-sm font-semibold text-gray-900">Recent recipes</h2>
+              <BookOpen className="h-4 w-4 text-mise-ink/40" />
+              <h2 className="text-sm font-semibold text-mise-ink">Recent recipes</h2>
             </div>
             <Link href="/chef/recipes/new"
-              className="inline-flex items-center gap-1 text-xs font-medium text-white bg-green-700 hover:bg-green-600 px-3 py-1.5 rounded-lg transition-colors">
+              className="inline-flex items-center gap-1 text-xs font-medium text-white bg-mise-gold hover:bg-yellow-600 px-3 py-1.5 rounded-lg transition-colors">
               <Plus className="h-3 w-3" /> Add
             </Link>
           </div>
@@ -235,7 +235,7 @@ export default async function ChefDashboard() {
               <Link key={recipe.id} href={`/chef/recipes/${recipe.id}/edit`}
                 className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{recipe.name}</p>
+                  <p className="text-sm font-medium text-mise-ink">{recipe.name}</p>
                   <p className="text-xs text-gray-400 mt-0.5">
                     Updated {new Date(recipe.updated_at).toLocaleDateString('en-GB')}
                   </p>
@@ -249,7 +249,7 @@ export default async function ChefDashboard() {
             ))}
           </div>
           <div className="px-5 py-3 border-t border-gray-50">
-            <Link href="/chef/recipes" className="text-xs font-medium text-green-700 hover:text-green-800">
+            <Link href="/chef/recipes" className="text-xs font-medium text-mise-mid hover:text-mise-deep">
               View all recipes →
             </Link>
           </div>
@@ -260,10 +260,10 @@ export default async function ChefDashboard() {
       {!isNewUser && recentRecipes.length === 0 && (
         <div className="bg-white border border-dashed border-gray-200 rounded-xl p-10 text-center shadow-sm">
           <ChefHat className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-sm font-medium text-gray-500">No recipes yet</p>
+          <p className="text-sm font-medium text-mise-ink/50">No recipes yet</p>
           <p className="text-xs text-gray-400 mt-1">Build your first dish to start tracking food costs and GP</p>
           <Link href="/chef/recipes/new"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-green-700 hover:text-green-800 mt-3">
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-mise-mid hover:text-mise-deep mt-3">
             Create first recipe <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>

@@ -115,20 +115,20 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
   return (
     <div className="space-y-5">
       {/* Staff name */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
         <label className="block text-sm font-semibold text-gray-700 mb-2">Your name</label>
         <input
           value={staffName}
           onChange={e => setStaffName(e.target.value)}
           placeholder="e.g. James Smith"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent"
         />
       </div>
 
       {/* Progress bar */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-gray-500">{answered} of {total} answered</span>
+          <span className="text-xs font-medium text-mise-ink/50">{answered} of {total} answered</span>
           {fails > 0 && (
             <span className="text-xs font-medium text-red-600 flex items-center gap-1">
               <AlertTriangle className="h-3.5 w-3.5" /> {fails} fail{fails !== 1 ? 's' : ''}
@@ -151,20 +151,20 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
         const isCollapsed = collapsed.has(cat)
 
         return (
-          <div key={cat} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div key={cat} className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
             <button
               onClick={() => toggleCategory(cat)}
               className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <h2 className="text-sm font-semibold text-gray-900">{cat}</h2>
+                <h2 className="text-sm font-semibold text-mise-ink">{cat}</h2>
                 {catFails > 0 && (
                   <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">{catFails} fail{catFails !== 1 ? 's' : ''}</span>
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">{catAnswered}/{questions.length}</span>
-                {isCollapsed ? <ChevronDown className="h-4 w-4 text-gray-400" /> : <ChevronUp className="h-4 w-4 text-gray-400" />}
+                <span className="text-xs text-mise-ink/40">{catAnswered}/{questions.length}</span>
+                {isCollapsed ? <ChevronDown className="h-4 w-4 text-mise-ink/40" /> : <ChevronUp className="h-4 w-4 text-mise-ink/40" />}
               </div>
             </button>
 
@@ -174,7 +174,7 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
                   const a = answers[q.key]
                   return (
                     <div key={q.key} className={`px-5 py-4 transition-colors ${a.answer === 'fail' ? 'bg-red-50/40' : a.answer === 'pass' ? 'bg-green-50/20' : ''}`}>
-                      <p className="text-sm font-medium text-gray-900 mb-3">{q.label}</p>
+                      <p className="text-sm font-medium text-mise-ink mb-3">{q.label}</p>
 
                       {/* Answer buttons */}
                       <div className="flex gap-2 mb-3">
@@ -234,14 +234,14 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
       })}
 
       {/* Overall notes */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
         <label className="block text-sm font-semibold text-gray-700 mb-2">Overall notes <span className="text-gray-400 font-normal">(optional)</span></label>
         <textarea
           value={overallNotes}
           onChange={e => setOverallNotes(e.target.value)}
           placeholder="Any additional observations or actions required…"
           rows={3}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent resize-none"
         />
       </div>
 
@@ -254,7 +254,7 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
       <button
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full py-3 bg-green-700 hover:bg-green-600 text-white text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        className="w-full py-3 bg-mise-gold hover:bg-yellow-600 text-white text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
       >
         {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Submitting audit…</> : 'Submit audit'}
       </button>

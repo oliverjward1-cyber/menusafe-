@@ -47,8 +47,8 @@ export default async function AllergenMatrixPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between no-print">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Allergen Matrix</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">Allergen Matrix</h1>
+          <p className="text-mise-ink/50 mt-1">
             UK Food Information Regulations 2014 — approved dishes only
           </p>
         </div>
@@ -65,11 +65,11 @@ export default async function AllergenMatrixPage() {
       </div>
 
       {!recipes || recipes.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+        <div className="bg-white rounded-2xl border border-black/[0.06] p-12 text-center">
           <p className="text-gray-500">No approved dishes yet. Approve recipes from the dashboard first.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black/[0.06] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse">
               <thead>

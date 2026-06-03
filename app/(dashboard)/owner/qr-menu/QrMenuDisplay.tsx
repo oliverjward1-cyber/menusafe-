@@ -34,7 +34,7 @@ export default function QrMenuDisplay({
 
   return (
     <div className="max-w-sm">
-      <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-8 text-center">
         <p className="text-sm font-medium text-gray-700 mb-4">{restaurantName}</p>
         {qrDataUrl && (
           <img

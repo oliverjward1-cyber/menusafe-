@@ -141,12 +141,12 @@ export default function ScanInvoicePage() {
         <Link href="/chef/ingredients" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Scan invoice</h1>
+        <h1 className="text-2xl font-display font-semibold text-mise-ink">Scan invoice</h1>
       </div>
 
       {/* Upload area */}
       {!scanning && items.length === 0 && !done && (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
             <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide">Upload your invoice</h2>
             <p className="text-xs text-gray-400 mt-0.5">Photo, scan or screenshot of any supplier invoice — Brakes, Bidfood, local suppliers, handwritten notes.</p>
@@ -163,7 +163,7 @@ export default function ScanInvoicePage() {
 
             <div className="relative flex items-center gap-3">
               <div className="flex-1 border-t border-gray-100" />
-              <span className="text-xs text-gray-400">or</span>
+              <span className="text-xs text-mise-ink/40">or</span>
               <div className="flex-1 border-t border-gray-100" />
             </div>
 
@@ -183,7 +183,7 @@ export default function ScanInvoicePage() {
             <input ref={fileRef} type="file" accept="image/*,.pdf" className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
 
-            <p className="text-xs text-center text-gray-400">
+            <p className="text-xs text-center text-mise-ink/40">
               Supports JPG, PNG, WebP. AI reads the invoice and extracts all ingredient prices automatically.
             </p>
           </div>
@@ -192,12 +192,12 @@ export default function ScanInvoicePage() {
 
       {/* Scanning state */}
       {scanning && (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-10 text-center">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-10 text-center">
           {preview && (
             <img src={preview} alt="Invoice" className="max-h-48 mx-auto rounded-lg object-contain mb-6 border border-gray-100" />
           )}
           <Loader2 className="h-8 w-8 text-green-600 animate-spin mx-auto mb-3" />
-          <p className="text-sm font-medium text-gray-900">Reading your invoice…</p>
+          <p className="text-sm font-medium text-mise-ink">Reading your invoice…</p>
           <p className="text-xs text-gray-400 mt-1">Claude AI is extracting ingredient names, prices, allergens and calories</p>
         </div>
       )}
@@ -231,7 +231,7 @@ export default function ScanInvoicePage() {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide">Extracted ingredients</h2>
@@ -239,7 +239,7 @@ export default function ScanInvoicePage() {
               </div>
               <div className="flex items-center gap-3">
                 <button onClick={() => setItems((prev) => prev.map((i) => ({ ...i, selected: true })))}
-                  className="text-xs text-green-700 hover:underline">Select all</button>
+                  className="text-xs text-mise-mid hover:underline">Select all</button>
                 <button onClick={() => setItems((prev) => prev.map((i) => ({ ...i, selected: false })))}
                   className="text-xs text-gray-400 hover:underline">Deselect all</button>
               </div>
@@ -276,13 +276,13 @@ export default function ScanInvoicePage() {
                       <td className="px-4 py-3">
                         <input type="checkbox" checked={item.selected}
                           onChange={(e) => updateItem(item.id, 'selected', e.target.checked)}
-                          className="rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                          className="rounded border-gray-300 text-green-600 focus:ring-mise-gold" />
                       </td>
                       <td className="px-4 py-3">
                         <input
                           type="text" value={item.name}
                           onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                          className="w-full rounded-lg border border-transparent hover:border-gray-200 focus:border-green-400 px-2 py-1 text-sm font-medium text-gray-900 focus:outline-none bg-transparent focus:bg-white"
+                          className="w-full rounded-lg border border-transparent hover:border-gray-200 focus:border-green-400 px-2 py-1 text-sm font-medium text-mise-ink focus:outline-none bg-transparent focus:bg-white"
                         />
                       </td>
                       <td className="px-4 py-3">
@@ -316,7 +316,7 @@ export default function ScanInvoicePage() {
               type="checkbox"
               checked={allergensVerified}
               onChange={(e) => setAllergensVerified(e.target.checked)}
-              className="mt-0.5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+              className="mt-0.5 rounded border-gray-300 text-green-600 focus:ring-mise-gold"
             />
             <span className="text-sm text-gray-700">
               I have reviewed the allergen information above and confirm it is correct to the best of my knowledge.
@@ -339,7 +339,7 @@ export default function ScanInvoicePage() {
 
       {/* Done */}
       {done && (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-8 text-center">
           <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
           <h2 className="text-lg font-bold text-gray-900 mb-1">{savedCount} ingredient{savedCount !== 1 ? 's' : ''} saved</h2>
           <p className="text-sm text-gray-500 mb-6">

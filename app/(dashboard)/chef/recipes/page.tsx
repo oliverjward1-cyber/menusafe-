@@ -107,15 +107,15 @@ export default function RecipesPage() {
   }
 
   if (loading) {
-    return <div className="py-24 text-center text-sm text-gray-400">Loading…</div>
+    return <div className="py-24 text-center text-sm text-mise-ink/40">Loading…</div>
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Recipes</h1>
-          <p className="text-gray-500 mt-1">Target GP: {targetGp}%</p>
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">Recipes</h1>
+          <p className="text-mise-ink/50 mt-1">Target GP: {targetGp}%</p>
         </div>
         <Link
           href="/chef/recipes/new"
@@ -164,7 +164,7 @@ export default function RecipesPage() {
                       {!isActive && <Badge variant="gray">Inactive</Badge>}
                     </div>
                     {recipe.description && (
-                      <p className="text-sm text-gray-500 mt-1">{recipe.description}</p>
+                      <p className="text-sm text-mise-ink/50 mt-1">{recipe.description}</p>
                     )}
                     {recipeAllergens.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
@@ -176,19 +176,19 @@ export default function RecipesPage() {
                   <div className="flex items-start gap-4">
                     <div className="flex gap-5 text-right shrink-0">
                       <div>
-                        <p className="text-xs text-gray-500">Food cost</p>
+                        <p className="text-xs text-mise-ink/50">Food cost</p>
                         <p className="font-semibold text-gray-900">{formatCurrency(foodCost)}</p>
                       </div>
                       {sellPrice > 0 && (
                         <div>
-                          <p className="text-xs text-gray-500">GP</p>
+                          <p className="text-xs text-mise-ink/50">GP</p>
                           <p className={`font-semibold ${gp !== null && gp >= targetGp ? 'text-green-700' : 'text-red-600'}`}>
                             {gp !== null ? formatPercent(gp) : '—'}
                           </p>
                         </div>
                       )}
                       <div>
-                        <p className="text-xs text-gray-500">Suggested</p>
+                        <p className="text-xs text-mise-ink/50">Suggested</p>
                         <p className="font-semibold text-gray-900">{formatCurrency(suggested)}</p>
                       </div>
                     </div>

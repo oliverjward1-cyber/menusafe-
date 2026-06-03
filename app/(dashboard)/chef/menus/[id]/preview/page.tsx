@@ -90,7 +90,7 @@ export default async function MenuPreviewPage({ params }: Props) {
       </div>
 
       {/* Customer-facing view */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white rounded-2xl border border-black/[0.06] overflow-hidden shadow-sm">
         <div className="bg-gray-900 text-white px-6 py-8">
           <h1 className="text-3xl font-bold">{menu.name}</h1>
           {menu.description && <p className="text-gray-400 mt-1 text-sm">{menu.description}</p>}
@@ -99,7 +99,7 @@ export default async function MenuPreviewPage({ params }: Props) {
 
         <div className="px-4 py-8 space-y-10">
           {Object.keys(byCategory).length === 0 ? (
-            <div className="text-center py-10 text-gray-400">
+            <div className="text-center py-10 text-mise-ink/40">
               <p>No dishes on this menu yet. Add some from the editor.</p>
             </div>
           ) : (

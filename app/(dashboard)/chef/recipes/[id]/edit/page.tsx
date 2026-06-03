@@ -446,15 +446,15 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
       style={{ position: 'fixed', top: dropRect.top, left: dropRect.left, width: dropRect.width, zIndex: 9999 }}
       className="bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-y-auto"
     >
-      {searching && <div className="px-3 py-2 text-xs text-gray-400">Searching…</div>}
+      {searching && <div className="px-3 py-2 text-xs text-mise-ink/40">Searching…</div>}
       {!searching && results.length === 0 && (
-        <div className="px-3 py-2 text-xs text-gray-400">No results found</div>
+        <div className="px-3 py-2 text-xs text-mise-ink/40">No results found</div>
       )}
       {results.map((r, i) => (
         <button key={i} onMouseDown={() => selectResult(r)}
           className="w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-50 last:border-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-900">{r.name}</span>
+            <span className="text-sm font-medium text-mise-ink">{r.name}</span>
             {r.type === 'library' && (
               <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">Library</span>
             )}
@@ -478,7 +478,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
-        <p className="text-sm text-gray-400">Loading recipe…</p>
+        <p className="text-sm text-mise-ink/40">Loading recipe…</p>
       </div>
     )
   }
@@ -491,24 +491,24 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
         <Link href="/chef/recipes" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Edit recipe</h1>
+        <h1 className="text-2xl font-display font-semibold text-mise-ink">Edit recipe</h1>
       </div>
 
       {/* Recipe details */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
           <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide">Recipe details</h2>
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Recipe name</label>
+            <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Recipe name</label>
             <input type="text" value={recipeName} onChange={(e) => setRecipeName(e.target.value)}
               placeholder="e.g. Grilled Chicken Caesar"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600/10" />
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-mise-gold/10" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Category</label>
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Category</label>
               <select value={category} onChange={(e) => setCategory(e.target.value)}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none">
                 <option value="">Select category</option>
@@ -516,30 +516,30 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Portion size</label>
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Portion size</label>
               <input type="text" value={portionSize} onChange={(e) => setPortionSize(e.target.value)}
                 placeholder="e.g. 280g"
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Description</label>
+            <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Description</label>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)}
               rows={2} placeholder="Brief description for the menu..."
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none resize-none" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Sell price (£)</label>
+            <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Sell price (£)</label>
             <input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)}
               placeholder="0.00" step="0.01" min="0"
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
-            <p className="mt-1 text-xs text-gray-400">Used to calculate gross profit % in the summary below.</p>
+            <p className="mt-1 text-xs text-mise-ink/40">Used to calculate gross profit % in the summary below.</p>
           </div>
         </div>
       </div>
 
       {/* May contain allergens */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
         <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide mb-1">May contain</h2>
         <p className="text-xs text-gray-400 mb-4">
           Tick any allergens that may be present due to kitchen cross-contamination — even if not in the recipe ingredients.
@@ -566,7 +566,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
       </div>
 
       {/* Ingredients */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between rounded-t-xl">
           <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide">Ingredients</h2>
           <span className="text-xs text-gray-400 flex items-center gap-1.5">
@@ -576,7 +576,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
         </div>
 
         {lines.length === 0 ? (
-          <div className="py-10 text-center text-sm text-gray-400">
+          <div className="py-10 text-center text-sm text-mise-ink/40">
             No ingredients yet — search below to add one.
           </div>
         ) : (
@@ -600,7 +600,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
                     <tr key={l.uid} className="hover:bg-gray-50/50">
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">{l.name}</div>
-                        {l.brand && <div className="text-xs text-gray-400">{l.brand}</div>}
+                        {l.brand && <div className="text-xs text-mise-ink/40">{l.brand}</div>}
                         {l.source === 'library'
                           ? <div className="text-xs text-green-600 mt-0.5">From your library</div>
                           : l.kcalPer100 && <div className="text-xs text-gray-400 mt-0.5">{l.kcalPer100} kcal/100g</div>}
@@ -620,7 +620,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
                                   {allergenLabel(k)}
                                 </span>
                               ))
-                            : <span className="text-xs text-gray-400">None detected</span>}
+                            : <span className="text-xs text-mise-ink/40">None detected</span>}
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -641,7 +641,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
         <div className="p-4 border-t border-gray-100 bg-gray-50 space-y-3 rounded-b-xl">
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_110px_130px_auto] gap-3 items-end">
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Search ingredient</label>
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Search ingredient</label>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
                 <input ref={searchInputRef} type="text" value={query}
@@ -653,14 +653,14 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Qty (g)</label>
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Qty (g)</label>
               <input type="number" value={qtyInput} onChange={(e) => setQtyInput(e.target.value)}
                 placeholder="0" min="0" step="1"
                 onKeyDown={(e) => e.key === 'Enter' && addLine()}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">
                 Cost (£/kg)
                 {pending?.type === 'library' && <span className="ml-1 text-green-600 normal-case font-normal">auto</span>}
               </label>
@@ -681,7 +681,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
             </button>
           </div>
           {pending?.type === 'off' && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-mise-ink/40">
               Enter cost price per kg so food cost and GP can be calculated accurately.
             </p>
           )}
@@ -689,7 +689,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
       </div>
 
       {/* Summary */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
           <h2 className="text-sm font-medium text-gray-700 uppercase tracking-wide">Recipe summary</h2>
         </div>

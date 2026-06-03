@@ -54,10 +54,10 @@ export default function NewMenuPage() {
         <Link href="/chef/menus" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Create menu</h1>
+        <h1 className="text-2xl font-display font-semibold text-mise-ink">Create menu</h1>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-6 space-y-5">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Menu name <span className="text-red-500">*</span></label>
           <input
@@ -65,7 +65,7 @@ export default function NewMenuPage() {
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="e.g. Summer Menu 2025, Dinner Menu, Sunday Specials"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent"
           />
         </div>
 
@@ -76,7 +76,7 @@ export default function NewMenuPage() {
             onChange={e => setDescription(e.target.value)}
             rows={2}
             placeholder="e.g. Available June–August. Celebrating seasonal British produce."
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent resize-none"
           />
         </div>
 

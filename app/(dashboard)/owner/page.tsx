@@ -110,39 +110,39 @@ export default async function OwnerDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{restaurant?.name}</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
+        <h1 className="text-2xl font-display font-semibold text-mise-ink">{restaurant?.name}</h1>
+        <p className="text-sm text-mise-ink/50 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
       </div>
 
       {/* Top stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total dishes</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{recipeStats.length}</p>
-          <Link href="/chef/recipes" className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 mt-2 font-medium">
+        <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
+          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Total dishes</p>
+          <p className="text-3xl font-display font-semibold text-mise-ink mt-1">{recipeStats.length}</p>
+          <Link href="/chef/recipes" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
             View all <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Avg menu GP</p>
+        <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
+          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Avg menu GP</p>
           <p className={`text-3xl font-bold mt-1 ${avgGp === null ? 'text-gray-400' : avgGp >= targetGp ? 'text-green-700' : 'text-red-600'}`}>
             {avgGp !== null ? formatPercent(avgGp) : '—'}
           </p>
-          <p className="text-xs text-gray-400 mt-2">Target: {targetGp}%</p>
+          <p className="text-xs text-mise-ink/40 mt-2">Target: {targetGp}%</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Below target GP</p>
+        <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
+          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Below target GP</p>
           <p className={`text-3xl font-bold mt-1 ${belowTargetCount > 0 ? 'text-red-600' : 'text-green-700'}`}>
             {belowTargetCount}
           </p>
-          <p className="text-xs text-gray-400 mt-2">{belowTargetCount === 0 ? 'All dishes on target' : `dish${belowTargetCount !== 1 ? 'es' : ''} need pricing review`}</p>
+          <p className="text-xs text-mise-ink/40 mt-2">{belowTargetCount === 0 ? 'All dishes on target' : `dish${belowTargetCount !== 1 ? 'es' : ''} need pricing review`}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Pending approval</p>
+        <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
+          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Pending approval</p>
           <p className={`text-3xl font-bold mt-1 ${pendingCount > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
             {pendingCount}
           </p>
-          <p className="text-xs text-gray-400 mt-2">{pendingCount === 0 ? 'All up to date' : `recipe${pendingCount !== 1 ? 's' : ''} awaiting review`}</p>
+          <p className="text-xs text-mise-ink/40 mt-2">{pendingCount === 0 ? 'All up to date' : `recipe${pendingCount !== 1 ? 's' : ''} awaiting review`}</p>
         </div>
       </div>
 
@@ -150,20 +150,20 @@ export default async function OwnerDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Published menus */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MenuSquare className="h-4 w-4 text-green-700" />
-              <h2 className="text-sm font-semibold text-gray-900">Live menus</h2>
+              <h2 className="text-sm font-semibold text-mise-ink">Live menus</h2>
             </div>
-            <Link href="/chef/menus" className="text-xs text-green-700 hover:text-green-800 font-medium">Manage →</Link>
+            <Link href="/chef/menus" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Manage →</Link>
           </div>
           <div className="divide-y divide-gray-50">
             {allMenus.length === 0 ? (
               <div className="px-5 py-8 text-center">
                 <GlobeLock className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">No menus created yet</p>
-                <Link href="/chef/menus/new" className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 mt-2 font-medium">
+                <p className="text-sm text-mise-ink/40">No menus created yet</p>
+                <Link href="/chef/menus/new" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
                   Create first menu <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -175,8 +175,8 @@ export default async function OwnerDashboard() {
                       ? <Globe className="h-4 w-4 text-green-600 shrink-0" />
                       : <GlobeLock className="h-4 w-4 text-gray-300 shrink-0" />}
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{menu.name}</p>
-                      <p className="text-xs text-gray-400">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</p>
+                      <p className="text-sm font-medium text-mise-ink">{menu.name}</p>
+                      <p className="text-xs text-mise-ink/40">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</p>
                     </div>
                   </div>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${menu.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
@@ -197,20 +197,20 @@ export default async function OwnerDashboard() {
         </div>
 
         {/* Staff training */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-blue-600" />
-              <h2 className="text-sm font-semibold text-gray-900">Staff training</h2>
+              <h2 className="text-sm font-semibold text-mise-ink">Staff training</h2>
             </div>
-            <Link href="/owner/staff-quiz" className="text-xs text-green-700 hover:text-green-800 font-medium">View all →</Link>
+            <Link href="/owner/staff-quiz" className="text-xs text-mise-mid hover:text-mise-deep font-medium">View all →</Link>
           </div>
 
           {trainedStaff.length === 0 ? (
             <div className="px-5 py-8 text-center">
               <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-gray-400">No staff trained yet</p>
-              <Link href="/owner/staff-quiz" className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 mt-2 font-medium">
+              <p className="text-sm text-mise-ink/40">No staff trained yet</p>
+              <Link href="/owner/staff-quiz" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
                 Set up staff quiz <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -247,7 +247,7 @@ export default async function OwnerDashboard() {
                     <div key={s.id} className="flex items-center justify-between px-4 py-2.5 bg-amber-50/50">
                       <div className="flex items-center gap-2">
                         <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                        <p className="text-sm font-medium text-gray-900">{s.staff_name}</p>
+                        <p className="text-sm font-medium text-mise-ink">{s.staff_name}</p>
                       </div>
                       <p className="text-xs text-amber-600 font-medium">{daysLeft}d left</p>
                     </div>
@@ -262,7 +262,7 @@ export default async function OwnerDashboard() {
                   <div key={s.id} className="flex items-center justify-between px-4 py-2.5 bg-red-50/40">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
-                      <p className="text-sm font-medium text-gray-900">{s.staff_name}</p>
+                      <p className="text-sm font-medium text-mise-ink">{s.staff_name}</p>
                     </div>
                     <p className="text-xs text-red-500 font-medium">Needs retraining</p>
                   </div>
@@ -275,7 +275,7 @@ export default async function OwnerDashboard() {
                         <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
                         <p className="text-sm text-gray-700">{s.staff_name}</p>
                       </div>
-                      <p className="text-xs text-gray-400">Expires {expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                      <p className="text-xs text-mise-ink/40">Expires {expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
                     </div>
                   )
                 })}
@@ -286,13 +286,13 @@ export default async function OwnerDashboard() {
       </div>
 
       {/* Recipe list */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-gray-500" />
-            <h2 className="text-sm font-semibold text-gray-900">All dishes</h2>
+            <BookOpen className="h-4 w-4 text-mise-ink/50" />
+            <h2 className="text-sm font-semibold text-mise-ink">All dishes</h2>
           </div>
-          <Link href="/chef/recipes/new" className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-green-700 hover:bg-green-600 px-3 py-1.5 rounded-lg transition-colors">
+          <Link href="/chef/recipes/new" className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-mise-gold hover:bg-yellow-600 px-3 py-1.5 rounded-lg transition-colors">
             + Add dish
           </Link>
         </div>
@@ -300,9 +300,9 @@ export default async function OwnerDashboard() {
         {recipeStats.length === 0 ? (
           <div className="py-16 text-center">
             <ChefHat className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-gray-500">No recipes yet</p>
+            <p className="text-sm font-medium text-mise-ink/50">No recipes yet</p>
             <p className="text-xs text-gray-400 mt-1">Add your first dish to start tracking food costs and GP</p>
-            <Link href="/chef/recipes/new" className="inline-flex items-center gap-1.5 text-sm font-medium text-green-700 hover:text-green-800 mt-3">
+            <Link href="/chef/recipes/new" className="inline-flex items-center gap-1.5 text-sm font-medium text-mise-mid hover:text-mise-deep mt-3">
               Add first dish <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -342,17 +342,17 @@ export default async function OwnerDashboard() {
 
                   <div className="flex items-center gap-5 shrink-0">
                     <div className="text-right">
-                      <p className="text-xs text-gray-400">Food cost</p>
-                      <p className="text-sm font-semibold text-gray-900">{formatCurrency(recipe.foodCost)}</p>
+                      <p className="text-xs text-mise-ink/40">Food cost</p>
+                      <p className="text-sm font-semibold text-mise-ink">{formatCurrency(recipe.foodCost)}</p>
                     </div>
                     {recipe.sell_price && (
                       <div className="text-right">
-                        <p className="text-xs text-gray-400">Sell price</p>
-                        <p className="text-sm font-semibold text-gray-900">{formatCurrency(recipe.sell_price)}</p>
+                        <p className="text-xs text-mise-ink/40">Sell price</p>
+                        <p className="text-sm font-semibold text-mise-ink">{formatCurrency(recipe.sell_price)}</p>
                       </div>
                     )}
                     <div className="text-right">
-                      <p className="text-xs text-gray-400">GP</p>
+                      <p className="text-xs text-mise-ink/40">GP</p>
                       <p className={`text-sm font-bold flex items-center gap-1 ${
                         recipe.gp === null ? 'text-gray-300' :
                         recipe.gp >= targetGp ? 'text-green-700' : 'text-red-600'

@@ -42,8 +42,8 @@ export default async function MenusPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Menus</h1>
-          <p className="text-gray-500 mt-1">{menus?.length ?? 0} menu{menus?.length !== 1 ? 's' : ''}</p>
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">Menus</h1>
+          <p className="text-mise-ink/50 mt-1">{menus?.length ?? 0} menu{menus?.length !== 1 ? 's' : ''}</p>
         </div>
         <Link
           href="/chef/menus/new"
@@ -75,7 +75,7 @@ export default async function MenusPage() {
         <Card>
           <div className="text-center py-10">
             <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-200" />
-            <h2 className="text-base font-semibold text-gray-900 mb-1">No menus yet</h2>
+            <h2 className="text-base font-semibold text-mise-ink mb-1">No menus yet</h2>
             <p className="text-sm text-gray-500 mb-4">
               Create a menu, add your recipes, then publish it for customers to view.
             </p>
@@ -96,7 +96,7 @@ export default async function MenusPage() {
                 <div className="flex items-start gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h2 className="text-base font-semibold text-gray-900">{menu.name}</h2>
+                      <h2 className="text-base font-semibold text-mise-ink">{menu.name}</h2>
                       <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
                         {DAYPART_LABELS[menu.daypart] ?? menu.daypart}
                       </span>
@@ -105,13 +105,13 @@ export default async function MenusPage() {
                           <Globe className="h-3 w-3" /> Published
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 text-mise-ink/50">
                           <GlobeLock className="h-3 w-3" /> Draft
                         </span>
                       )}
                     </div>
                     {menu.description && (
-                      <p className="text-sm text-gray-500 mt-0.5">{menu.description}</p>
+                      <p className="text-sm text-mise-ink/50 mt-0.5">{menu.description}</p>
                     )}
                     <p className="text-xs text-gray-400 mt-1">{count} dish{count !== 1 ? 'es' : ''}</p>
                   </div>

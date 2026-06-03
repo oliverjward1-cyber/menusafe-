@@ -30,8 +30,8 @@ export default async function IngredientsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Ingredients</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">Ingredients</h1>
+          <p className="text-mise-ink/50 mt-1">
             {ingredients?.length ?? 0} ingredient{ingredients?.length !== 1 ? 's' : ''}
           </p>
         </div>

@@ -25,7 +25,7 @@ export default async function QRPage() {
         <Link href="/chef/menus" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">QR code for tables</h1>
+        <h1 className="text-2xl font-display font-semibold text-mise-ink">QR code for tables</h1>
       </div>
 
       <QRDisplay

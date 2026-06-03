@@ -23,9 +23,9 @@ export default async function NewAuditPage() {
         <div>
           <div className="flex items-center gap-2">
             <ClipboardCheck className="h-5 w-5 text-green-700" />
-            <h1 className="text-2xl font-bold text-gray-900">Weekly Kitchen Audit</h1>
+            <h1 className="text-2xl font-display font-semibold text-mise-ink">Weekly Kitchen Audit</h1>
           </div>
-          <p className="text-sm text-gray-500 mt-0.5">Complete all sections — add photos where required</p>
+          <p className="text-sm text-mise-ink/50 mt-0.5">Complete all sections — add photos where required</p>
         </div>
       </div>
 

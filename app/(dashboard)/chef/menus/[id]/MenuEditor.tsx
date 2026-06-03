@@ -204,18 +204,18 @@ export function MenuEditor({
   return (
     <div className="space-y-5">
       {/* Menu details */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5 space-y-4">
         <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Menu details</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Name</label>
             <input value={name} onChange={e => { setName(e.target.value); setSaved(false) }}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent" />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Service</label>
             <select value={daypart} onChange={e => { setDaypart(e.target.value); setSaved(false) }}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white">
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent bg-white">
               {DAYPARTS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
             </select>
           </div>
@@ -224,7 +224,7 @@ export function MenuEditor({
           <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
           <input value={description} onChange={e => { setDescription(e.target.value); setSaved(false) }}
             placeholder="Optional — shown on the customer menu"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent" />
         </div>
       </div>
 
@@ -232,24 +232,24 @@ export function MenuEditor({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {/* Left: available dishes */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden flex flex-col">
           <div className="px-5 py-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Available dishes</h2>
             <p className="text-xs text-gray-400 mt-0.5">Click a dish to add it to your menu</p>
             <div className="relative mt-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-mise-ink/40" />
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search dishes…"
-                className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent"
               />
             </div>
           </div>
 
           <div className="overflow-y-auto flex-1" style={{ maxHeight: 420 }}>
             {filtered.length === 0 ? (
-              <div className="px-5 py-8 text-center text-sm text-gray-400">
+              <div className="px-5 py-8 text-center text-sm text-mise-ink/40">
                 {search ? 'No dishes match your search.' : 'All dishes are already on this menu.'}
               </div>
             ) : (
@@ -261,10 +261,10 @@ export function MenuEditor({
                   >
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{cat}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400">{byCategory[cat]?.length}</span>
+                      <span className="text-xs text-mise-ink/40">{byCategory[cat]?.length}</span>
                       {collapsedCats.has(cat)
-                        ? <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
-                        : <ChevronDown className="h-3.5 w-3.5 text-gray-400" />}
+                        ? <ChevronRight className="h-3.5 w-3.5 text-mise-ink/40" />
+                        : <ChevronDown className="h-3.5 w-3.5 text-mise-ink/40" />}
                     </div>
                   </button>
                   {!collapsedCats.has(cat) && byCategory[cat]?.map(r => {
@@ -276,7 +276,7 @@ export function MenuEditor({
                         className="w-full flex items-center justify-between px-5 py-3 text-left border-b border-gray-50 hover:bg-green-50 hover:border-green-100 transition-colors group"
                       >
                         <div>
-                          <p className="text-sm font-medium text-gray-900 group-hover:text-green-800">{r.name}</p>
+                          <p className="text-sm font-medium text-mise-ink group-hover:text-green-800">{r.name}</p>
                           {r.sell_price && (
                             <p className="text-xs text-gray-400 mt-0.5">{formatCurrency(r.sell_price)}</p>
                           )}
@@ -299,7 +299,7 @@ export function MenuEditor({
         </div>
 
         {/* Right: menu order */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden flex flex-col">
           <div className="px-5 py-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">On this menu</h2>
             <p className="text-xs text-gray-400 mt-0.5">
@@ -311,9 +311,9 @@ export function MenuEditor({
             {menuOrder.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-48 text-center px-5">
                 <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                  <GripVertical className="h-5 w-5 text-gray-400" />
+                  <GripVertical className="h-5 w-5 text-mise-ink/40" />
                 </div>
-                <p className="text-sm text-gray-400">Click dishes on the left to add them here</p>
+                <p className="text-sm text-mise-ink/40">Click dishes on the left to add them here</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-50">
@@ -330,11 +330,11 @@ export function MenuEditor({
                     >
                       <GripVertical className="h-4 w-4 text-gray-300 shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{r.name}</p>
+                        <p className="text-sm font-medium text-mise-ink truncate">{r.name}</p>
                         <p className="text-xs text-gray-400 mt-0.5">{r.category ?? 'Uncategorised'}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {r.sell_price && <span className="text-xs text-gray-500">{formatCurrency(r.sell_price)}</span>}
+                        {r.sell_price && <span className="text-xs text-mise-ink/50">{formatCurrency(r.sell_price)}</span>}
                         {gp != null && (
                           <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${gp >= 65 ? 'bg-green-100 text-green-700' : gp >= 55 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-600'}`}>
                             {gp.toFixed(0)}%
@@ -358,29 +358,29 @@ export function MenuEditor({
 
       {/* GP Summary */}
       {menuRecipes.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="h-4 w-4 text-green-700" />
             <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Menu GP summary</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
             <div>
-              <p className="text-xs text-gray-500">Dishes</p>
-              <p className="text-2xl font-bold text-gray-900">{menuRecipes.length}</p>
+              <p className="text-xs text-mise-ink/50">Dishes</p>
+              <p className="text-2xl font-display font-semibold text-mise-ink">{menuRecipes.length}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Avg GP%</p>
+              <p className="text-xs text-mise-ink/50">Avg GP%</p>
               <p className={`text-2xl font-bold ${avgGp == null ? 'text-gray-300' : avgGp >= 65 ? 'text-green-700' : avgGp >= 55 ? 'text-amber-600' : 'text-red-600'}`}>
                 {avgGp != null ? `${avgGp.toFixed(1)}%` : '—'}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Total food cost</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalMenuCost)}</p>
+              <p className="text-xs text-mise-ink/50">Total food cost</p>
+              <p className="text-2xl font-display font-semibold text-mise-ink">{formatCurrency(totalMenuCost)}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Total menu revenue</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalMenuRevenue)}</p>
+              <p className="text-xs text-mise-ink/50">Total menu revenue</p>
+              <p className="text-2xl font-display font-semibold text-mise-ink">{formatCurrency(totalMenuRevenue)}</p>
             </div>
           </div>
 
@@ -400,8 +400,8 @@ export function MenuEditor({
                 return (
                   <tr key={r.id}>
                     <td className="py-2 text-gray-900">{r.name}</td>
-                    <td className="py-2 text-right text-gray-500">{formatCurrency(cost)}</td>
-                    <td className="py-2 text-right text-gray-500">{r.sell_price ? formatCurrency(r.sell_price) : '—'}</td>
+                    <td className="py-2 text-right text-mise-ink/50">{formatCurrency(cost)}</td>
+                    <td className="py-2 text-right text-mise-ink/50">{r.sell_price ? formatCurrency(r.sell_price) : '—'}</td>
                     <td className={`py-2 text-right font-medium ${gp == null ? 'text-gray-300' : gp >= 65 ? 'text-green-700' : gp >= 55 ? 'text-amber-600' : 'text-red-600'}`}>
                       {gp != null ? `${gp.toFixed(1)}%` : '—'}
                     </td>
