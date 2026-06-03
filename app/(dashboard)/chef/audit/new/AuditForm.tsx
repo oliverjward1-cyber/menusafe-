@@ -75,7 +75,7 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
       .insert({ restaurant_id: restaurantId, completed_by: staffName.trim(), score, total: scoreTotal, status, notes: overallNotes.trim() || null })
       .select('id').single()
 
-    if (auditErr || !audit) { setError('Failed to save audit. Please try again.'); setSubmitting(false); return }
+    if (auditErr || !audit) { setError(auditErr?.message ?? 'Failed to save audit. Please try again.'); setSubmitting(false); return }
 
     // Upload photos + insert answers
     const answerRows = []
