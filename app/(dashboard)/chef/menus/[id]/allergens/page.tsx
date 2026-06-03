@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ALLERGENS } from '@/lib/constants/allergens'
-import { ChevronLeft, Printer } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
+import { PrintButton } from './PrintButton'
 
 interface Props { params: { id: string } }
 
@@ -55,16 +55,8 @@ export default async function AllergenMatrixPage({ params }: Props) {
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Allergen matrix — {menu.name}</h1>
         </div>
-        <button
-          onClick={() => {}}
-          className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-          id="print-btn"
-        >
-          <Printer className="h-4 w-4" /> Print / save PDF
-        </button>
+        <PrintButton />
       </div>
-
-      <PrintButton />
 
       {/* Printable matrix */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden print:border-0 print:shadow-none print:rounded-none">
@@ -84,11 +76,9 @@ export default async function AllergenMatrixPage({ params }: Props) {
                 </th>
                 {ALLERGENS.map(a => (
                   <th key={a.key} className="px-2 py-3 text-center border-b border-gray-200 min-w-[52px]">
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="font-semibold text-gray-700 leading-tight text-center" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', height: '80px', whiteSpace: 'nowrap' }}>
-                        {a.shortLabel}
-                      </span>
-                    </div>
+                    <span className="font-semibold text-gray-700 leading-tight text-center" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', display: 'inline-block', height: '80px', whiteSpace: 'nowrap' }}>
+                      {a.shortLabel}
+                    </span>
                   </th>
                 ))}
               </tr>
@@ -137,15 +127,5 @@ export default async function AllergenMatrixPage({ params }: Props) {
         </div>
       </div>
     </div>
-  )
-}
-
-function PrintButton() {
-  return (
-    <script dangerouslySetInnerHTML={{
-      __html: `
-        document.getElementById('print-btn')?.addEventListener('click', () => window.print());
-      `
-    }} />
   )
 }
