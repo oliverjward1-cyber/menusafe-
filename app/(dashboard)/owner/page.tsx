@@ -1,49 +1,77 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { formatCurrency, formatPercent, calcGpPercent, calcSuggestedPrice } from '@/lib/utils'
+import { formatCurrency, formatPercent, calcGpPercent } from '@/lib/utils'
 import { ALLERGENS } from '@/lib/constants/allergens'
 import { AllergenBadge } from '@/components/allergen/AllergenBadge'
 import ApproveRejectButtons from './ApproveRejectButtons'
-import { TrendingUp, TrendingDown, CheckCircle, AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
+import {
+  TrendingUp, TrendingDown, AlertTriangle, Globe, GlobeLock,
+  Users, Clock, CheckCircle2, ChefHat, ArrowRight, BookOpen, MenuSquare,
+} from 'lucide-react'
+
+function addMonths(date: Date, months: number): Date {
+  const d = new Date(date)
+  d.setMonth(d.getMonth() + months)
+  return d
+}
 
 export default async function OwnerDashboard() {
   const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('restaurant_id')
-    .eq('id', user.id)
-    .single()
+    .from('profiles').select('restaurant_id').eq('id', user.id).single()
 
-  const { data: restaurant } = await supabase
-    .from('restaurants')
-    .select('*')
-    .eq('id', profile?.restaurant_id ?? '')
-    .single()
+  const rid = profile?.restaurant_id ?? ''
 
-  const { data: recipes } = await supabase
-    .from('recipes')
-    .select(`
-      *,
+  const [restaurantRes, recipesRes, menusRes, quizRes] = await Promise.all([
+    supabase.from('restaurants').select('*').eq('id', rid).single(),
+    supabase.from('recipes').select(`
+      id, name, category, sell_price, status, is_active, updated_at,
       recipe_ingredients (
         quantity,
-        ingredients ( cost_per_unit, unit_type, allergen_celery, allergen_cereals_gluten, allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin, allergen_milk, allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites )
+        ingredients ( cost_per_unit, unit_type, allergen_celery, allergen_cereals_gluten,
+          allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin, allergen_milk,
+          allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts,
+          allergen_sesame, allergen_soya, allergen_sulphites )
       )
-    `)
-    .eq('restaurant_id', profile?.restaurant_id ?? '')
-    .order('created_at', { ascending: false })
+    `).eq('restaurant_id', rid).order('created_at', { ascending: false }),
+    supabase.from('menus').select('id, name, daypart, is_published, updated_at')
+      .eq('restaurant_id', rid).order('updated_at', { ascending: false }),
+    supabase.from('staff_quiz_attempts')
+      .select('id, staff_name, score, total_questions, passed, completed_at')
+      .eq('restaurant_id', rid).order('completed_at', { ascending: false }),
+  ])
 
+  const restaurant = restaurantRes.data
   const targetGp = restaurant?.target_gp ?? 70
+  const allMenus = menusRes.data ?? []
+  const publishedMenus = allMenus.filter(m => m.is_published)
+  const allAttempts = quizRes.data ?? []
 
-  function calcFoodCost(recipe: NonNullable<typeof recipes>[number]): number {
+  // Get latest passing attempt per staff member
+  const latestByStaff = new Map<string, typeof allAttempts[number]>()
+  for (const a of allAttempts) {
+    if (a.passed && !latestByStaff.has(a.staff_name)) {
+      latestByStaff.set(a.staff_name, a)
+    }
+  }
+  const trainedStaff = Array.from(latestByStaff.values())
+  const now = new Date()
+  const twoWeeksFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
+  const expiringStaff = trainedStaff.filter(s => {
+    const expiry = addMonths(new Date(s.completed_at), 3)
+    return expiry > now && expiry <= twoWeeksFromNow
+  })
+  const expiredStaff = trainedStaff.filter(s => {
+    return addMonths(new Date(s.completed_at), 3) < now
+  })
+
+  function calcFoodCost(recipe: NonNullable<typeof recipesRes.data>[number]): number {
     if (!recipe?.recipe_ingredients) return 0
-    return recipe.recipe_ingredients.reduce((sum: number, ri: { quantity: number; ingredients: { cost_per_unit: number; unit_type: string } | null }) => {
+    return recipe.recipe_ingredients.reduce((sum: number, ri: any) => {
       if (!ri.ingredients) return sum
       const { cost_per_unit, unit_type } = ri.ingredients
       switch (unit_type) {
@@ -55,90 +83,249 @@ export default async function OwnerDashboard() {
     }, 0)
   }
 
-  const recipeStats = (recipes ?? []).map((r) => {
+  const recipeStats = (recipesRes.data ?? []).map(r => {
     const foodCost = calcFoodCost(r)
     const sellPrice = r.sell_price ?? 0
     const gp = sellPrice > 0 ? calcGpPercent(foodCost, sellPrice) : null
     const belowTarget = gp !== null && gp < targetGp
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recipeAllergens = ALLERGENS.filter((a) =>
+    const recipeAllergens = ALLERGENS.filter(a =>
       r.recipe_ingredients?.some((ri: any) => ri.ingredients?.[a.key])
     )
     return { ...r, foodCost, gp, belowTarget, recipeAllergens }
   })
 
-  const approved = recipeStats.filter((r) => r.status === 'approved' && r.gp !== null)
+  const approved = recipeStats.filter(r => r.status === 'approved' && r.gp !== null)
   const avgGp = approved.length
     ? approved.reduce((s, r) => s + (r.gp ?? 0), 0) / approved.length
     : null
-  const belowTargetCount = recipeStats.filter((r) => r.belowTarget).length
-  const pendingCount = recipeStats.filter((r) => r.status === 'draft').length
+  const belowTargetCount = recipeStats.filter(r => r.belowTarget).length
+  const pendingCount = recipeStats.filter(r => r.status === 'draft').length
+
+  const DAYPART_LABELS: Record<string, string> = {
+    'all-day': 'All day', 'lunch': 'Lunch', 'dinner': 'Dinner',
+    'brunch': 'Brunch', 'specials': 'Specials',
+  }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{restaurant?.name}</h1>
-        <p className="text-gray-500 mt-1">Owner dashboard · Target GP: {targetGp}%</p>
+        <p className="text-sm text-gray-500 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card>
-          <p className="text-xs text-gray-500">Total dishes</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{recipeStats.length}</p>
-        </Card>
-        <Card>
-          <p className="text-xs text-gray-500">Avg menu GP</p>
-          <p className={`text-2xl font-bold mt-1 ${avgGp === null ? 'text-gray-400' : avgGp >= targetGp ? 'text-green-700' : 'text-red-600'}`}>
+      {/* Top stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total dishes</p>
+          <p className="text-3xl font-bold text-gray-900 mt-1">{recipeStats.length}</p>
+          <Link href="/chef/recipes" className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 mt-2 font-medium">
+            View all <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Avg menu GP</p>
+          <p className={`text-3xl font-bold mt-1 ${avgGp === null ? 'text-gray-400' : avgGp >= targetGp ? 'text-green-700' : 'text-red-600'}`}>
             {avgGp !== null ? formatPercent(avgGp) : '—'}
           </p>
-        </Card>
-        <Card>
-          <p className="text-xs text-gray-500">Below target GP</p>
-          <p className={`text-2xl font-bold mt-1 ${belowTargetCount > 0 ? 'text-red-600' : 'text-green-700'}`}>
+          <p className="text-xs text-gray-400 mt-2">Target: {targetGp}%</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Below target GP</p>
+          <p className={`text-3xl font-bold mt-1 ${belowTargetCount > 0 ? 'text-red-600' : 'text-green-700'}`}>
             {belowTargetCount}
           </p>
-        </Card>
-        <Card>
-          <p className="text-xs text-gray-500">Pending approval</p>
-          <p className={`text-2xl font-bold mt-1 ${pendingCount > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
+          <p className="text-xs text-gray-400 mt-2">{belowTargetCount === 0 ? 'All dishes on target' : `dish${belowTargetCount !== 1 ? 'es' : ''} need pricing review`}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Pending approval</p>
+          <p className={`text-3xl font-bold mt-1 ${pendingCount > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
             {pendingCount}
           </p>
-        </Card>
+          <p className="text-xs text-gray-400 mt-2">{pendingCount === 0 ? 'All up to date' : `recipe${pendingCount !== 1 ? 's' : ''} awaiting review`}</p>
+        </div>
+      </div>
+
+      {/* Published menus + staff training row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        {/* Published menus */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MenuSquare className="h-4 w-4 text-green-700" />
+              <h2 className="text-sm font-semibold text-gray-900">Live menus</h2>
+            </div>
+            <Link href="/chef/menus" className="text-xs text-green-700 hover:text-green-800 font-medium">Manage →</Link>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {allMenus.length === 0 ? (
+              <div className="px-5 py-8 text-center">
+                <GlobeLock className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-400">No menus created yet</p>
+                <Link href="/chef/menus/new" className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 mt-2 font-medium">
+                  Create first menu <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+            ) : (
+              allMenus.slice(0, 5).map(menu => (
+                <div key={menu.id} className="flex items-center justify-between px-5 py-3">
+                  <div className="flex items-center gap-3">
+                    {menu.is_published
+                      ? <Globe className="h-4 w-4 text-green-600 shrink-0" />
+                      : <GlobeLock className="h-4 w-4 text-gray-300 shrink-0" />}
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{menu.name}</p>
+                      <p className="text-xs text-gray-400">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</p>
+                    </div>
+                  </div>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${menu.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    {menu.is_published ? 'Live' : 'Draft'}
+                  </span>
+                </div>
+              ))
+            )}
+            {publishedMenus.length === 0 && allMenus.length > 0 && (
+              <div className="px-5 py-3 bg-amber-50 border-t border-amber-100">
+                <p className="text-xs text-amber-700 flex items-center gap-1.5">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  No menus are currently published to customers
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Staff training */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-blue-600" />
+              <h2 className="text-sm font-semibold text-gray-900">Staff training</h2>
+            </div>
+            <Link href="/owner/staff-quiz" className="text-xs text-green-700 hover:text-green-800 font-medium">View all →</Link>
+          </div>
+
+          {trainedStaff.length === 0 ? (
+            <div className="px-5 py-8 text-center">
+              <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+              <p className="text-sm text-gray-400">No staff trained yet</p>
+              <Link href="/owner/staff-quiz" className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 mt-2 font-medium">
+                Set up staff quiz <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          ) : (
+            <div>
+              <div className="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100">
+                <div className="px-4 py-3 text-center">
+                  <p className="text-2xl font-bold text-green-700">{trainedStaff.length}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Trained</p>
+                </div>
+                <div className="px-4 py-3 text-center">
+                  <p className={`text-2xl font-bold ${expiringStaff.length > 0 ? 'text-amber-600' : 'text-gray-300'}`}>
+                    {expiringStaff.length}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">Expiring soon</p>
+                </div>
+                <div className="px-4 py-3 text-center">
+                  <p className={`text-2xl font-bold ${expiredStaff.length > 0 ? 'text-red-600' : 'text-gray-300'}`}>
+                    {expiredStaff.length}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">Expired</p>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-50 max-h-48 overflow-y-auto">
+                {expiringStaff.length > 0 && (
+                  <div className="px-4 py-2 bg-amber-50">
+                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Expiring within 2 weeks</p>
+                  </div>
+                )}
+                {expiringStaff.map(s => {
+                  const expiry = addMonths(new Date(s.completed_at), 3)
+                  const daysLeft = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+                  return (
+                    <div key={s.id} className="flex items-center justify-between px-4 py-2.5 bg-amber-50/50">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                        <p className="text-sm font-medium text-gray-900">{s.staff_name}</p>
+                      </div>
+                      <p className="text-xs text-amber-600 font-medium">{daysLeft}d left</p>
+                    </div>
+                  )
+                })}
+                {expiredStaff.length > 0 && (
+                  <div className="px-4 py-2 bg-red-50">
+                    <p className="text-xs font-semibold text-red-600 uppercase tracking-wide">Training expired</p>
+                  </div>
+                )}
+                {expiredStaff.map(s => (
+                  <div key={s.id} className="flex items-center justify-between px-4 py-2.5 bg-red-50/40">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
+                      <p className="text-sm font-medium text-gray-900">{s.staff_name}</p>
+                    </div>
+                    <p className="text-xs text-red-500 font-medium">Needs retraining</p>
+                  </div>
+                ))}
+                {trainedStaff.filter(s => !expiringStaff.includes(s) && !expiredStaff.includes(s)).map(s => {
+                  const expiry = addMonths(new Date(s.completed_at), 3)
+                  return (
+                    <div key={s.id} className="flex items-center justify-between px-4 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                        <p className="text-sm text-gray-700">{s.staff_name}</p>
+                      </div>
+                      <p className="text-xs text-gray-400">Expires {expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Recipe list */}
-      <Card padding={false}>
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-base font-semibold text-gray-900">All dishes</h2>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-gray-500" />
+            <h2 className="text-sm font-semibold text-gray-900">All dishes</h2>
+          </div>
+          <Link href="/chef/recipes/new" className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-green-700 hover:bg-green-600 px-3 py-1.5 rounded-lg transition-colors">
+            + Add dish
+          </Link>
         </div>
+
         {recipeStats.length === 0 ? (
-          <div className="py-12 text-center text-gray-500 text-sm">No recipes yet</div>
+          <div className="py-16 text-center">
+            <ChefHat className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+            <p className="text-sm font-medium text-gray-500">No recipes yet</p>
+            <p className="text-xs text-gray-400 mt-1">Add your first dish to start tracking food costs and GP</p>
+            <Link href="/chef/recipes/new" className="inline-flex items-center gap-1.5 text-sm font-medium text-green-700 hover:text-green-800 mt-3">
+              Add first dish <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-50">
             {recipeStats.map((recipe) => (
-              <div key={recipe.id} className="px-6 py-4">
-                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+              <div key={recipe.id} className="px-5 py-4 hover:bg-gray-50/50 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-gray-900">{recipe.name}</span>
-                      {recipe.category && <Badge variant="gray">{recipe.category}</Badge>}
-                      <Badge
-                        variant={
-                          recipe.status === 'approved'
-                            ? 'green'
-                            : recipe.status === 'rejected'
-                            ? 'red'
-                            : 'yellow'
-                        }
-                      >
-                        {recipe.status}
-                      </Badge>
+                      {recipe.category && (
+                        <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">{recipe.category}</span>
+                      )}
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        recipe.status === 'approved' ? 'bg-green-100 text-green-700' :
+                        recipe.status === 'rejected' ? 'bg-red-100 text-red-600' :
+                        'bg-amber-100 text-amber-700'
+                      }`}>{recipe.status}</span>
                       {recipe.belowTarget && (
-                        <Badge variant="red">
-                          <AlertTriangle className="h-3 w-3 inline mr-1" />
-                          Below GP target
-                        </Badge>
+                        <span className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full font-medium flex items-center gap-1">
+                          <AlertTriangle className="h-3 w-3" /> Below target
+                        </span>
                       )}
                     </div>
                     {recipe.recipeAllergens.length > 0 && (
@@ -148,57 +335,41 @@ export default async function OwnerDashboard() {
                         ))}
                       </div>
                     )}
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 mt-1.5">
                       Updated {new Date(recipe.updated_at).toLocaleDateString('en-GB')}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-6 shrink-0">
+                  <div className="flex items-center gap-5 shrink-0">
                     <div className="text-right">
-                      <p className="text-xs text-gray-500">Food cost</p>
-                      <p className="font-semibold text-sm">{formatCurrency(recipe.foodCost)}</p>
+                      <p className="text-xs text-gray-400">Food cost</p>
+                      <p className="text-sm font-semibold text-gray-900">{formatCurrency(recipe.foodCost)}</p>
                     </div>
                     {recipe.sell_price && (
                       <div className="text-right">
-                        <p className="text-xs text-gray-500">Sell price</p>
-                        <p className="font-semibold text-sm">{formatCurrency(recipe.sell_price)}</p>
+                        <p className="text-xs text-gray-400">Sell price</p>
+                        <p className="text-sm font-semibold text-gray-900">{formatCurrency(recipe.sell_price)}</p>
                       </div>
                     )}
                     <div className="text-right">
-                      <p className="text-xs text-gray-500">GP</p>
-                      <p
-                        className={`font-bold text-sm flex items-center gap-1 ${
-                          recipe.gp === null
-                            ? 'text-gray-400'
-                            : recipe.gp >= targetGp
-                            ? 'text-green-700'
-                            : 'text-red-600'
-                        }`}
-                      >
+                      <p className="text-xs text-gray-400">GP</p>
+                      <p className={`text-sm font-bold flex items-center gap-1 ${
+                        recipe.gp === null ? 'text-gray-300' :
+                        recipe.gp >= targetGp ? 'text-green-700' : 'text-red-600'
+                      }`}>
                         {recipe.gp !== null ? (
-                          <>
-                            {recipe.gp >= targetGp ? (
-                              <TrendingUp className="h-3.5 w-3.5" />
-                            ) : (
-                              <TrendingDown className="h-3.5 w-3.5" />
-                            )}
-                            {formatPercent(recipe.gp)}
-                          </>
-                        ) : (
-                          '—'
-                        )}
+                          <>{recipe.gp >= targetGp ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}{formatPercent(recipe.gp)}</>
+                        ) : '—'}
                       </p>
                     </div>
-                    {recipe.status === 'draft' && (
-                      <ApproveRejectButtons recipeId={recipe.id} />
-                    )}
+                    {recipe.status === 'draft' && <ApproveRejectButtons recipeId={recipe.id} />}
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </Card>
+      </div>
     </div>
   )
 }
