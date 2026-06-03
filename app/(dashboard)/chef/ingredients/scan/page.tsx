@@ -302,7 +302,13 @@ export default function ScanInvoicePage() {
                           {UNIT_TYPES.map((u) => <option key={u}>{u}</option>)}
                         </select>
                       </td>
-                      <td className="px-4 py-3 text-gray-500 text-sm">{item.quantity}</td>
+                      <td className="px-4 py-3">
+                        <input
+                          type="number" step="0.001" min="0" value={item.quantity}
+                          onChange={(e) => updateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                          className="w-20 rounded-lg border border-transparent hover:border-gray-200 focus:border-green-400 px-2 py-1 text-sm text-gray-500 focus:outline-none bg-transparent focus:bg-white"
+                        />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
