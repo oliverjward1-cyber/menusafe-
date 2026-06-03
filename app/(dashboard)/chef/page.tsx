@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import {
   Package, BookOpen, Plus, Upload, ArrowRight, CheckCircle2, Circle,
-  Sparkles, ChefHat, MenuSquare, Globe,
+  Sparkles, ChefHat, MenuSquare, Globe, ShoppingCart,
 } from 'lucide-react'
 import { SeedButton } from '@/components/SeedButton'
 import { AllergenAlertBanner } from '@/components/AllergenAlertBanner'
@@ -135,7 +135,7 @@ export default async function ChefDashboard() {
 
       {/* Quick actions */}
       {!isNewUser && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           <Link href="/chef/ingredients/new"
             className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50/40 transition-colors group shadow-sm">
             <div className="h-10 w-10 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
@@ -163,6 +163,13 @@ export default async function ChefDashboard() {
               <MenuSquare className="h-5 w-5 text-orange-700" />
             </div>
             <span className="text-xs font-medium text-gray-700 text-center">New menu</span>
+          </Link>
+          <Link href="/chef/planner"
+            className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-teal-300 hover:bg-teal-50/40 transition-colors group shadow-sm">
+            <div className="h-10 w-10 bg-teal-100 rounded-xl flex items-center justify-center group-hover:bg-teal-200 transition-colors">
+              <ShoppingCart className="h-5 w-5 text-teal-700" />
+            </div>
+            <span className="text-xs font-medium text-gray-700 text-center">Menu planner</span>
           </Link>
         </div>
       )}

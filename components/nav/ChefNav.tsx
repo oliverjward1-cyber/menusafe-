@@ -11,6 +11,7 @@ import {
   LogOut,
   ChefHat,
   MenuSquare,
+  ShoppingCart,
 } from 'lucide-react'
 
 const navItems = [
@@ -18,6 +19,7 @@ const navItems = [
   { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
   { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
   { href: '/chef/menus', label: 'Menus', icon: MenuSquare },
+  { href: '/chef/planner', label: 'Menu Planner', icon: ShoppingCart },
 ]
 
 export function ChefNav({ restaurantName }: { restaurantName: string }) {
