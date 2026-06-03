@@ -93,29 +93,37 @@ export default async function MenusPage() {
             const count = (menu.menu_recipes as any)?.[0]?.count ?? 0
             return (
               <Card key={menu.id}>
-                <div className="flex items-start gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h2 className="text-base font-semibold text-mise-ink">{menu.name}</h2>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                        {DAYPART_LABELS[menu.daypart] ?? menu.daypart}
-                      </span>
-                      {menu.is_published ? (
-                        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-medium">
-                          <Globe className="h-3 w-3" /> Published
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-base font-semibold text-mise-ink">{menu.name}</h2>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                          {DAYPART_LABELS[menu.daypart] ?? menu.daypart}
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 text-mise-ink/50">
-                          <GlobeLock className="h-3 w-3" /> Draft
-                        </span>
+                        {menu.is_published ? (
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-medium">
+                            <Globe className="h-3 w-3" /> Published
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 text-mise-ink/50">
+                            <GlobeLock className="h-3 w-3" /> Draft
+                          </span>
+                        )}
+                      </div>
+                      {menu.description && (
+                        <p className="text-sm text-mise-ink/50 mt-0.5">{menu.description}</p>
                       )}
+                      <p className="text-xs text-gray-400 mt-1">{count} dish{count !== 1 ? 'es' : ''}</p>
                     </div>
-                    {menu.description && (
-                      <p className="text-sm text-mise-ink/50 mt-0.5">{menu.description}</p>
-                    )}
-                    <p className="text-xs text-gray-400 mt-1">{count} dish{count !== 1 ? 'es' : ''}</p>
+                    <Link
+                      href={`/chef/menus/${menu.id}`}
+                      className="shrink-0 inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      <Pencil className="h-3.5 w-3.5" /> Edit
+                    </Link>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <Link
                       href={`/chef/menus/${menu.id}/preview`}
                       className="inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
@@ -124,12 +132,6 @@ export default async function MenusPage() {
                     </Link>
                     <DuplicateMenuButton menuId={menu.id} />
                     <PublishToggle menuId={menu.id} isPublished={menu.is_published} />
-                    <Link
-                      href={`/chef/menus/${menu.id}`}
-                      className="inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      <Pencil className="h-3.5 w-3.5" /> Edit
-                    </Link>
                   </div>
                 </div>
               </Card>
