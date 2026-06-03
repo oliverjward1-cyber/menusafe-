@@ -1,13 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { formatCurrency, formatPercent, calcGpPercent } from '@/lib/utils'
-import { ALLERGENS } from '@/lib/constants/allergens'
-import { AllergenBadge } from '@/components/allergen/AllergenBadge'
-import ApproveRejectButtons from './ApproveRejectButtons'
+import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
-  TrendingUp, TrendingDown, AlertTriangle, Globe, GlobeLock,
-  Users, Clock, CheckCircle2, ChefHat, ArrowRight, BookOpen, MenuSquare,
+  AlertTriangle, Globe, GlobeLock,
+  Users, Clock, CheckCircle2, ArrowRight, MenuSquare,
 } from 'lucide-react'
 
 function addMonths(date: Date, months: number): Date {
@@ -29,15 +26,9 @@ export default async function OwnerDashboard() {
   const [restaurantRes, recipesRes, menusRes, quizRes] = await Promise.all([
     supabase.from('restaurants').select('*').eq('id', rid).single(),
     supabase.from('recipes').select(`
-      id, name, category, sell_price, status, is_active, updated_at,
-      recipe_ingredients (
-        quantity,
-        ingredients ( cost_per_unit, unit_type, allergen_celery, allergen_cereals_gluten,
-          allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin, allergen_milk,
-          allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts,
-          allergen_sesame, allergen_soya, allergen_sulphites )
-      )
-    `).eq('restaurant_id', rid).order('created_at', { ascending: false }),
+      id, name, sell_price, status,
+      recipe_ingredients ( quantity, ingredients ( cost_per_unit, unit_type ) )
+    `).eq('restaurant_id', rid),
     supabase.from('menus').select('id, name, daypart, is_published, updated_at')
       .eq('restaurant_id', rid).order('updated_at', { ascending: false }),
     supabase.from('staff_quiz_attempts')
@@ -88,10 +79,7 @@ export default async function OwnerDashboard() {
     const sellPrice = r.sell_price ?? 0
     const gp = sellPrice > 0 ? calcGpPercent(foodCost, sellPrice) : null
     const belowTarget = gp !== null && gp < targetGp
-    const recipeAllergens = ALLERGENS.filter(a =>
-      r.recipe_ingredients?.some((ri: any) => ri.ingredients?.[a.key])
-    )
-    return { ...r, foodCost, gp, belowTarget, recipeAllergens }
+    return { ...r, foodCost, gp, belowTarget }
   })
 
   const approved = recipeStats.filter(r => r.status === 'approved' && r.gp !== null)
@@ -285,91 +273,6 @@ export default async function OwnerDashboard() {
         </div>
       </div>
 
-      {/* Recipe list */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-mise-ink/50" />
-            <h2 className="text-sm font-semibold text-mise-ink">All dishes</h2>
-          </div>
-          <Link href="/chef/recipes/new" className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-mise-gold hover:bg-yellow-600 px-3 py-1.5 rounded-lg transition-colors">
-            + Add dish
-          </Link>
-        </div>
-
-        {recipeStats.length === 0 ? (
-          <div className="py-16 text-center">
-            <ChefHat className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-mise-ink/50">No recipes yet</p>
-            <p className="text-xs text-gray-400 mt-1">Add your first dish to start tracking food costs and GP</p>
-            <Link href="/chef/recipes/new" className="inline-flex items-center gap-1.5 text-sm font-medium text-mise-mid hover:text-mise-deep mt-3">
-              Add first dish <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-50">
-            {recipeStats.map((recipe) => (
-              <div key={recipe.id} className="px-5 py-4 hover:bg-gray-50/50 transition-colors">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-gray-900">{recipe.name}</span>
-                      {recipe.category && (
-                        <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">{recipe.category}</span>
-                      )}
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        recipe.status === 'approved' ? 'bg-green-100 text-green-700' :
-                        recipe.status === 'rejected' ? 'bg-red-100 text-red-600' :
-                        'bg-amber-100 text-amber-700'
-                      }`}>{recipe.status}</span>
-                      {recipe.belowTarget && (
-                        <span className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full font-medium flex items-center gap-1">
-                          <AlertTriangle className="h-3 w-3" /> Below target
-                        </span>
-                      )}
-                    </div>
-                    {recipe.recipeAllergens.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {recipe.recipeAllergens.map((a: (typeof ALLERGENS)[number]) => (
-                          <AllergenBadge key={a.key} allergenKey={a.key} size="sm" />
-                        ))}
-                      </div>
-                    )}
-                    <p className="text-xs text-gray-400 mt-1.5">
-                      Updated {new Date(recipe.updated_at).toLocaleDateString('en-GB')}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-5 shrink-0">
-                    <div className="text-right">
-                      <p className="text-xs text-mise-ink/40">Food cost</p>
-                      <p className="text-sm font-semibold text-mise-ink">{formatCurrency(recipe.foodCost)}</p>
-                    </div>
-                    {recipe.sell_price && (
-                      <div className="text-right">
-                        <p className="text-xs text-mise-ink/40">Sell price</p>
-                        <p className="text-sm font-semibold text-mise-ink">{formatCurrency(recipe.sell_price)}</p>
-                      </div>
-                    )}
-                    <div className="text-right">
-                      <p className="text-xs text-mise-ink/40">GP</p>
-                      <p className={`text-sm font-bold flex items-center gap-1 ${
-                        recipe.gp === null ? 'text-gray-300' :
-                        recipe.gp >= targetGp ? 'text-green-700' : 'text-red-600'
-                      }`}>
-                        {recipe.gp !== null ? (
-                          <>{recipe.gp >= targetGp ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}{formatPercent(recipe.gp)}</>
-                        ) : '—'}
-                      </p>
-                    </div>
-                    {recipe.status === 'draft' && <ApproveRejectButtons recipeId={recipe.id} />}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   )
 }
