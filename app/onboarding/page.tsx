@@ -19,6 +19,8 @@ const GP_PRESETS = [
   { label: '75%', value: 75, note: 'Premium' },
 ]
 
+const PRESET_VALUES = GP_PRESETS.map(p => p.value)
+
 export default function OnboardingPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
@@ -151,7 +153,7 @@ export default function OnboardingPage() {
                   Target gross profit
                   <span className="ml-2 text-xs text-gray-400 font-normal">What GP% are you aiming for per dish?</span>
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-5 gap-2">
                   {GP_PRESETS.map((p) => (
                     <button key={p.value} type="button" onClick={() => setTargetGp(p.value)}
                       className={`py-3 rounded-xl border text-center transition-colors ${targetGp === p.value ? 'border-green-700 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}>
@@ -159,7 +161,25 @@ export default function OnboardingPage() {
                       <p className="text-xs text-gray-400 mt-0.5">{p.note}</p>
                     </button>
                   ))}
+                  <button type="button" onClick={() => { if (PRESET_VALUES.includes(targetGp)) setTargetGp(0) }}
+                    className={`py-3 rounded-xl border text-center transition-colors ${!PRESET_VALUES.includes(targetGp) ? 'border-green-700 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                    <p className={`text-base font-bold ${!PRESET_VALUES.includes(targetGp) ? 'text-green-800' : 'text-gray-900'}`}>Custom</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Set your own</p>
+                  </button>
                 </div>
+                {!PRESET_VALUES.includes(targetGp) && (
+                  <div className="mt-3 flex items-center gap-3">
+                    <input
+                      type="number" min={1} max={99}
+                      value={targetGp || ''}
+                      onChange={e => setTargetGp(Math.min(99, Math.max(1, parseInt(e.target.value) || 0)))}
+                      placeholder="e.g. 68"
+                      className="w-28 border border-green-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      autoFocus
+                    />
+                    <span className="text-sm text-gray-500">% target GP</span>
+                  </div>
+                )}
               </div>
             </div>
 
