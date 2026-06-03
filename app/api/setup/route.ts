@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(req: NextRequest) {
   const { name, slug, targetGp } = await req.json()
@@ -21,7 +22,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'That URL is already taken — try a different one.' }, { status: 409 })
   }
 
-  const { data: restaurant, error } = await supabase
+  const adminClient = createAdminClient()
+  const { data: restaurant, error } = await adminClient
     .from('restaurants')
     .insert({ name: name.trim(), slug: slug.trim(), target_gp: targetGp ?? 70 })
     .select('id, slug')

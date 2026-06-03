@@ -37,11 +37,12 @@ export default async function MenuEditPage({ params }: Props) {
     .eq('status', 'approved')
     .order('category')
 
-  // Recipes already in this menu
+  // Recipes already in this menu, ordered by position
   const { data: menuRecipes } = await supabase
     .from('menu_recipes')
-    .select('recipe_id')
+    .select('recipe_id, position')
     .eq('menu_id', params.id)
+    .order('position', { ascending: true })
 
   const { data: restaurant } = rid
     ? await supabase.from('restaurants').select('slug').eq('id', rid).single()
@@ -51,7 +52,7 @@ export default async function MenuEditPage({ params }: Props) {
     ? `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/menu/${restaurant.slug}`
     : null
 
-  const selectedIds = new Set((menuRecipes ?? []).map(r => r.recipe_id))
+  const selectedIds = (menuRecipes ?? []).map(r => r.recipe_id)
 
   return (
     <div className="space-y-5 max-w-4xl">
@@ -91,7 +92,7 @@ export default async function MenuEditPage({ params }: Props) {
         menuDaypart={menu.daypart}
         isPublished={menu.is_published}
         allRecipes={(allRecipes ?? []) as any}
-        initialSelectedIds={Array.from(selectedIds)}
+        initialSelectedIds={selectedIds}
         menuUrl={menuUrl}
       />
     </div>

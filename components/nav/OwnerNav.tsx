@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard,
-  ShieldCheck,
   Users,
   QrCode,
   LogOut,
