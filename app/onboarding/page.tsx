@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, Upload, BookOpen, Package, CheckCircle2, ChefHat } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
+import { MenuPhotoImport } from './MenuPhotoImport'
 
 function slugify(text: string) {
   return text.toLowerCase().trim()
@@ -31,6 +32,7 @@ export default function OnboardingPage() {
   const [slugEdited, setSlugEdited] = useState(false)
   const [targetGp, setTargetGp] = useState(70)
   const [saving, setSaving] = useState(false)
+  const [restaurantId, setRestaurantId] = useState('')
   const [error, setError] = useState('')
 
   function handleNameChange(val: string) {
@@ -50,6 +52,7 @@ export default function OnboardingPage() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Something went wrong'); setSaving(false); return }
+      setRestaurantId(data.id ?? '')
       setStep(3)
     } catch {
       setError('Network error — please try again')
@@ -197,61 +200,42 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 3 — Get started */}
+        {/* Step 3 — Menu import */}
         {step === 3 && (
           <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
-            <div className="text-center mb-8">
-              <div className="h-16 w-16 bg-mise-mid/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="h-8 w-8 text-mise-fresh" />
+            <div className="text-center mb-6">
+              <div className="h-14 w-14 bg-mise-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="h-7 w-7 text-mise-gold" />
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">You&apos;re all set up!</h2>
+              <h2 className="text-xl font-display font-semibold text-white mb-1">
+                {restaurantName} is ready
+              </h2>
               <p className="text-sm text-gray-400">
-                <strong className="text-white">{restaurantName}</strong> is ready. Now let&apos;s get your ingredients and recipes in.
+                Take a photo of your existing menu and we&apos;ll add all your dishes instantly — names, categories, and prices.
               </p>
             </div>
 
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Choose where to start</p>
-            <div className="space-y-3">
+            <MenuPhotoImport restaurantId={restaurantId} />
+
+            <div className="mt-6 pt-5 border-t border-white/10 space-y-2">
+              <p className="text-xs font-sans font-semibold text-gray-500 uppercase tracking-widest text-center mb-3">Or start another way</p>
               <button onClick={() => router.push('/chef/ingredients/upload')}
-                className="w-full flex items-start gap-4 p-4 rounded-xl border border-white/10 hover:border-mise-fresh/40 hover:bg-mise-mid/20 transition-colors text-left">
-                <div className="h-10 w-10 bg-mise-mid/40 rounded-lg flex items-center justify-center shrink-0">
-                  <Upload className="h-5 w-5 text-mise-fresh" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">Upload your costing sheet</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Import prices from a CSV file — from your supplier or your own spreadsheet. Fastest way to get started.</p>
-                </div>
-                <ArrowRight className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/5 transition-colors text-left">
+                <Upload className="h-4 w-4 text-gray-400 shrink-0" />
+                <span className="text-sm text-gray-300">Upload supplier invoice / CSV</span>
+                <ArrowRight className="h-3.5 w-3.5 text-gray-500 ml-auto" />
               </button>
-
-              <button onClick={() => router.push('/chef/ingredients/new')}
-                className="w-full flex items-start gap-4 p-4 rounded-xl border border-white/10 hover:border-mise-fresh/40 hover:bg-mise-mid/20 transition-colors text-left">
-                <div className="h-10 w-10 bg-white/10 rounded-lg flex items-center justify-center shrink-0">
-                  <Package className="h-5 w-5 text-gray-300" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">Add ingredients manually</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Add individual ingredients with their cost, unit type, and allergens.</p>
-                </div>
-                <ArrowRight className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
-              </button>
-
               <button onClick={() => router.push('/chef/recipes/new')}
-                className="w-full flex items-start gap-4 p-4 rounded-xl border border-white/10 hover:border-mise-fresh/40 hover:bg-mise-mid/20 transition-colors text-left">
-                <div className="h-10 w-10 bg-mise-gold/20 rounded-lg flex items-center justify-center shrink-0">
-                  <BookOpen className="h-5 w-5 text-mise-gold" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">Build your first recipe</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Search ingredients, set quantities, and see food cost and GP calculate in real time.</p>
-                </div>
-                <ArrowRight className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/5 transition-colors text-left">
+                <BookOpen className="h-4 w-4 text-gray-400 shrink-0" />
+                <span className="text-sm text-gray-300">Add dishes manually</span>
+                <ArrowRight className="h-3.5 w-3.5 text-gray-500 ml-auto" />
               </button>
             </div>
 
             <button onClick={() => router.push('/chef')}
-              className="w-full mt-4 py-2.5 text-sm text-gray-500 hover:text-gray-300 transition-colors">
-              Skip for now — take me to the dashboard
+              className="w-full mt-4 py-2 text-xs text-gray-600 hover:text-gray-400 transition-colors">
+              Skip — take me to the dashboard
             </button>
           </div>
         )}
