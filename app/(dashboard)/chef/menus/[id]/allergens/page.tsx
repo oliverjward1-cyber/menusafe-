@@ -22,7 +22,7 @@ export default async function AllergenMatrixPage({ params }: Props) {
     .from('menu_recipes')
     .select(`
       recipes (
-        id, name, category,
+        id, name, category, declared_allergens,
         recipe_ingredients (
           ingredients (
             allergen_celery, allergen_cereals_gluten, allergen_crustaceans,
@@ -41,7 +41,14 @@ export default async function AllergenMatrixPage({ params }: Props) {
     .sort((a: any, b: any) => (a.category ?? '').localeCompare(b.category ?? ''))
 
   function hasAllergen(recipe: any, key: string): boolean {
-    return recipe.recipe_ingredients?.some((ri: any) => ri.ingredients?.[key]) ?? false
+    const fromIngredients = recipe.recipe_ingredients?.some((ri: any) => ri.ingredients?.[key]) ?? false
+    if (fromIngredients) return true
+    // Fall back to declared_allergens when no ingredients are linked yet
+    const hasIngredients = (recipe.recipe_ingredients?.length ?? 0) > 0
+    if (!hasIngredients && recipe.declared_allergens?.length > 0) {
+      return recipe.declared_allergens.includes(key)
+    }
+    return false
   }
 
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })

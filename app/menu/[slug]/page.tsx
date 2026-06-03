@@ -53,7 +53,7 @@ export default async function PublicMenuPage({ params }: Props) {
         .from('menu_recipes')
         .select(`
           recipes (
-            id, name, description, category, sell_price, may_contain_allergens,
+            id, name, description, category, sell_price, may_contain_allergens, declared_allergens,
             recipe_ingredients (
               quantity, unit_type,
               ingredients (
@@ -80,7 +80,7 @@ export default async function PublicMenuPage({ params }: Props) {
     ? await supabase
         .from('recipes')
         .select(`
-          id, name, description, category, sell_price,
+          id, name, description, category, sell_price, declared_allergens,
           recipe_ingredients (
             ingredients (
               name, allergen_celery, allergen_cereals_gluten, allergen_crustaceans,
@@ -97,6 +97,10 @@ export default async function PublicMenuPage({ params }: Props) {
     : { data: null }
 
   function getDishAllergens(recipe: any): AllergenKey[] {
+    const hasIngredients = (recipe.recipe_ingredients?.length ?? 0) > 0
+    if (!hasIngredients && recipe.declared_allergens?.length > 0) {
+      return recipe.declared_allergens as AllergenKey[]
+    }
     return ALLERGENS
       .filter(a => recipe.recipe_ingredients?.some((ri: any) => ri.ingredients?.[a.key]))
       .map(a => a.key)
