@@ -57,4 +57,4 @@ export const AUDIT_QUESTIONS: AuditQuestion[] = [
   { key: 'pest_records', category: 'Pest Control', label: 'Pest control contractor records up to date' },
 ]
 
-export const AUDIT_CATEGORIES = [...new Set(AUDIT_QUESTIONS.map(q => q.category))]
+export const AUDIT_CATEGORIES = Array.from(new Set(AUDIT_QUESTIONS.map(q => q.category)))
