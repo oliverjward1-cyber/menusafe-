@@ -239,21 +239,21 @@ export default function PlannerPage() {
                             <button
                               onClick={() => setPortionCount(recipe.id, count - 1)}
                               disabled={count === 0}
-                              className="h-7 w-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors">
-                              <Minus className="h-3 w-3" />
+                              className="h-10 w-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors">
+                              <Minus className="h-4 w-4" />
                             </button>
                             <input
                               type="number" min="0" value={count === 0 ? '' : count}
                               placeholder="0"
                               onChange={(e) => setPortionCount(recipe.id, parseInt(e.target.value) || 0)}
-                              className="w-14 text-center rounded-lg border border-gray-200 px-2 py-1 text-sm font-medium text-gray-900 focus:outline-none focus:border-green-400"
+                              className="w-16 text-center rounded-lg border border-gray-200 px-2 py-2 text-sm font-medium text-gray-900 focus:outline-none focus:border-green-400"
                             />
                             <button
                               onClick={() => setPortionCount(recipe.id, count + 1)}
-                              className="h-7 w-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
-                              <Plus className="h-3 w-3" />
+                              className="h-10 w-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+                              <Plus className="h-4 w-4" />
                             </button>
-                            <span className="text-xs text-gray-400 w-14">portions</span>
+                            <span className="text-xs text-gray-400 hidden sm:inline">portions</span>
                           </div>
                         </div>
                       )

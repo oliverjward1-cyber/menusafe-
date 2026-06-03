@@ -119,7 +119,7 @@ export default function RecipesPage() {
         </div>
         <Link
           href="/chef/recipes/new"
-          className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
+          className="inline-flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Add recipe
@@ -132,7 +132,7 @@ export default function RecipesPage() {
           <h3 className="text-base font-medium text-gray-900 mb-2">No recipes yet</h3>
           <p className="text-sm text-gray-500 mb-6">Build your first recipe from your ingredients.</p>
           <Link href="/chef/recipes/new"
-            className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors">
+            className="inline-flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
             <Plus className="h-4 w-4" /> Add recipe
           </Link>
         </Card>

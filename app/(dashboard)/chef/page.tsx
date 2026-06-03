@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import {
-  Package, BookOpen, Plus, Upload, ArrowRight, CheckCircle2, Circle,
+  Package, BookOpen, Plus, ArrowRight, CheckCircle2, Circle,
   Sparkles, ChefHat, MenuSquare, Globe, ShoppingCart,
 } from 'lucide-react'
 import { SeedButton } from '@/components/SeedButton'
@@ -176,7 +176,7 @@ export default async function ChefDashboard() {
 
       {/* Stats row */}
       {!isNewUser && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Ingredients</p>
             <p className="text-3xl font-bold text-gray-900 mt-1">{ingredientCount}</p>
@@ -191,7 +191,7 @@ export default async function ChefDashboard() {
               View all <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm col-span-2 sm:col-span-1">
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Live menus</p>
             <p className={`text-3xl font-bold mt-1 ${publishedMenus.length > 0 ? 'text-green-700' : 'text-gray-300'}`}>
               {publishedMenus.length}

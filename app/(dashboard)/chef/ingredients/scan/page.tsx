@@ -273,10 +273,12 @@ export default function ScanInvoicePage() {
                 <tbody className="divide-y divide-gray-50">
                   {items.map((item) => (
                     <tr key={item.id} className={`hover:bg-gray-50/50 ${!item.selected ? 'opacity-40' : ''}`}>
-                      <td className="px-4 py-3">
-                        <input type="checkbox" checked={item.selected}
-                          onChange={(e) => updateItem(item.id, 'selected', e.target.checked)}
-                          className="rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                      <td className="px-2 py-3">
+                        <label className="flex items-center justify-center h-10 w-10 cursor-pointer">
+                          <input type="checkbox" checked={item.selected}
+                            onChange={(e) => updateItem(item.id, 'selected', e.target.checked)}
+                            className="rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                        </label>
                       </td>
                       <td className="px-4 py-3">
                         <input
@@ -330,7 +332,7 @@ export default function ScanInvoicePage() {
             </span>
           </label>
 
-          <div className="flex gap-3 justify-end">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
             <button onClick={() => { setItems([]); setPreview(null); setFileName(''); setAllergensVerified(false) }}
               className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
               Cancel

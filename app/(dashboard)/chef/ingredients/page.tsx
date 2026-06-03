@@ -35,7 +35,7 @@ export default async function IngredientsPage() {
             {ingredients?.length ?? 0} ingredient{ingredients?.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 justify-end">
           <Link
             href="/chef/ingredients/scan"
             className="inline-flex items-center gap-2 border border-green-200 text-green-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-50 transition-colors"
@@ -52,7 +52,7 @@ export default async function IngredientsPage() {
           </Link>
           <Link
             href="/chef/ingredients/new"
-            className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add ingredient
@@ -69,7 +69,7 @@ export default async function IngredientsPage() {
           </p>
           <Link
             href="/chef/ingredients/new"
-            className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add ingredient
