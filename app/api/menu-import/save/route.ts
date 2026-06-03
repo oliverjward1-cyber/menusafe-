@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
     method: null,
   }))
 
-  const { error } = await supabase.from('recipes').insert(rows)
+  const { data, error } = await supabase.from('recipes').insert(rows).select('id, name')
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, count: rows.length })
+  return NextResponse.json({ ok: true, count: rows.length, recipes: data })
 }

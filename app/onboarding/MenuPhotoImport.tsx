@@ -2,7 +2,8 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, Loader2, CheckCircle2, Trash2, AlertTriangle, ArrowRight, ImagePlus } from 'lucide-react'
+import { Loader2, CheckCircle2, Trash2, AlertTriangle, ArrowRight, ImagePlus } from 'lucide-react'
+import { AllergenSheetImport } from './AllergenSheetImport'
 
 interface Dish {
   name: string
@@ -23,8 +24,9 @@ interface Props {
 export function MenuPhotoImport({ restaurantId }: Props) {
   const router = useRouter()
   const fileRef = useRef<HTMLInputElement>(null)
-  const [stage, setStage] = useState<'upload' | 'scanning' | 'review' | 'saving' | 'done'>('upload')
+  const [stage, setStage] = useState<'upload' | 'scanning' | 'review' | 'saving' | 'done' | 'allergens'>('upload')
   const [dishes, setDishes] = useState<EditableDish[]>([])
+  const [savedRecipes, setSavedRecipes] = useState<{ id: string; name: string }[]>([])
   const [error, setError] = useState('')
   const [preview, setPreview] = useState<string | null>(null)
 
@@ -78,13 +80,15 @@ export function MenuPhotoImport({ restaurantId }: Props) {
       body: JSON.stringify({ restaurantId, dishes: selected }),
     })
 
+    const data = await res.json()
     if (!res.ok) {
-      const data = await res.json()
       setError(data.error ?? 'Failed to save dishes')
       setStage('review')
       return
     }
 
+    // Store saved recipes for allergen matching
+    setSavedRecipes(data.recipes ?? selected.map((d, i) => ({ id: `unknown-${i}`, name: d.name })))
     setStage('done')
   }
 
@@ -131,22 +135,47 @@ export function MenuPhotoImport({ restaurantId }: Props) {
     )
   }
 
+  if (stage === 'allergens') {
+    return (
+      <div>
+        <div className="text-center mb-6">
+          <p className="text-sm font-semibold text-mise-ink">Upload your allergen sheet</p>
+          <p className="text-xs text-mise-ink/40 mt-1">
+            We&apos;ll match the allergens to the {savedRecipes.length} dishes you just added
+          </p>
+        </div>
+        <AllergenSheetImport
+          recipes={savedRecipes}
+          onDone={() => router.push('/chef/recipes')}
+        />
+      </div>
+    )
+  }
+
   if (stage === 'done') {
     return (
-      <div className="text-center py-10">
+      <div className="text-center py-6">
         <CheckCircle2 className="h-12 w-12 text-mise-fresh mx-auto mb-4" />
-        <p className="text-xl font-display font-semibold text-mise-ink mb-2">
+        <p className="text-xl font-display font-semibold text-mise-ink mb-1">
           {selectedCount} dish{selectedCount !== 1 ? 'es' : ''} added
         </p>
         <p className="text-sm text-mise-ink/50 mb-6">
-          Your menu is ready. Add ingredients and costs when you&apos;re ready.
+          Do you have an existing allergen sheet? Upload it now and we&apos;ll pre-fill allergens for every dish.
         </p>
-        <button
-          onClick={() => router.push('/chef/recipes')}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-mise-gold hover:bg-yellow-600 text-white font-semibold rounded-xl transition-colors"
-        >
-          Go to my recipes <ArrowRight className="h-4 w-4" />
-        </button>
+        <div className="space-y-3">
+          <button
+            onClick={() => setStage('allergens')}
+            className="w-full py-3 bg-mise-gold hover:bg-yellow-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+          >
+            Yes — upload my allergen sheet
+          </button>
+          <button
+            onClick={() => router.push('/chef/recipes')}
+            className="w-full py-2.5 text-sm text-mise-ink/40 hover:text-mise-ink/60 transition-colors"
+          >
+            Skip — go to my recipes <ArrowRight className="h-3.5 w-3.5 inline" />
+          </button>
+        </div>
       </div>
     )
   }
