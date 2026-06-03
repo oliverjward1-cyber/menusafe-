@@ -70,7 +70,7 @@ export default async function ChefDashboard() {
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          {isNewUser ? 'Welcome to MenuSafe 👋' : `Good day, ${profile?.full_name?.split(' ')[0] ?? 'Chef'} 👋`}
+          {isNewUser ? 'Welcome to mise' : `Good day, ${firstName}`}
         </h1>
         <p className="text-gray-500 mt-1">
           {isNewUser ? 'Let\'s get your kitchen set up.' : 'Here\'s what\'s happening in the kitchen.'}

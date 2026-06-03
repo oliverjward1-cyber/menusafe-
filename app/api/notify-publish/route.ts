@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://yoursite.com'
 
   await resend.emails.send({
-    from: 'MenuSafe <noreply@menusafe.co.uk>',
+    from: 'mise <noreply@getmise.app>',
     to: user.email,
     subject: `Menu published: ${menuName} — ${restaurantName}`,
     html: `

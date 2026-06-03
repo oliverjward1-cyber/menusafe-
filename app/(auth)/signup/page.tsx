@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { UtensilsCrossed } from 'lucide-react'
 import { slugify } from '@/lib/utils'
+import { MiseLogo } from '@/components/MiseLogo'
 
 type Role = 'owner' | 'chef'
 
@@ -94,20 +94,17 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-mise-ink flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-600 rounded-xl mb-4">
-            <UtensilsCrossed className="h-6 w-6 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
-          <p className="text-gray-500 mt-1">Get started with MenuSafe</p>
+        <div className="flex flex-col items-center mb-10">
+          <MiseLogo className="mb-3 scale-125" />
+          <p className="text-mise-fresh/70 text-sm mt-1 font-sans">Create your account</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+        <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
           {/* Role selector */}
           <div className="mb-6">
-            <p className="text-sm font-medium text-gray-700 mb-3">I am a&hellip;</p>
+            <p className="text-sm font-medium text-gray-300 mb-3">I am a&hellip;</p>
             <div className="grid grid-cols-2 gap-3">
               {(['owner', 'chef'] as Role[]).map((r) => (
                 <button
@@ -116,8 +113,8 @@ export default function SignupPage() {
                   onClick={() => setRole(r)}
                   className={`rounded-lg border-2 p-3 text-sm font-medium transition-colors ${
                     role === r
-                      ? 'border-brand-600 bg-brand-50 text-brand-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      ? 'border-mise-fresh bg-mise-mid/30 text-white'
+                      : 'border-white/10 text-gray-400 hover:border-white/20'
                   }`}
                 >
                   {r === 'owner' ? '👤 Owner' : '👨‍🍳 Chef / Staff'}
@@ -186,9 +183,9 @@ export default function SignupPage() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-gray-400 mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-brand-600 hover:text-brand-700 font-medium">
+          <Link href="/login" className="text-mise-fresh hover:text-mise-gold font-medium">
             Sign in
           </Link>
         </p>

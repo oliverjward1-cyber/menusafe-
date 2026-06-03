@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { UtensilsCrossed } from 'lucide-react'
+import { MiseLogo } from '@/components/MiseLogo'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -34,17 +34,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-mise-ink flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-600 rounded-xl mb-4">
-            <UtensilsCrossed className="h-6 w-6 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">MenuSafe</h1>
-          <p className="text-gray-500 mt-1">Sign in to your account</p>
+        <div className="flex flex-col items-center mb-10">
+          <MiseLogo className="mb-3 scale-125" />
+          <p className="text-mise-fresh/70 text-sm mt-1 font-sans">Sign in to your account</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+        <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
           <form onSubmit={handleLogin} className="space-y-5">
             <Input
               label="Email address"
@@ -66,20 +63,20 @@ export default function LoginPage() {
             />
 
             {error && (
-              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              <div className="rounded-lg bg-red-900/30 border border-red-500/40 px-4 py-3 text-sm text-red-300">
                 {error}
               </div>
             )}
 
-            <Button type="submit" loading={loading} size="lg" className="w-full">
+            <Button type="submit" loading={loading} size="lg" className="w-full !bg-mise-mid hover:!bg-mise-deep">
               Sign in
             </Button>
           </form>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-gray-400 mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-brand-600 hover:text-brand-700 font-medium">
+          <Link href="/signup" className="text-mise-fresh hover:text-mise-gold font-medium">
             Create one
           </Link>
         </p>
