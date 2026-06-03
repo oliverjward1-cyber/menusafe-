@@ -64,48 +64,52 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
     // Calculate score
     const applicable = AUDIT_QUESTIONS.filter(q => answers[q.key].answer !== 'na')
     const passed = applicable.filter(q => answers[q.key].answer === 'pass').length
-    const score = passed
     const scoreTotal = applicable.length
     const pct = scoreTotal > 0 ? (passed / scoreTotal) * 100 : 100
     const status = pct >= 90 ? 'green' : pct >= 70 ? 'amber' : 'red'
 
-    // Insert audit
-    const { data: audit, error: auditErr } = await supabase
-      .from('kitchen_audits')
-      .insert({ restaurant_id: restaurantId, completed_by: staffName.trim(), score, total: scoreTotal, status, notes: overallNotes.trim() || null })
-      .select('id').single()
-
-    if (auditErr || !audit) { setError(auditErr?.message ?? 'Failed to save audit. Please try again.'); setSubmitting(false); return }
-
-    // Upload photos + insert answers
-    const answerRows = []
+    // Upload photos first
+    const photoUrls: Record<string, string> = {}
     for (const q of AUDIT_QUESTIONS) {
       const a = answers[q.key]
-      let photoUrl: string | null = null
-
       if (a.photoFile) {
         const ext = a.photoFile.name.split('.').pop() ?? 'jpg'
-        const path = `${restaurantId}/${audit.id}/${q.key}.${ext}`
+        const path = `${restaurantId}/${Date.now()}/${q.key}.${ext}`
         const { error: uploadErr } = await supabase.storage
           .from('audit-photos')
           .upload(path, a.photoFile, { upsert: true })
         if (!uploadErr) {
           const { data: urlData } = supabase.storage.from('audit-photos').getPublicUrl(path)
-          photoUrl = urlData.publicUrl
+          photoUrls[q.key] = urlData.publicUrl
         }
       }
-
-      answerRows.push({
-        audit_id: audit.id,
-        question_key: q.key,
-        answer: a.answer,
-        notes: a.notes.trim() || null,
-        photo_url: photoUrl,
-      })
     }
 
-    await supabase.from('kitchen_audit_answers').insert(answerRows)
-    router.push(`/chef/audit/${audit.id}`)
+    const answerRows = AUDIT_QUESTIONS.map(q => ({
+      question_key: q.key,
+      answer: answers[q.key].answer,
+      notes: answers[q.key].notes.trim() || null,
+      photo_url: photoUrls[q.key] ?? null,
+    }))
+
+    const res = await fetch('/api/audit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurantId,
+        completedBy: staffName.trim(),
+        score: passed,
+        total: scoreTotal,
+        status,
+        notes: overallNotes.trim() || null,
+        answers: answerRows,
+      }),
+    })
+
+    const data = await res.json()
+    if (!res.ok) { setError(data.error ?? 'Failed to save audit. Please try again.'); setSubmitting(false); return }
+
+    router.push(`/chef/audit/${data.id}`)
   }
 
   return (
