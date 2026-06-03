@@ -5,14 +5,17 @@ import { Menu, X } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
 import { usePathname } from 'next/navigation'
 
-export function MobileNavWrapper({ children }: { children: React.ReactNode }) {
+interface Props {
+  nav: React.ReactNode
+  children: React.ReactNode
+}
+
+export function MobileNavWrapper({ nav, children }: Props) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
-  // Close drawer on route change
   useEffect(() => { setOpen(false) }, [pathname])
 
-  // Prevent body scroll when drawer open
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -20,8 +23,8 @@ export function MobileNavWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {/* Mobile top bar */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-gray-900 text-white sticky top-0 z-30 border-b border-gray-700">
+      {/* Mobile top bar — fixed so it always sits above content */}
+      <div className="md:hidden fixed top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 bg-gray-900 text-white border-b border-gray-700">
         <MiseLogo />
         <button
           onClick={() => setOpen(true)}
@@ -32,6 +35,9 @@ export function MobileNavWrapper({ children }: { children: React.ReactNode }) {
         </button>
       </div>
 
+      {/* Spacer so content doesn't hide under fixed bar on mobile */}
+      <div className="md:hidden h-[52px] shrink-0" />
+
       {/* Backdrop */}
       {open && (
         <div
@@ -40,7 +46,7 @@ export function MobileNavWrapper({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* Drawer */}
+      {/* Slide-out drawer */}
       <div className={`md:hidden fixed top-0 left-0 h-full w-72 bg-gray-900 z-50 transform transition-transform duration-300 ease-in-out ${open ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
           <MiseLogo />
@@ -52,15 +58,18 @@ export function MobileNavWrapper({ children }: { children: React.ReactNode }) {
             <X className="h-5 w-5" />
           </button>
         </div>
-        {/* Nav content injected here — hides the built-in header */}
-        <div className="[&>aside>div:first-child]:hidden">
-          {children}
+        {/* Strip the aside header since we have our own above */}
+        <div className="[&>aside>div:first-child]:hidden overflow-y-auto h-[calc(100%-52px)]">
+          {nav}
         </div>
       </div>
 
-      {/* Desktop sidebar — unchanged */}
-      <div className="hidden md:block">
-        {children}
+      {/* Page body — desktop: sidebar + main side by side */}
+      <div className="flex flex-row flex-1">
+        <div className="hidden md:block">{nav}</div>
+        <main className="flex-1 min-w-0">
+          <div className="p-4 md:p-6 max-w-5xl mx-auto">{children}</div>
+        </main>
       </div>
     </>
   )

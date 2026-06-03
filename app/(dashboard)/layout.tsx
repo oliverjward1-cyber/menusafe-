@@ -39,12 +39,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">
       <ViewSwitcher menuUrl={menuUrl} />
-      <div className="flex flex-row flex-1">
-        <MobileNavWrapper>{nav}</MobileNavWrapper>
-        <main className="flex-1 min-w-0">
-          <div className="p-4 md:p-6 max-w-5xl mx-auto">{children}</div>
-        </main>
-      </div>
+      <MobileNavWrapper nav={nav}>{children}</MobileNavWrapper>
     </div>
   )
 }
