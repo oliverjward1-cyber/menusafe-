@@ -14,6 +14,7 @@ import {
   Package,
   BookOpen,
   MenuSquare,
+  ClipboardCheck,
 } from 'lucide-react'
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
   { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
   { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
   { href: '/chef/menus', label: 'Menus', icon: MenuSquare },
+  { href: '/chef/audit', label: 'Kitchen Audit', icon: ClipboardCheck },
   { href: '/owner/allergen-matrix', label: 'Allergen Matrix', icon: ShieldCheck },
   { href: '/owner/staff-quiz', label: 'Staff Quiz', icon: Users },
   { href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode },
