@@ -33,7 +33,7 @@ export function ChefNav({ restaurantName }: { restaurantName: string }) {
   }
 
   return (
-    <aside className="w-full md:w-64 md:min-h-screen bg-gray-900 text-white flex flex-col">
+    <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
       <div className="p-4 border-b border-gray-700">
         <MiseLogo className="mb-2" />
         <p className="text-xs text-gray-400 truncate">{restaurantName}</p>

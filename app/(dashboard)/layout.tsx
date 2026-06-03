@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ChefNav } from '@/components/nav/ChefNav'
 import { OwnerNav } from '@/components/nav/OwnerNav'
 import { ViewSwitcher } from '@/components/nav/ViewSwitcher'
+import { MobileNavWrapper } from '@/components/nav/MobileNavWrapper'
 
 export default async function DashboardLayout({
   children,
@@ -31,17 +32,17 @@ export default async function DashboardLayout({
     redirect('/onboarding')
   }
 
+  const nav = profile?.role === 'chef'
+    ? <ChefNav restaurantName={restaurant?.name ?? ''} />
+    : <OwnerNav restaurantName={restaurant?.name ?? ''} restaurantSlug={restaurant?.slug ?? ''} />
+
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">
       <ViewSwitcher menuUrl={menuUrl} />
-      <div className="flex flex-col md:flex-row flex-1">
-        {profile?.role === 'chef' ? (
-          <ChefNav restaurantName={restaurant?.name ?? ''} />
-        ) : (
-          <OwnerNav restaurantName={restaurant?.name ?? ''} restaurantSlug={restaurant?.slug ?? ''} />
-        )}
+      <div className="flex flex-row flex-1">
+        <MobileNavWrapper>{nav}</MobileNavWrapper>
         <main className="flex-1 min-w-0">
-          <div className="p-6 max-w-5xl mx-auto">{children}</div>
+          <div className="p-4 md:p-6 max-w-5xl mx-auto">{children}</div>
         </main>
       </div>
     </div>
