@@ -22,6 +22,8 @@ const GP_PRESETS = [
 ]
 const PRESET_VALUES = GP_PRESETS.map(p => p.value)
 
+const STEPS = ['Welcome', 'Your restaurant', 'Your menu']
+
 export default function OnboardingPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
@@ -69,13 +71,30 @@ export default function OnboardingPage() {
           <MiseLogo className="scale-125" />
         </div>
 
-        {/* Step indicator */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          {[1, 2, 3].map((s) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`h-2 w-8 rounded-full transition-colors ${s <= step ? 'bg-mise-fresh' : 'bg-white/10'}`} />
-            </div>
-          ))}
+        {/* Step progress bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            {STEPS.map((s, i) => {
+              const num = i + 1
+              const done = step > num
+              const active = step === num
+              return (
+                <div key={s} className="flex flex-col items-center gap-1 flex-1">
+                  <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${done ? 'bg-mise-fresh text-white' : active ? 'bg-mise-gold text-white ring-2 ring-mise-gold/30' : 'bg-white/10 text-gray-500'}`}>
+                    {done ? '✓' : num}
+                  </div>
+                  <span className={`text-xs hidden sm:block transition-colors ${active ? 'text-white font-medium' : done ? 'text-mise-fresh/70' : 'text-gray-600'}`}>{s}</span>
+                </div>
+              )
+            })}
+          </div>
+          <div className="relative h-1.5 bg-white/10 rounded-full mt-1">
+            <div
+              className="absolute left-0 top-0 h-1.5 bg-mise-fresh rounded-full transition-all duration-500"
+              style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
+            />
+          </div>
+          <p className="text-center text-xs text-gray-500 mt-2">Step {step} of {STEPS.length} — {STEPS[step - 1]}</p>
         </div>
 
         {/* Step 1 — Welcome */}
