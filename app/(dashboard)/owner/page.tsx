@@ -4,7 +4,7 @@ import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
   AlertTriangle, Globe, GlobeLock,
-  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck,
+  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck, AlertOctagon,
 } from 'lucide-react'
 
 function addMonths(date: Date, months: number): Date {
@@ -23,7 +23,11 @@ export default async function OwnerDashboard() {
 
   const rid = profile?.restaurant_id ?? ''
 
-  const [restaurantRes, recipesRes, menusRes, quizRes, auditRes] = await Promise.all([
+  const now = new Date()
+  const todayStr = now.toISOString().split('T')[0]
+  const currentHour = now.getHours()
+
+  const [restaurantRes, recipesRes, menusRes, quizRes, auditRes, tempLogsToday, openIncidentsRes] = await Promise.all([
     supabase.from('restaurants').select('*').eq('id', rid).single(),
     supabase.from('recipes').select(`
       id, name, sell_price, status,
@@ -40,6 +44,14 @@ export default async function OwnerDashboard() {
       .order('completed_at', { ascending: false })
       .limit(1)
       .single(),
+    supabase.from('temperature_logs')
+      .select('check_type')
+      .eq('restaurant_id', rid)
+      .gte('logged_at', `${todayStr}T00:00:00Z`),
+    supabase.from('incidents')
+      .select('id, severity')
+      .eq('restaurant_id', rid)
+      .eq('resolved', false),
   ])
 
   const restaurant = restaurantRes.data
@@ -49,6 +61,20 @@ export default async function OwnerDashboard() {
   const publishedMenus = allMenus.filter(m => m.is_published)
   const allAttempts = quizRes.data ?? []
 
+  // Open incidents
+  const openIncidents = openIncidentsRes.data ?? []
+  const criticalIncidents = openIncidents.filter(i => i.severity === 'critical' || i.severity === 'high')
+
+  // Temperature check alerts
+  const todayTempLogs = tempLogsToday.data ?? []
+  const hasAmCheck = todayTempLogs.some(l => l.check_type === 'am')
+  const hasPmCheck = todayTempLogs.some(l => l.check_type === 'pm')
+  const amOverdue = !hasAmCheck && currentHour >= 10
+  const pmOverdue = !hasPmCheck && currentHour >= 18
+  const tempAlerts: string[] = []
+  if (amOverdue) tempAlerts.push('AM temperature check (due by 10:00)')
+  if (pmOverdue) tempAlerts.push('PM temperature check (due by 18:00)')
+
   // Get latest passing attempt per staff member
   const latestByStaff = new Map<string, typeof allAttempts[number]>()
   for (const a of allAttempts) {
@@ -57,7 +83,6 @@ export default async function OwnerDashboard() {
     }
   }
   const trainedStaff = Array.from(latestByStaff.values())
-  const now = new Date()
   const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
   const expiringStaff = trainedStaff.filter(s => {
     const expiry = addMonths(new Date(s.completed_at), 6)
@@ -103,6 +128,40 @@ export default async function OwnerDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Open incidents alert */}
+      {openIncidents.length > 0 && (
+        <Link href="/owner/incidents" className="block">
+          <div className={`border rounded-2xl px-5 py-4 flex items-start gap-3 hover:opacity-90 transition-opacity ${
+            criticalIncidents.length > 0 ? 'bg-red-50 border-red-300' : 'bg-orange-50 border-orange-200'
+          }`}>
+            <AlertOctagon className={`h-5 w-5 flex-shrink-0 mt-0.5 ${criticalIncidents.length > 0 ? 'text-red-600' : 'text-orange-500'}`} />
+            <div>
+              <p className={`text-sm font-semibold ${criticalIncidents.length > 0 ? 'text-red-700' : 'text-orange-700'}`}>
+                {criticalIncidents.length > 0 ? 'Critical incident requires attention' : 'Open incidents require resolution'}
+              </p>
+              <p className={`text-sm mt-0.5 ${criticalIncidents.length > 0 ? 'text-red-600' : 'text-orange-600'}`}>
+                {openIncidents.length} open incident{openIncidents.length !== 1 ? 's' : ''} — tap to view
+              </p>
+            </div>
+          </div>
+        </Link>
+      )}
+
+      {/* Temperature check overdue alert */}
+      {tempAlerts.length > 0 && (
+        <Link href="/owner/temperature-logs" className="block">
+          <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-start gap-3 hover:bg-red-100 transition-colors">
+            <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-red-700">Temperature check overdue</p>
+              <p className="text-sm text-red-600 mt-0.5">
+                {tempAlerts.join(' · ')} — tap to log now
+              </p>
+            </div>
+          </div>
+        </Link>
+      )}
+
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>

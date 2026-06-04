@@ -20,6 +20,7 @@ import {
   Sparkles,
   Truck,
   ShieldCheck,
+  AlertOctagon,
 } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
 
@@ -126,6 +127,7 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
             { href: '/owner/temperature-logs', label: 'Temp Logs', icon: Thermometer },
             { href: '/owner/cleaning', label: 'Cleaning', icon: Sparkles },
             { href: '/owner/deliveries', label: 'Deliveries', icon: Truck },
+            { href: '/owner/incidents', label: 'Incidents', icon: AlertOctagon },
             { href: '/owner/eho', label: 'EHO Mode', icon: ShieldCheck },
           ].map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href)

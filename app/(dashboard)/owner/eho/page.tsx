@@ -34,7 +34,7 @@ export default async function EHOInspectionPage() {
 
   const [
     restaurantRes, recipesRes, menusRes, quizRes, auditRes, profilesRes,
-    tempLogsRes, cleaningLogsRes, deliveriesRes,
+    tempLogsRes, cleaningLogsRes, deliveriesRes, incidentsRes,
   ] = await Promise.all([
     supabase.from('restaurants').select('*').eq('id', rid).single(),
     supabase.from('recipes').select(`
@@ -52,6 +52,7 @@ export default async function EHOInspectionPage() {
     supabase.from('temperature_logs').select('*').eq('restaurant_id', rid).order('logged_at', { ascending: false }).limit(20),
     supabase.from('cleaning_logs').select('*').eq('restaurant_id', rid).order('completed_at', { ascending: false }).limit(20),
     supabase.from('delivery_records').select('*').eq('restaurant_id', rid).order('delivered_at', { ascending: false }).limit(10),
+    supabase.from('incidents').select('*').eq('restaurant_id', rid).order('occurred_at', { ascending: false }).limit(10),
   ])
 
   const restaurant = restaurantRes.data
@@ -62,6 +63,7 @@ export default async function EHOInspectionPage() {
   const tempLogs = tempLogsRes.data ?? []
   const cleaningLogs = cleaningLogsRes.data ?? []
   const deliveries = deliveriesRes.data ?? []
+  const incidentsList = incidentsRes.data ?? []
   const profiles = profilesRes.data ?? []
   const lastAudit = audits[0]
 
@@ -425,6 +427,45 @@ export default async function EHOInspectionPage() {
                       <td className="px-4 py-2.5 font-mono text-mise-ink/70">{rec.temperature != null ? `${rec.temperature}°C` : '—'}</td>
                       <td className="px-4 py-2.5 capitalize text-mise-ink/60">{rec.condition}</td>
                       <td className="px-4 py-2.5 text-mise-ink/40">{new Date(rec.delivered_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        {/* 8. Incident Log */}
+        <section>
+          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
+            <span className="text-red-500 text-xl">⚠️</span> Incident Log (recent)
+          </h2>
+          {incidentsList.length === 0 ? (
+            <div className="flex items-center gap-2 p-4 bg-green-50 rounded-xl text-sm text-green-700">
+              <CheckCircle2 className="h-4 w-4 shrink-0" /> No incidents on record
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="text-left px-4 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Incident</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Severity</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Status</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {incidentsList.map((inc: any) => (
+                    <tr key={inc.id} className={!inc.resolved && inc.severity === 'critical' ? 'bg-red-50' : ''}>
+                      <td className="px-4 py-2.5 font-medium text-mise-ink">{inc.title}</td>
+                      <td className="px-4 py-2.5 capitalize text-mise-ink/70">{inc.severity}</td>
+                      <td className="px-4 py-2.5">
+                        {inc.resolved
+                          ? <span className="text-green-600 text-xs font-medium">Resolved</span>
+                          : <span className="text-red-600 text-xs font-medium">Open</span>}
+                      </td>
+                      <td className="px-4 py-2.5 text-mise-ink/40">{new Date(inc.occurred_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                     </tr>
                   ))}
                 </tbody>
