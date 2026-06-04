@@ -176,7 +176,7 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
                               ? opt === 'pass' ? 'bg-green-600 border-green-600 text-white'
                                 : opt === 'fail' ? 'bg-red-600 border-red-600 text-white'
                                 : 'bg-gray-500 border-gray-500 text-white'
-                              : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                              : 'bg-white border-gray-300 text-gray-700 hover:border-mise-gold hover:bg-mise-gold/5'
                           }`}
                         >
                           {opt === 'pass' ? 'Yes' : opt === 'fail' ? 'No' : 'N/A'}
