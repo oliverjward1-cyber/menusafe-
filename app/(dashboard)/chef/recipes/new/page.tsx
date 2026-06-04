@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency, calcSuggestedPrice } from '@/lib/utils'
 import { RECIPE_CATEGORIES } from '@/lib/constants/allergens'
-import { ChevronLeft, Search, X, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, Search, X, AlertTriangle, Sparkles, Mic, Loader2 } from 'lucide-react'
 
 const ALLERGEN_MAP = [
   { offKey: 'gluten',                        dbKey: 'allergen_cereals_gluten', label: 'Gluten' },
@@ -152,6 +152,46 @@ export default function NewRecipePage() {
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const [aiMode, setAiMode] = useState(false)
+  const [aiInput, setAiInput] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiDone, setAiDone] = useState(false)
+  const [listening, setListening] = useState(false)
+
+  async function handleAiFill() {
+    if (!aiInput.trim()) return
+    setAiLoading(true)
+    setAiDone(false)
+    const res = await fetch('/api/recipes/ai-describe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: aiInput }),
+    })
+    const data = await res.json()
+    setAiLoading(false)
+    if (res.ok) {
+      if (data.name) setRecipeName(data.name)
+      if (data.description) setDescription(data.description)
+      if (data.category) setCategory(data.category)
+      if (data.portionSize) setPortionSize(data.portionSize)
+      if (data.sellPrice) setSellPrice(String(data.sellPrice))
+      setAiDone(true)
+      setAiMode(false)
+    }
+  }
+
+  function startVoice() {
+    const SpeechRecognition = (window as unknown as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown }).SpeechRecognition ?? (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition
+    if (!SpeechRecognition) { alert('Voice input not supported in this browser'); return }
+    const recognition = new (SpeechRecognition as new () => { lang: string; onresult: (e: { results: { transcript: string }[][] }) => void; onerror: () => void; onend: () => void; start: () => void })()
+    recognition.lang = 'en-GB'
+    recognition.onresult = (e) => { setAiInput(e.results[0][0].transcript) }
+    recognition.onerror = () => setListening(false)
+    recognition.onend = () => setListening(false)
+    setListening(true)
+    recognition.start()
+  }
 
   useEffect(() => {
     async function load() {
@@ -418,6 +458,51 @@ export default function NewRecipePage() {
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
         <h1 className="text-2xl font-display font-semibold text-mise-ink">Add recipe</h1>
+      </div>
+
+      {/* AI assist panel */}
+      <div className="bg-mise-deep/5 border border-mise-deep/20 rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-mise-mid" />
+            <span className="text-sm font-semibold text-mise-ink">AI recipe assist</span>
+            {aiDone && <span className="text-xs text-green-600 font-medium">Fields filled ✓</span>}
+          </div>
+          <button onClick={() => setAiMode(v => !v)} className="text-xs text-mise-mid hover:text-mise-deep font-medium">
+            {aiMode ? 'Hide' : 'Describe dish'}
+          </button>
+        </div>
+        {aiMode && (
+          <div className="space-y-3">
+            <p className="text-xs text-mise-ink/50">Describe your dish in plain English — the AI will fill in the name, description, category, portion size and price.</p>
+            <div className="flex gap-2">
+              <textarea
+                value={aiInput}
+                onChange={e => setAiInput(e.target.value)}
+                placeholder="e.g. Pan-seared salmon fillet served with a lemon butter sauce, wilted spinach and new potatoes. A main course, priced at £18.50."
+                rows={3}
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold resize-none"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={startVoice}
+                disabled={listening}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border font-medium transition-colors ${listening ? 'bg-red-100 border-red-300 text-red-600 animate-pulse' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+              >
+                <Mic className="h-4 w-4" />
+                {listening ? 'Listening…' : 'Voice'}
+              </button>
+              <button
+                onClick={handleAiFill}
+                disabled={aiLoading || !aiInput.trim()}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-mise-mid text-white rounded-lg text-sm font-medium hover:bg-mise-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {aiLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</> : <><Sparkles className="h-4 w-4" /> Fill in fields</>}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Recipe details */}

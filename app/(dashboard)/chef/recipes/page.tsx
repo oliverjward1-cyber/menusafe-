@@ -106,6 +106,103 @@ export default function RecipesPage() {
     }
   }
 
+  const COURSE_GROUPS = [
+    { key: 'Starters', label: 'Starters' },
+    { key: 'Mains', label: 'Mains' },
+    { key: 'Desserts', label: 'Desserts' },
+    { key: 'Specials', label: 'Specials' },
+    { key: 'Events', label: 'Events' },
+    { key: 'other', label: 'Other' },
+  ]
+
+  const KNOWN_COURSES = ['Starters', 'Mains', 'Desserts', 'Specials', 'Events']
+
+  const grouped = Object.fromEntries(
+    COURSE_GROUPS.map(g => [
+      g.key,
+      recipes.filter(r => {
+        const cat = r.category ?? ''
+        if (g.key === 'other') return !KNOWN_COURSES.includes(cat)
+        return cat === g.key
+      })
+    ])
+  )
+
+  function RecipeCard({ recipe }: { recipe: RecipeRow }) {
+    const id = recipe.id
+    const name = recipe.name
+    const isActive = recipe.is_active
+    const foodCost = calcFoodCost(recipe)
+    const sellPrice = recipe.sell_price ?? 0
+    const gp = sellPrice > 0 ? calcGpPercent(foodCost, sellPrice) : null
+    const suggested = calcSuggestedPrice(foodCost, targetGp)
+    const recipeAllergens = ALLERGENS.filter((a) =>
+      recipe.recipe_ingredients?.some((ri) => ri.ingredients?.[a.key])
+    )
+
+    return (
+      <Card className={isActive ? '' : 'opacity-60'}>
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-semibold text-gray-900">{name}</h3>
+              <Badge variant={recipe.status === 'approved' ? 'green' : recipe.status === 'rejected' ? 'red' : 'yellow'}>
+                {recipe.status}
+              </Badge>
+              {!isActive && <Badge variant="gray">Inactive</Badge>}
+            </div>
+            {recipe.description && (
+              <p className="text-sm text-mise-ink/50 mt-1">{recipe.description}</p>
+            )}
+            {recipeAllergens.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {recipeAllergens.map((a) => <AllergenBadge key={a.key} allergenKey={a.key} size="sm" />)}
+              </div>
+            )}
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="flex gap-5 text-right shrink-0">
+              <div>
+                <p className="text-xs text-mise-ink/50">Food cost</p>
+                <p className="font-semibold text-gray-900">{formatCurrency(foodCost)}</p>
+              </div>
+              {sellPrice > 0 && (
+                <div>
+                  <p className="text-xs text-mise-ink/50">GP</p>
+                  <p className={`font-semibold ${gp !== null && gp >= targetGp ? 'text-green-700' : 'text-red-600'}`}>
+                    {gp !== null ? formatPercent(gp) : '—'}
+                  </p>
+                </div>
+              )}
+              <div>
+                <p className="text-xs text-mise-ink/50">Suggested</p>
+                <p className="font-semibold text-gray-900">{formatCurrency(suggested)}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 shrink-0 pt-0.5">
+              <button onClick={() => toggleActive(id, isActive)} title={isActive ? 'Mark inactive' : 'Mark active'}
+                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                {isActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+              </button>
+              <button onClick={() => handleDuplicate(id)} title="Duplicate recipe" disabled={duplicating === id}
+                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40">
+                {duplicating === id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
+              </button>
+              <Link href={`/chef/recipes/${id}/edit`}
+                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                <Pencil className="h-4 w-4" />
+              </Link>
+              <button onClick={() => handleDelete(id, name)}
+                className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </Card>
+    )
+  }
+
   if (loading) {
     return <div className="py-24 text-center text-sm text-mise-ink/40">Loading…</div>
   }
@@ -117,12 +214,9 @@ export default function RecipesPage() {
           <h1 className="text-2xl font-display font-semibold text-mise-ink">Recipes</h1>
           <p className="text-mise-ink/50 mt-1">Target GP: {targetGp}%</p>
         </div>
-        <Link
-          href="/chef/recipes/new"
-          className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Add recipe
+        <Link href="/chef/recipes/new"
+          className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors">
+          <Plus className="h-4 w-4" /> Add recipe
         </Link>
       </div>
 
@@ -137,92 +231,17 @@ export default function RecipesPage() {
           </Link>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {recipes.map((recipe) => {
-            const id = recipe.id
-            const name = recipe.name
-            const isActive = recipe.is_active
-            const category = recipe.category
-            const foodCost = calcFoodCost(recipe)
-            const sellPrice = recipe.sell_price ?? 0
-            const gp = sellPrice > 0 ? calcGpPercent(foodCost, sellPrice) : null
-            const suggested = calcSuggestedPrice(foodCost, targetGp)
-            const recipeAllergens = ALLERGENS.filter((a) =>
-              recipe.recipe_ingredients?.some((ri) => ri.ingredients?.[a.key])
-            )
-
+        <div className="space-y-8">
+          {COURSE_GROUPS.map(({ key, label }) => {
+            const items = grouped[key]
+            if (items.length === 0) return null
             return (
-              <Card key={id} className={isActive ? '' : 'opacity-60'}>
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-gray-900">{name}</h3>
-                      {category && <Badge variant="gray">{category}</Badge>}
-                      <Badge variant={recipe.status === 'approved' ? 'green' : recipe.status === 'rejected' ? 'red' : 'yellow'}>
-                        {recipe.status}
-                      </Badge>
-                      {!isActive && <Badge variant="gray">Inactive</Badge>}
-                    </div>
-                    {recipe.description && (
-                      <p className="text-sm text-mise-ink/50 mt-1">{recipe.description}</p>
-                    )}
-                    {recipeAllergens.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {recipeAllergens.map((a) => <AllergenBadge key={a.key} allergenKey={a.key} size="sm" />)}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="flex gap-5 text-right shrink-0">
-                      <div>
-                        <p className="text-xs text-mise-ink/50">Food cost</p>
-                        <p className="font-semibold text-gray-900">{formatCurrency(foodCost)}</p>
-                      </div>
-                      {sellPrice > 0 && (
-                        <div>
-                          <p className="text-xs text-mise-ink/50">GP</p>
-                          <p className={`font-semibold ${gp !== null && gp >= targetGp ? 'text-green-700' : 'text-red-600'}`}>
-                            {gp !== null ? formatPercent(gp) : '—'}
-                          </p>
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-xs text-mise-ink/50">Suggested</p>
-                        <p className="font-semibold text-gray-900">{formatCurrency(suggested)}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1 shrink-0 pt-0.5">
-                      <button
-                        onClick={() => toggleActive(id, isActive)}
-                        title={isActive ? 'Mark inactive' : 'Mark active'}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                      >
-                        {isActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                      </button>
-                      <button
-                        onClick={() => handleDuplicate(id)}
-                        title="Duplicate recipe"
-                        disabled={duplicating === id}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40"
-                      >
-                        {duplicating === id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
-                      </button>
-                      <Link href={`/chef/recipes/${id}/edit`}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
-                        <Pencil className="h-4 w-4" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(id, name)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
+              <div key={key}>
+                <h2 className="text-sm font-semibold text-mise-ink/50 uppercase tracking-widest mb-3">{label}</h2>
+                <div className="space-y-3">
+                  {items.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)}
                 </div>
-              </Card>
+              </div>
             )
           })}
         </div>
