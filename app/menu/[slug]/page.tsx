@@ -249,9 +249,6 @@ export default async function PublicMenuPage({ params }: Props) {
             management tool — the accuracy of allergen data is the sole responsibility of the
             restaurant operator. Always speak to staff before ordering if you have an allergy.
           </p>
-          <p className="text-xs text-gray-300 mt-2">
-            <a href="/terms" className="underline hover:text-gray-500">mise Terms of Service</a>
-          </p>
         </div>
       </div>
     </div>

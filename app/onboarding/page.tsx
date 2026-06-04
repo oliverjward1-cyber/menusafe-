@@ -139,7 +139,7 @@ export default function OnboardingPage() {
         {step === 2 && (
           <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
             <h2 className="text-xl font-bold text-white mb-1">Set up your restaurant</h2>
-            <p className="text-sm text-gray-400 mb-6">This takes 30 seconds and you can change everything later.</p>
+            <p className="text-sm text-gray-400 mb-6">You can change all of this later.</p>
 
             <div className="space-y-5">
               <div>
@@ -187,17 +187,20 @@ export default function OnboardingPage() {
                   </button>
                 </div>
                 {!PRESET_VALUES.includes(targetGp) && (
-                  <div className="mt-3 flex items-center gap-3">
-                    <input
-                      type="number" min={1} max={99}
-                      value={targetGp || ''}
-                      onChange={e => setTargetGp(Math.min(99, Math.max(1, parseInt(e.target.value) || 0)))}
-                      placeholder="e.g. 68"
-                      className="w-28 border border-mise-fresh/40 rounded-lg px-3 py-2 text-sm bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-mise-fresh/30"
-                      autoFocus
-                    />
-                    <span className="text-sm text-gray-400">% target GP</span>
-                  </div>
+                  <>
+                    <div className="mt-3 flex items-center gap-3">
+                      <input
+                        type="number" min={1} max={99}
+                        value={targetGp || ''}
+                        onChange={e => setTargetGp(Math.min(99, Math.max(1, parseInt(e.target.value) || 0)))}
+                        placeholder="e.g. 68"
+                        className="w-28 border border-mise-fresh/40 rounded-lg px-3 py-2 text-sm bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-mise-fresh/30"
+                        autoFocus
+                      />
+                      <span className="text-sm text-gray-400">% target GP</span>
+                    </div>
+                    {targetGp >= 99 && <p className="text-xs text-amber-400 mt-1">Maximum target GP is 99%</p>}
+                  </>
                 )}
               </div>
             </div>

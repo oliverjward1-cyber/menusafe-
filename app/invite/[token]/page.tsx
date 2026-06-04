@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -19,6 +20,7 @@ export default function InviteAcceptPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [expired, setExpired] = useState(false)
+  const [pwError, setPwError] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -60,8 +62,8 @@ export default function InviteAcceptPage() {
     })
 
     if (signInError) {
-      setError('Account created but sign-in failed. Please go to the login page.')
-      setLoading(false)
+      setError('Account created! Redirecting to login…')
+      setTimeout(() => router.push('/login'), 1500)
       return
     }
 
@@ -82,6 +84,9 @@ export default function InviteAcceptPage() {
             <p className="text-mise-fresh/70 text-sm">
               This invite link has expired or already been used. Ask your restaurant owner to send a new invite.
             </p>
+            <Link href="/login" className="mt-4 inline-block text-sm text-mise-fresh hover:text-white transition-colors">
+              Go to login
+            </Link>
           </div>
         </div>
       </div>
@@ -118,15 +123,22 @@ export default function InviteAcceptPage() {
               required
               autoComplete="new-password"
             />
-            <Input
-              label="Confirm password"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Repeat your password"
-              required
-              autoComplete="new-password"
-            />
+            <div>
+              <Input
+                label="Confirm password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                onBlur={() => {
+                  if (confirmPassword && password !== confirmPassword) setPwError('Passwords do not match')
+                  else setPwError('')
+                }}
+                placeholder="Repeat your password"
+                required
+                autoComplete="new-password"
+              />
+              {pwError && <p className="text-xs text-red-400 mt-1">{pwError}</p>}
+            </div>
 
             {error && (
               <div className="rounded-lg bg-red-900/30 border border-red-500/40 px-4 py-3 text-sm text-red-300">

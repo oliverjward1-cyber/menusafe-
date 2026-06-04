@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { CheckCircle, XCircle, AlertTriangle, Clock } from 'lucide-react'
 import QrCodeDisplay from './QrCodeDisplay'
+import { RemindButton } from './RemindButton'
 
 function addMonths(date: Date, months: number): Date {
   const d = new Date(date)
@@ -252,6 +253,7 @@ export default async function StaffQuizPage({
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Passed</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Expires</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+                      <th className="text-left px-4 py-3 font-medium text-gray-600">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -291,6 +293,15 @@ export default async function StaffQuizPage({
                               <AlertTriangle className="h-3 w-3 inline mr-1" />
                               Expired
                             </Badge>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {(r.status === 'expiring' || r.status === 'expired') && (
+                            <RemindButton
+                              staffName={r.staffName}
+                              restaurantName={restaurant?.name ?? ''}
+                              quizUrl={`${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/quiz/${restaurant?.slug}`}
+                            />
                           )}
                         </td>
                       </tr>

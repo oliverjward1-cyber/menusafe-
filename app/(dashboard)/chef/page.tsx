@@ -44,6 +44,9 @@ export default async function ChefDashboard() {
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'Chef'
 
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+
   const checklist = [
     {
       done: true,
@@ -86,7 +89,7 @@ export default async function ChefDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-display font-semibold text-mise-ink">
-          {isNewUser ? 'Welcome to mise' : `Good day, ${firstName}`}
+          {isNewUser ? 'Welcome to mise' : `${greeting}, ${firstName}`}
         </h1>
         <p className="text-sm text-mise-ink/50 mt-0.5">
           {isNewUser ? "Let's get your kitchen set up." : "Here's what's happening in your kitchen."}

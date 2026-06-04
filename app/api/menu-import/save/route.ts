@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(req: NextRequest) {
@@ -8,7 +9,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing data' }, { status: 400 })
   }
 
-  const supabase = createAdminClient()
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
+  if (!profile?.restaurant_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (profile.restaurant_id !== restaurantId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  const adminSupabase = createAdminClient()
 
   const rows = dishes.map((d: { name: string; category: string; price: number | null; description: string | null }) => ({
     restaurant_id: restaurantId,
@@ -20,7 +28,7 @@ export async function POST(req: NextRequest) {
     method: null,
   }))
 
-  const { data, error } = await supabase.from('recipes').insert(rows).select('id, name')
+  const { data, error } = await adminSupabase.from('recipes').insert(rows).select('id, name')
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

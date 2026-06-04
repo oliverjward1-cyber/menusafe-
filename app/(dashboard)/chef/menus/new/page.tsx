@@ -112,7 +112,7 @@ export default function NewMenuPage() {
             className="px-5 py-2 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-2"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-            Create and add dishes →
+            Save and add recipes →
           </button>
         </div>
       </div>

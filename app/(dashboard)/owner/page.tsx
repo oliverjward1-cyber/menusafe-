@@ -52,13 +52,13 @@ export default async function OwnerDashboard() {
   }
   const trainedStaff = Array.from(latestByStaff.values())
   const now = new Date()
-  const twoWeeksFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
+  const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
   const expiringStaff = trainedStaff.filter(s => {
-    const expiry = addMonths(new Date(s.completed_at), 3)
-    return expiry > now && expiry <= twoWeeksFromNow
+    const expiry = addMonths(new Date(s.completed_at), 6)
+    return expiry > now && expiry <= thirtyDaysFromNow
   })
   const expiredStaff = trainedStaff.filter(s => {
-    return addMonths(new Date(s.completed_at), 3) < now
+    return addMonths(new Date(s.completed_at), 6) < now
   })
 
   function calcFoodCost(recipe: NonNullable<typeof recipesRes.data>[number]): number {
@@ -190,7 +190,7 @@ export default async function OwnerDashboard() {
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-blue-600" />
-              <h2 className="text-sm font-semibold text-mise-ink">Staff training</h2>
+              <h2 className="text-sm font-semibold text-mise-ink">Staff Quiz</h2>
             </div>
             <Link href="/owner/staff-quiz" className="text-xs text-mise-mid hover:text-mise-deep font-medium">View all →</Link>
           </div>
@@ -226,11 +226,11 @@ export default async function OwnerDashboard() {
               <div className="divide-y divide-gray-50 max-h-48 overflow-y-auto">
                 {expiringStaff.length > 0 && (
                   <div className="px-4 py-2 bg-amber-50">
-                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Expiring within 2 weeks</p>
+                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Expiring within 30 days</p>
                   </div>
                 )}
                 {expiringStaff.map(s => {
-                  const expiry = addMonths(new Date(s.completed_at), 3)
+                  const expiry = addMonths(new Date(s.completed_at), 6)
                   const daysLeft = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
                   return (
                     <div key={s.id} className="flex items-center justify-between px-4 py-2.5 bg-amber-50/50">
@@ -257,7 +257,7 @@ export default async function OwnerDashboard() {
                   </div>
                 ))}
                 {trainedStaff.filter(s => !expiringStaff.includes(s) && !expiredStaff.includes(s)).map(s => {
-                  const expiry = addMonths(new Date(s.completed_at), 3)
+                  const expiry = addMonths(new Date(s.completed_at), 6)
                   return (
                     <div key={s.id} className="flex items-center justify-between px-4 py-2.5">
                       <div className="flex items-center gap-2">

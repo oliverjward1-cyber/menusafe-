@@ -27,8 +27,8 @@ export async function middleware(request: NextRequest) {
   }
 
   if (path.startsWith('/owner') && user) {
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    if (profile?.role !== 'owner') {
+    const { data: profile, error: profileError } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    if (profileError || profile?.role !== 'owner') {
       return NextResponse.redirect(new URL('/chef', request.url))
     }
   }

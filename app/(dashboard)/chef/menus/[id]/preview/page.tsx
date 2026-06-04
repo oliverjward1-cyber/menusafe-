@@ -100,7 +100,10 @@ export default async function MenuPreviewPage({ params }: Props) {
         <div className="px-4 py-8 space-y-10">
           {Object.keys(byCategory).length === 0 ? (
             <div className="text-center py-10 text-mise-ink/40">
-              <p>No dishes on this menu yet. Add some from the editor.</p>
+              <p>No dishes on this menu yet.</p>
+              <Link href={`/chef/menus/${params.id}`} className="mt-3 inline-flex items-center gap-1 text-sm text-mise-mid hover:text-mise-deep font-medium">
+                <ChevronLeft className="h-4 w-4" /> Back to editor
+              </Link>
             </div>
           ) : (
             Object.entries(byCategory).map(([cat, dishes]) => (
