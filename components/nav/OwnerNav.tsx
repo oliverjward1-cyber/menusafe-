@@ -71,6 +71,8 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
             { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
             { href: '/chef/menus', label: 'Menus', icon: MenuSquare },
             { href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode },
+            { href: '/chef/audit', label: 'Kitchen Audit', icon: ClipboardCheck },
+            { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
           ].map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href)
             return (
@@ -85,9 +87,7 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
         <div>
           <p className="px-3 mb-1 text-xs font-semibold text-gray-500 uppercase tracking-widest">Allergens</p>
           {[
-            { href: '/chef/audit', label: 'Kitchen Audit', icon: ClipboardCheck },
             { href: '/owner/staff-quiz', label: 'Staff Quiz', icon: Users },
-            { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
             { href: '/owner/quiz-questions', label: 'Quiz Questions', icon: GraduationCap },
           ].map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href)
