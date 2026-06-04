@@ -3,18 +3,18 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { CheckCircle2, XCircle, MinusCircle, Camera, Loader2, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react'
+import { Camera, Loader2, AlertTriangle, MessageSquare } from 'lucide-react'
 
 type Answer = 'pass' | 'fail' | 'na' | null
 interface AnswerState {
   answer: Answer
-  notes: string
+  notes: string | null
   photoFile: File | null
   photoPreview: string | null
   uploading: boolean
 }
 
-const DEFAULT_STATE: AnswerState = { answer: null, notes: '', photoFile: null, photoPreview: null, uploading: false }
+const DEFAULT_STATE: AnswerState = { answer: null, notes: null, photoFile: null, photoPreview: null, uploading: false }
 
 export function AuditForm({ restaurantId, questions }: { restaurantId: string; questions: { key: string; label: string; category: string; requiresPhotoOnFail?: boolean }[] }) {
   const router = useRouter()
@@ -28,19 +28,18 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
   const [answers, setAnswers] = useState<Record<string, AnswerState>>(
     Object.fromEntries(questions.map(q => [q.key, { ...DEFAULT_STATE }]))
   )
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
   function setAnswer(key: string, field: keyof AnswerState, value: unknown) {
-    setAnswers(prev => ({ ...prev, [key]: { ...prev[key], [field]: value } }))
-  }
-
-  function toggleCategory(cat: string) {
-    setCollapsed(prev => {
-      const n = new Set(prev)
-      n.has(cat) ? n.delete(cat) : n.add(cat)
-      return n
+    setAnswers(prev => {
+      const current = prev[key]
+      const updated = { ...current, [field]: value }
+      // Auto-open notes when fail is selected
+      if (field === 'answer' && value === 'fail' && current.notes === null) {
+        updated.notes = ''
+      }
+      return { ...prev, [key]: updated }
     })
   }
 
@@ -89,7 +88,7 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
     const answerRows = questions.map(q => ({
       question_key: q.key,
       answer: answers[q.key].answer,
-      notes: answers[q.key].notes.trim() || null,
+      notes: answers[q.key].notes?.trim() || null,
       photo_url: photoUrls[q.key] ?? null,
     }))
 
@@ -147,89 +146,84 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
       {/* Questions by category */}
       {categories.map(cat => {
         const catQuestions = questions.filter(q => q.category === cat)
-        const catAnswered = catQuestions.filter(q => answers[q.key].answer !== null).length
-        const catFails = catQuestions.filter(q => answers[q.key].answer === 'fail').length
-        const isCollapsed = collapsed.has(cat)
-
+        const catAnswered = catQuestions.filter(q => answers[q.key]?.answer !== null).length
+        const catFails = catQuestions.filter(q => answers[q.key]?.answer === 'fail').length
         return (
           <div key={cat} className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
-            <button
-              onClick={() => toggleCategory(cat)}
-              className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <h2 className="text-sm font-semibold text-mise-ink">{cat}</h2>
-                {catFails > 0 && (
-                  <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">{catFails} fail{catFails !== 1 ? 's' : ''}</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-mise-ink/40">{catAnswered}/{catQuestions.length}</span>
-                {isCollapsed ? <ChevronDown className="h-4 w-4 text-mise-ink/40" /> : <ChevronUp className="h-4 w-4 text-mise-ink/40" />}
-              </div>
-            </button>
+            <div className="px-5 pt-4 pb-2 border-b border-gray-100">
+              <h2 className="text-sm font-semibold text-mise-ink">{cat}</h2>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {catAnswered} of {catQuestions.length} answered
+                {catFails > 0 && <span className="text-red-500 ml-2">· {catFails} fail{catFails !== 1 ? 's' : ''}</span>}
+              </p>
+            </div>
+            <div className="px-5">
+              {catQuestions.map(q => {
+                const a = answers[q.key] ?? DEFAULT_STATE
+                return (
+                  <div key={q.key} className="border-b border-gray-100 last:border-0 py-4">
+                    {/* Question text */}
+                    <p className="text-sm font-medium text-mise-ink mb-3 leading-snug">{q.label}</p>
 
-            {!isCollapsed && (
-              <div className="divide-y divide-gray-50 border-t border-gray-100">
-                {catQuestions.map(q => {
-                  const a = answers[q.key]
-                  return (
-                    <div key={q.key} className={`px-5 py-4 transition-colors ${a.answer === 'fail' ? 'bg-red-50/40' : a.answer === 'pass' ? 'bg-green-50/20' : ''}`}>
-                      <p className="text-sm font-medium text-mise-ink mb-3">{q.label}</p>
-
-                      {/* Answer buttons */}
-                      <div className="flex gap-2 mb-3">
-                        {(['pass', 'fail', 'na'] as const).map(opt => (
-                          <button
-                            key={opt}
-                            onClick={() => setAnswer(q.key, 'answer', opt)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
-                              a.answer === opt
-                                ? opt === 'pass' ? 'bg-green-600 border-green-600 text-white'
-                                  : opt === 'fail' ? 'bg-red-600 border-red-600 text-white'
-                                  : 'bg-gray-500 border-gray-500 text-white'
-                                : 'border-gray-200 text-gray-500 hover:border-gray-300 bg-white'
-                            }`}
-                          >
-                            {opt === 'pass' ? <CheckCircle2 className="h-3.5 w-3.5" /> : opt === 'fail' ? <XCircle className="h-3.5 w-3.5" /> : <MinusCircle className="h-3.5 w-3.5" />}
-                            {opt === 'na' ? 'N/A' : opt.charAt(0).toUpperCase() + opt.slice(1)}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Notes + photo on fail, optional on pass */}
-                      {a.answer !== null && a.answer !== 'na' && (
-                        <div className="space-y-2">
-                          {a.answer === 'fail' && (
-                            <input
-                              value={a.notes}
-                              onChange={e => setAnswer(q.key, 'notes', e.target.value)}
-                              placeholder="Describe the issue…"
-                              className="w-full border border-red-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent bg-white"
-                            />
-                          )}
-                          <div className="flex items-center gap-3">
-                            <label className={`inline-flex items-center gap-1.5 text-xs font-medium cursor-pointer px-3 py-1.5 rounded-lg border transition-colors ${
-                              a.answer === 'fail'
-                                ? 'border-red-200 text-red-600 hover:bg-red-50'
-                                : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                            }`}>
-                              <Camera className="h-3.5 w-3.5" />
-                              {a.photoPreview ? 'Change photo' : a.answer === 'fail' ? 'Attach photo (recommended)' : 'Add photo'}
-                              <input type="file" accept="image/*" capture="environment" className="hidden"
-                                onChange={e => handlePhoto(q.key, e.target.files?.[0] ?? null)} />
-                            </label>
-                            {a.photoPreview && (
-                              <img src={a.photoPreview} alt="evidence" className="h-10 w-10 rounded-lg object-cover border border-gray-200" />
-                            )}
-                          </div>
-                        </div>
-                      )}
+                    {/* Full-width stacked answer buttons */}
+                    <div className="space-y-2 mb-3">
+                      {(['pass', 'fail', 'na'] as const).map(opt => (
+                        <button
+                          key={opt}
+                          onClick={() => setAnswer(q.key, 'answer', opt)}
+                          className={`w-full py-3 px-4 rounded-xl border text-sm font-medium transition-colors text-left ${
+                            a.answer === opt
+                              ? opt === 'pass' ? 'bg-green-600 border-green-600 text-white'
+                                : opt === 'fail' ? 'bg-red-600 border-red-600 text-white'
+                                : 'bg-gray-500 border-gray-500 text-white'
+                              : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {opt === 'pass' ? 'Yes' : opt === 'fail' ? 'No' : 'N/A'}
+                        </button>
+                      ))}
                     </div>
-                  )
-                })}
-              </div>
-            )}
+
+                    {/* Media & Comment row - show only when answered */}
+                    {a.answer !== null && (
+                      <div className="flex items-center gap-3 mt-2">
+                        <label className="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer hover:text-gray-700">
+                          <Camera className="h-4 w-4" />
+                          {a.photoPreview ? 'Change photo' : 'Media & Files'}
+                          <input type="file" accept="image/*" capture="environment" className="hidden"
+                            onChange={e => handlePhoto(q.key, e.target.files?.[0] ?? null)} />
+                        </label>
+                        <button
+                          onClick={() => setAnswer(q.key, 'notes', a.notes === null ? '' : null)}
+                          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700"
+                        >
+                          <MessageSquare className="h-4 w-4" /> Comment
+                        </button>
+                        {a.photoPreview && (
+                          <img src={a.photoPreview} alt="evidence" className="h-8 w-8 rounded-lg object-cover border border-gray-200 ml-auto" />
+                        )}
+                      </div>
+                    )}
+
+                    {/* Notes input - show when comment is open (notes !== null) or on fail */}
+                    {(a.answer === 'fail' || (a.notes !== null && a.answer !== null)) && (
+                      <textarea
+                        value={a.notes ?? ''}
+                        onChange={e => setAnswer(q.key, 'notes', e.target.value)}
+                        placeholder={a.answer === 'fail' ? 'Describe the issue…' : 'Add a comment…'}
+                        rows={2}
+                        className="mt-2 w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent resize-none"
+                      />
+                    )}
+
+                    {/* Photo hint for fails with requiresPhotoOnFail */}
+                    {a.answer === 'fail' && q.requiresPhotoOnFail && !a.photoPreview && (
+                      <p className="mt-1.5 text-xs text-red-400">Photo recommended for fails</p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )
       })}

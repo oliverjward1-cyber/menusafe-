@@ -28,9 +28,9 @@ interface EditState {
   requires_photo_on_fail: boolean
 }
 
-const emptyNew = (): EditState => ({
+const emptyNew = (category = CATEGORIES[0]): EditState => ({
   label: '',
-  category: CATEGORIES[0],
+  category,
   requires_photo_on_fail: false,
 })
 
@@ -40,7 +40,8 @@ export default function AuditQuestionsManager({ restaurantId }: { restaurantId: 
   const [error, setError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editState, setEditState] = useState<EditState>(emptyNew())
-  const [showAddForm, setShowAddForm] = useState(false)
+  // Per-category inline add form: stores the category currently showing the add form (or null)
+  const [addingCategory, setAddingCategory] = useState<string | null>(null)
   const [newQuestion, setNewQuestion] = useState<EditState>(emptyNew())
   const [saving, setSaving] = useState(false)
 
@@ -150,13 +151,23 @@ export default function AuditQuestionsManager({ restaurantId }: { restaurantId: 
       })
       if (!res.ok) throw new Error('Add failed')
       setNewQuestion(emptyNew())
-      setShowAddForm(false)
+      setAddingCategory(null)
       await fetchQuestions()
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Add failed')
     } finally {
       setSaving(false)
     }
+  }
+
+  function openAddForm(cat: string) {
+    setAddingCategory(cat)
+    setNewQuestion(emptyNew(cat))
+  }
+
+  function cancelAdd() {
+    setAddingCategory(null)
+    setNewQuestion(emptyNew())
   }
 
   // Group by category
@@ -192,72 +203,33 @@ export default function AuditQuestionsManager({ restaurantId }: { restaurantId: 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Audit Questions</h1>
-          <p className="text-sm text-gray-500 mt-1">Customise the kitchen audit checklist</p>
-        </div>
-        <button
-          onClick={() => { setShowAddForm(true); setNewQuestion(emptyNew()) }}
-          className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
-        >
-          + Add question
-        </button>
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">Audit Questions</h1>
+        <p className="text-sm text-gray-500 mt-1">Customise the kitchen audit checklist</p>
       </div>
-
-      {/* Add form */}
-      {showAddForm && (
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5 space-y-3">
-          <h3 className="font-medium text-gray-900 text-sm">New question</h3>
-          <input
-            type="text"
-            placeholder="Question label"
-            value={newQuestion.label}
-            onChange={(e) => setNewQuestion((prev) => ({ ...prev, label: e.target.value }))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-          />
-          <div className="flex gap-3 flex-wrap items-center">
-            <select
-              value={newQuestion.category}
-              onChange={(e) => setNewQuestion((prev) => ({ ...prev, category: e.target.value }))}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={newQuestion.requires_photo_on_fail}
-                onChange={(e) => setNewQuestion((prev) => ({ ...prev, requires_photo_on_fail: e.target.checked }))}
-                className="rounded"
-              />
-              Requires photo on fail
-            </label>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={addQuestion}
-              disabled={saving || !newQuestion.label.trim()}
-              className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors"
-            >
-              Add
-            </button>
-            <button
-              onClick={() => setShowAddForm(false)}
-              className="px-4 py-2 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Questions by category */}
       {allCategories.map((cat) => {
-        const qs = grouped[cat]
-        if (!qs || qs.length === 0) return null
+        const qs = grouped[cat] ?? []
+        const isAddingHere = addingCategory === cat
+        if (qs.length === 0 && !isAddingHere) {
+          // Show empty category with just the add button
+          return (
+            <div key={cat} className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
+                <h2 className="text-sm font-semibold text-gray-700">{cat}</h2>
+              </div>
+              <div className="px-5 py-3">
+                <button
+                  onClick={() => openAddForm(cat)}
+                  className="text-sm text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  + Add question
+                </button>
+              </div>
+            </div>
+          )
+        }
         return (
           <div key={cat} className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
             <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
@@ -315,9 +287,6 @@ export default function AuditQuestionsManager({ restaurantId }: { restaurantId: 
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-800">{q.label}</p>
                         <div className="flex gap-1.5 mt-1.5 flex-wrap">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                            {q.category}
-                          </span>
                           {q.requires_photo_on_fail && (
                             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700">
                               Photo required on fail
@@ -344,6 +313,64 @@ export default function AuditQuestionsManager({ restaurantId }: { restaurantId: 
                 </li>
               ))}
             </ul>
+
+            {/* Inline add form for this category */}
+            {isAddingHere ? (
+              <div className="px-5 py-4 border-t border-gray-100 space-y-3 bg-gray-50/50">
+                <input
+                  type="text"
+                  placeholder="Question label"
+                  value={newQuestion.label}
+                  onChange={(e) => setNewQuestion((prev) => ({ ...prev, label: e.target.value }))}
+                  autoFocus
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                />
+                <div className="flex gap-3 flex-wrap items-center">
+                  <select
+                    value={newQuestion.category}
+                    onChange={(e) => setNewQuestion((prev) => ({ ...prev, category: e.target.value }))}
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  >
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newQuestion.requires_photo_on_fail}
+                      onChange={(e) => setNewQuestion((prev) => ({ ...prev, requires_photo_on_fail: e.target.checked }))}
+                      className="rounded"
+                    />
+                    Requires photo on fail
+                  </label>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={addQuestion}
+                    disabled={saving || !newQuestion.label.trim()}
+                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                  >
+                    Add
+                  </button>
+                  <button
+                    onClick={cancelAdd}
+                    className="px-4 py-2 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="px-5 py-3 border-t border-gray-100">
+                <button
+                  onClick={() => openAddForm(cat)}
+                  className="text-sm text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  + Add question
+                </button>
+              </div>
+            )}
           </div>
         )
       })}
