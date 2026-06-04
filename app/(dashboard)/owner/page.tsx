@@ -4,7 +4,7 @@ import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
   AlertTriangle, Globe, GlobeLock,
-  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck,
+  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck,
 } from 'lucide-react'
 
 function addMonths(date: Date, months: number): Date {
@@ -104,9 +104,18 @@ export default async function OwnerDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">{restaurant?.name}</h1>
-        <p className="text-sm text-mise-ink/50 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">{restaurant?.name}</h1>
+          <p className="text-sm text-mise-ink/50 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
+        </div>
+        <Link
+          href="/owner/eho"
+          className="flex-shrink-0 inline-flex items-center gap-2 bg-mise-deep text-white rounded-xl px-4 py-2.5 text-sm font-semibold shadow hover:bg-mise-deep/90 transition-colors"
+        >
+          <ShieldCheck className="h-4 w-4" />
+          EHO Inspection Mode
+        </Link>
       </div>
 
       {/* Top stat cards */}
