@@ -22,6 +22,13 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
+  if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
+    const token = request.cookies.get('admin_auth')?.value
+    if (!token || token !== process.env.ADMIN_PASSWORD) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+  }
+
   if ((path.startsWith('/chef') || path.startsWith('/owner')) && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
