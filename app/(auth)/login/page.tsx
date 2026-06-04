@@ -29,7 +29,18 @@ export default function LoginPage() {
       return
     }
 
-    router.push('/')
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user!.id)
+      .single()
+
+    if (profile?.role === 'owner') {
+      router.push('/owner')
+    } else {
+      router.push('/chef')
+    }
     router.refresh()
   }
 

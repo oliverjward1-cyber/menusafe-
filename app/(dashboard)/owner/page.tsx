@@ -4,8 +4,9 @@ import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
   AlertTriangle, Globe, GlobeLock,
-  Users, Clock, CheckCircle2, ArrowRight, MenuSquare,
+  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, UserPlus,
 } from 'lucide-react'
+import { InviteChef } from './InviteChef'
 
 function addMonths(date: Date, months: number): Date {
   const d = new Date(date)
@@ -271,6 +272,18 @@ export default async function OwnerDashboard() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Invite head chef */}
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <UserPlus className="h-4 w-4 text-mise-mid" />
+          <h2 className="text-base font-semibold text-mise-ink">Invite your head chef</h2>
+        </div>
+        <p className="text-sm text-mise-ink/50 mb-4">
+          Your head chef gets their own login to manage recipes, ingredients, and kitchen audits.
+        </p>
+        <InviteChef />
       </div>
 
     </div>
