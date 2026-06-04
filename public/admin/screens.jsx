@@ -44,6 +44,54 @@ function OverviewScreen(props) {
     </div>
   ) : null;
 
+  var funnelCard = (
+    <div className="card">
+      <div className="card-head"><h3>Trial conversion funnel</h3><span className="sub">All time</span></div>
+      <div className="card-body">
+        <div style={{ display: "flex", gap: 0, alignItems: "stretch" }}>
+          {[
+            { label: "Signups", value: D.TRIAL_FUNNEL.signups, color: "var(--info)" },
+            { label: "Active trials", value: D.TRIAL_FUNNEL.activeTrials, color: "var(--warn)" },
+            { label: "Converted", value: D.TRIAL_FUNNEL.converted, color: "var(--good)" },
+          ].map(function(step, i) {
+            return (
+              <div key={step.label} style={{ flex: 1, textAlign: "center", padding: "16px 8px", borderRight: i < 2 ? "1px solid var(--hairline-2)" : "none" }}>
+                <div style={{ fontSize: 28, fontWeight: 700, color: step.color, fontFamily: "var(--font-display)" }}>{step.value}</div>
+                <div style={{ fontSize: 12, color: "var(--ink-faint)", marginTop: 4 }}>{step.label}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ padding: "12px 16px", borderTop: "1px solid var(--hairline-2)", fontSize: 13, color: "var(--ink-soft)" }}>
+          <b style={{ color: "var(--good)" }}>{D.TRIAL_FUNNEL.conversionRate}% conversion rate</b> · {D.TRIAL_FUNNEL.converted} paying customers
+        </div>
+      </div>
+    </div>
+  );
+
+  var acquisitionCard = (
+    <div className="card">
+      <div className="card-head"><h3>Acquisition sources</h3><span className="sub">How customers found you</span></div>
+      <div className="card-body" style={{ padding: "6px 0" }}>
+        {D.ACQUISITION_SOURCES.length === 0
+          ? <div style={{ padding: "20px", textAlign: "center", color: "var(--ink-faint)", fontSize: 13 }}>No acquisition data yet — add "How did you hear about us?" to signup</div>
+          : D.ACQUISITION_SOURCES.sort(function(a,b){return b.count-a.count;}).map(function(s, i) {
+              var max = D.ACQUISITION_SOURCES.reduce(function(m,x){return Math.max(m,x.count);}, 1);
+              return (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 18px" }}>
+                  <span style={{ width: 120, fontSize: 13, color: "var(--ink-soft)", flexShrink: 0 }}>{s.source}</span>
+                  <div style={{ flex: 1, height: 6, background: "var(--hairline-2)", borderRadius: 4 }}>
+                    <div style={{ width: (s.count/max*100)+"%", height: 6, background: "var(--accent)", borderRadius: 4 }}></div>
+                  </div>
+                  <span style={{ width: 24, textAlign: "right", fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>{s.count}</span>
+                </div>
+              );
+            })
+        }
+      </div>
+    </div>
+  );
+
   var chartCard = (
     <div className="card">
       <div className="card-head"><h3>Monthly recurring revenue</h3><span className="sub">Last 9 months</span><span className="spacer" style={{ marginLeft: "auto" }}></span><span className="badge b-good plain"><Icon name="up" size={13} sw={2.4} /> +£158 this month</span></div>
@@ -81,6 +129,7 @@ function OverviewScreen(props) {
         {chartCard}
         <div className="kpi-grid">{kpis}</div>
         <div className="lower-grid">{activityCard}{planCard}</div>
+        <div className="lower-grid">{funnelCard}{acquisitionCard}</div>
       </div>
     );
   }
@@ -91,6 +140,7 @@ function OverviewScreen(props) {
         <div className="kpi-grid">{kpis}</div>
         <div className="lower-grid">{chartCard}{activityCard}</div>
         {planCard}
+        <div className="lower-grid">{funnelCard}{acquisitionCard}</div>
       </div>
     );
   }
@@ -101,6 +151,7 @@ function OverviewScreen(props) {
       <div className="kpi-grid">{kpis}</div>
       <div className="lower-grid">{chartCard}{planCard}</div>
       {activityCard}
+      <div className="lower-grid">{funnelCard}{acquisitionCard}</div>
     </div>
   );
 }
@@ -128,7 +179,7 @@ function CustomersScreen(props) {
       </div>
       <div className="table-scroll">
         <table className="tbl">
-          <thead><tr><th>Restaurant</th><th>Plan</th><th>Status</th><th className="num">MRR</th><th>Sites</th><th>Joined</th><th></th></tr></thead>
+          <thead><tr><th>Restaurant</th><th>Plan</th><th>Status</th><th>Health</th><th className="num">MRR</th><th>Sites</th><th>Joined</th><th></th></tr></thead>
           <tbody>
             {rows.map(function (c) {
               var billable = c.status === "active" || c.status === "past_due";
@@ -137,6 +188,7 @@ function CustomersScreen(props) {
                   <td><div className="cell-main"><RestMark name={c.name} /><div><div className="cell-strong">{c.name}</div><div className="cell-sub">{c.contact} · {c.city}</div></div></div></td>
                   <td>{D.PLANS[c.plan].name}</td>
                   <td><Badge status={c.status} /></td>
+                  <td><span className={"badge plain b-" + c.healthStatus}>{c.healthScore}%</span></td>
                   <td className="num tnum">{billable ? gbp(D.PLANS[c.plan].price) : "—"}</td>
                   <td className="tnum">{c.sites}</td>
                   <td>{fmtShort(c.since)}</td>

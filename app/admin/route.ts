@@ -103,6 +103,20 @@ export async function GET() {
       { m: 'Apr', v: 0 }, { m: 'May', v: 0 },
       { m: 'Jun', v: customers.length * 49 },
     ],
+    TRIAL_FUNNEL: {
+      signups: customers.length,
+      activeTrials: customers.filter(c => c.status === 'trial').length,
+      converted: customers.filter(c => c.status === 'active').length,
+      conversionRate: customers.length > 0 ? Math.round((customers.filter(c => c.status === 'active').length / customers.length) * 100) : 0,
+    },
+    ACQUISITION_SOURCES: (() => {
+      const sources: Record<string, number> = {}
+      customers.forEach(c => {
+        const src = c.acquisitionSource || 'Unknown'
+        sources[src] = (sources[src] || 0) + 1
+      })
+      return Object.entries(sources).map(([source, count]) => ({ source, count }))
+    })(),
     INVOICES: [],
     WAITLIST: [],
     ACTIVITY: customers.slice(0, 6).map(c => ({

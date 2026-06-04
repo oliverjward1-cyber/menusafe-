@@ -5,6 +5,26 @@ function CustomerDrawer(props) {
   var plan = D.PLANS[c.plan];
   var billable = c.status === "active" || c.status === "past_due";
   var invs = D.INVOICES.filter(function (i) { return i.cust === c.id; }).slice(0, 4);
+  var _note = React.useState(""), noteText = _note[0], setNoteText = _note[1];
+  var _saving = React.useState(false), savingNote = _saving[0], setSavingNote = _saving[1];
+  var _notes = React.useState(c.notes || []), localNotes = _notes[0], setLocalNotes = _notes[1];
+
+  async function saveNote() {
+    if (!noteText.trim()) return;
+    setSavingNote(true);
+    var res = await fetch("/api/admin/notes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ restaurantId: c.id, note: noteText })
+    });
+    var data = await res.json();
+    setSavingNote(false);
+    if (res.ok) {
+      setLocalNotes(function(prev) { return [data.note].concat(prev); });
+      setNoteText("");
+      A.toast("Note saved");
+    }
+  }
   return (
     <Drawer onClose={props.onClose}>
       <div className="drawer-head">
@@ -33,6 +53,9 @@ function CustomerDrawer(props) {
             <div className="d-row"><span className="d-k">Email</span><span className="d-v">{c.email}</span></div>
             <div className="d-row"><span className="d-k">Plan</span><span className="d-v">{plan.name} · {gbp(plan.price)}/mo</span></div>
             <div className="d-row"><span className="d-k">Customer since</span><span className="d-v">{fmtDate(c.since)}</span></div>
+            {c.acquisitionSource && <div className="d-row"><span className="d-k">Source</span><span className="d-v">{c.acquisitionSource}</span></div>}
+            {c.referralCode && <div className="d-row"><span className="d-k">Referral code</span><span className="d-v tnum">{c.referralCode}</span></div>}
+            {c.referredBy && <div className="d-row"><span className="d-k">Referred by</span><span className="d-v tnum">{c.referredBy}</span></div>}
             <div className="d-row"><span className="d-k">Last active</span><span className="d-v">{fmtDate(c.lastActive)}</span></div>
           </div>
         </div>
@@ -90,6 +113,35 @@ function CustomerDrawer(props) {
             <button className="action-tile" onClick={function () { A.email(c); }}><span className="action-ico"><Icon name="mail" /></span>Send email</button>
           </div>
           <button className="action-tile danger" style={{ marginTop: 10, width: "100%" }} onClick={function () { A.openModal("cancel", c.id); }}><span className="action-ico"><Icon name="alert" /></span>{c.status === "cancelled" ? "Account cancelled" : "Suspend / cancel account"}</button>
+        </div>
+
+        <div>
+          <div className="section-label" style={{ marginBottom: 9 }}>Notes ({localNotes.length})</div>
+          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+            <input
+              value={noteText}
+              onChange={function(e) { setNoteText(e.target.value); }}
+              onKeyDown={function(e) { if (e.key === "Enter") saveNote(); }}
+              placeholder="Add a note… (Enter to save)"
+              style={{ flex: 1, border: "1px solid var(--hairline)", borderRadius: 8, padding: "8px 12px", fontSize: 13, background: "var(--surface-2)", color: "var(--ink)" }}
+            />
+            <button className="btn btn-primary btn-sm" onClick={saveNote} disabled={savingNote || !noteText.trim()}>
+              {savingNote ? "…" : "Add"}
+            </button>
+          </div>
+          <div className="detail-list">
+            {localNotes.length === 0
+              ? <div className="d-row"><span className="d-k" style={{ color: "var(--ink-faint)" }}>No notes yet</span></div>
+              : localNotes.map(function(n, i) {
+                  return (
+                    <div className="d-row" key={i} style={{ flexDirection: "column", alignItems: "flex-start", gap: 2 }}>
+                      <span style={{ fontSize: 13, color: "var(--ink)" }}>{n.note}</span>
+                      <span style={{ fontSize: 11, color: "var(--ink-faint)" }}>{n.created_by} · {new Date(n.created_at).toLocaleString("en-GB")}</span>
+                    </div>
+                  );
+                })
+            }
+          </div>
         </div>
       </div>
       <div className="drawer-foot">
