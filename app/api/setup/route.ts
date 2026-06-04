@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(req: NextRequest) {
-  const { name, slug, targetGp } = await req.json()
+  const { name, slug, targetGp, hearAbout, utmSource, utmMedium, utmCampaign, referralCode } = await req.json()
 
   if (!name?.trim() || !slug?.trim()) {
     return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 })
@@ -25,7 +25,16 @@ export async function POST(req: NextRequest) {
   const adminClient = createAdminClient()
   const { data: restaurant, error } = await adminClient
     .from('restaurants')
-    .insert({ name: name.trim(), slug: slug.trim(), target_gp: targetGp ?? 70 })
+    .insert({
+      name: name.trim(),
+      slug: slug.trim(),
+      target_gp: targetGp ?? 70,
+      acquisition_source: hearAbout || utmSource || null,
+      acquisition_medium: utmMedium || null,
+      acquisition_campaign: utmCampaign || null,
+      referred_by: referralCode || null,
+      referral_code: Math.random().toString(36).slice(2, 10).toUpperCase(),
+    })
     .select('id, slug')
     .single()
 

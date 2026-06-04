@@ -12,14 +12,16 @@ export async function GET() {
 
   const supabase = createAdminClient()
 
-  const [restRes, profileRes, recipeRes, auditRes, quizRes, loginEventsRes, sessionsRes] = await Promise.all([
-    supabase.from('restaurants').select('id, name, slug, plan, target_gp, created_at').order('created_at', { ascending: false }),
+  const [restRes, profileRes, recipeRes, auditRes, quizRes, loginEventsRes, sessionsRes, notesRes, menusRes] = await Promise.all([
+    supabase.from('restaurants').select('id, name, slug, plan, target_gp, created_at, acquisition_source, referral_code, referred_by').order('created_at', { ascending: false }),
     supabase.from('profiles').select('id, restaurant_id, role, full_name').order('created_at', { ascending: true }),
     supabase.from('recipes').select('restaurant_id'),
     supabase.from('kitchen_audits').select('restaurant_id, completed_at').order('completed_at', { ascending: false }),
     supabase.from('staff_quiz_attempts').select('restaurant_id, staff_name, passed, score, total_questions, completed_at').order('completed_at', { ascending: false }),
     supabase.from('login_events').select('*').order('created_at', { ascending: false }).limit(200),
     supabase.from('user_sessions').select('*').order('last_seen', { ascending: false }),
+    supabase.from('customer_notes').select('restaurant_id, note, created_by, created_at').order('created_at', { ascending: false }),
+    supabase.from('menus').select('restaurant_id, is_published'),
   ])
 
   const restaurants = restRes.data ?? []

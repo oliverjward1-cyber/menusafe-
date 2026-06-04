@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -21,6 +21,19 @@ export default function SignupPage() {
   const [restaurantCode, setRestaurantCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [hearAbout, setHearAbout] = useState('')
+  const [utmSource, setUtmSource] = useState('')
+  const [utmMedium, setUtmMedium] = useState('')
+  const [utmCampaign, setUtmCampaign] = useState('')
+  const [referralCode, setReferralCode] = useState('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setUtmSource(params.get('utm_source') || '')
+    setUtmMedium(params.get('utm_medium') || '')
+    setUtmCampaign(params.get('utm_campaign') || '')
+    setReferralCode(params.get('ref') || '')
+  }, [])
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
@@ -49,7 +62,16 @@ export default function SignupPage() {
         const slug = slugify(restaurantName)
         const { data: restaurant, error: restaurantError } = await supabase
           .from('restaurants')
-          .insert({ name: restaurantName, slug, target_gp: 70 })
+          .insert({
+            name: restaurantName,
+            slug,
+            target_gp: 70,
+            acquisition_source: hearAbout || utmSource || null,
+            acquisition_medium: utmMedium || null,
+            acquisition_campaign: utmCampaign || null,
+            referred_by: referralCode || null,
+            referral_code: Math.random().toString(36).slice(2, 10).toUpperCase(),
+          })
           .select('id')
           .single()
 
@@ -170,6 +192,26 @@ export default function SignupPage() {
                 hint="Ask your owner for the restaurant code"
               />
             )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                How did you hear about us?
+              </label>
+              <select
+                value={hearAbout}
+                onChange={(e) => setHearAbout(e.target.value)}
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-mise-fresh"
+              >
+                <option value="">Select an option</option>
+                <option value="Google search">Google search</option>
+                <option value="Instagram / TikTok">Instagram / TikTok</option>
+                <option value="Referred by another restaurant">Referred by another restaurant</option>
+                <option value="Reddit / Facebook group">Reddit / Facebook group</option>
+                <option value="Trade show / event">Trade show / event</option>
+                <option value="Direct outreach">Direct outreach</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
 
             {error && (
               <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
