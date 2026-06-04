@@ -36,11 +36,31 @@ export default function LoginPage() {
       .eq('id', user!.id)
       .single()
 
-    if (profile?.role === 'owner') {
-      router.push('/owner')
-    } else {
-      router.push('/chef')
+    const destination = profile?.role === 'owner' ? '/owner' : '/chef'
+
+    // Record session and check limits
+    try {
+      const sessionKey = `${navigator.userAgent.slice(0, 50)}-${Date.now()}`
+      const sessionRes = await fetch('/api/sessions/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionKey }),
+      })
+      if (sessionRes.ok) {
+        const sessionData = await sessionRes.json()
+        if (sessionData.allowed === false) {
+          router.push(`/session-limit?limit=${sessionData.limit}&count=${sessionData.activeCount}`)
+          return
+        }
+        if (sessionData.suspicious) {
+          sessionStorage.setItem('suspicious_login', '1')
+        }
+      }
+    } catch {
+      // Don't block login if session recording fails
     }
+
+    router.push(destination)
     router.refresh()
   }
 

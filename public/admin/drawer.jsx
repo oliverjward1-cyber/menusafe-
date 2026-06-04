@@ -28,12 +28,43 @@ function CustomerDrawer(props) {
         <div>
           <div className="section-label" style={{ marginBottom: 9 }}>Account</div>
           <div className="detail-list">
-            <div className="d-row"><span className="d-k">Owner</span><span className="d-v">{c.contact}</span></div>
+            <div className="d-row"><span className="d-k">Owner</span><span className="d-v">{c.ownerName || c.contact}</span></div>
+            <div className="d-row"><span className="d-k">Head chef</span><span className="d-v">{c.chefName || "—"}</span></div>
             <div className="d-row"><span className="d-k">Email</span><span className="d-v">{c.email}</span></div>
             <div className="d-row"><span className="d-k">Plan</span><span className="d-v">{plan.name} · {gbp(plan.price)}/mo</span></div>
-            <div className="d-row"><span className="d-k">Team members</span><span className="d-v">{c.seats}</span></div>
             <div className="d-row"><span className="d-k">Customer since</span><span className="d-v">{fmtDate(c.since)}</span></div>
             <div className="d-row"><span className="d-k">Last active</span><span className="d-v">{fmtDate(c.lastActive)}</span></div>
+          </div>
+        </div>
+
+        {/* Team members */}
+        <div>
+          <div className="section-label" style={{ marginBottom: 9 }}>Team ({(c.profiles || []).length} users)</div>
+          <div className="detail-list">
+            {(c.profiles || []).length === 0
+              ? <div className="d-row"><span className="d-k">No team members yet</span></div>
+              : (c.profiles || []).map(function(p) {
+                  return (
+                    <div className="d-row" key={p.id}>
+                      <span className="d-k" style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                        <span className="rest-mark" style={{ width: 22, height: 22, fontSize: 9, borderRadius: 6 }}>{(p.name || "?").slice(0,2).toUpperCase()}</span>
+                        {p.name || "Unknown"}
+                      </span>
+                      <span className="badge b-muted plain" style={{ marginLeft: "auto" }}>{p.role}</span>
+                    </div>
+                  );
+                })
+            }
+          </div>
+        </div>
+
+        {/* Allergen training */}
+        <div>
+          <div className="section-label" style={{ marginBottom: 9 }}>Allergen training</div>
+          <div className="stat-row">
+            <div className="stat-box"><div className="s-label">Staff trained</div><div className="s-val tnum" style={{ color: "var(--good)" }}>{c.trainedStaff || 0}</div></div>
+            <div className="stat-box"><div className="s-label">Quiz attempts</div><div className="s-val tnum">{c.totalQuizAttempts || 0}</div></div>
+            <div className="stat-box"><div className="s-label">Dishes</div><div className="s-val tnum">{c.dishes}</div></div>
           </div>
         </div>
 

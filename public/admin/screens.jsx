@@ -307,8 +307,140 @@ function WaitlistScreen(props) {
   );
 }
 
+/* ============ SECURITY ============ */
+function SecurityScreen(props) {
+  var D = props.data, A = props.actions;
+  var events = D.LOGIN_EVENTS || [];
+  var sessions = D.USER_SESSIONS || [];
+  var suspicious = events.filter(function(e) { return e.suspicious; });
+  var planLimits = { core: 3, plus: 5, multi: 999 };
+
+  // Group sessions by customer
+  var sessionsByCustomer = {};
+  sessions.forEach(function(s) {
+    if (!sessionsByCustomer[s.restaurant_id]) sessionsByCustomer[s.restaurant_id] = [];
+    sessionsByCustomer[s.restaurant_id].push(s);
+  });
+
+  // Customers near or at limit
+  var atLimit = D.CUSTOMERS.filter(function(c) {
+    var count = (sessionsByCustomer[c.id] || []).length;
+    var limit = planLimits[c.plan] || 3;
+    return count >= limit;
+  });
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+      {/* Summary cards */}
+      <div className="kpi-grid">
+        <Kpi icon="alert" label="Suspicious logins" value={suspicious.length} alert={suspicious.length > 0} foot="flagged in last 7 days" />
+        <Kpi icon="customers" label="Active sessions" value={sessions.length} foot="across all accounts" />
+        <Kpi icon="overview" label="At device limit" value={atLimit.length} alert={atLimit.length > 0} foot="accounts hitting cap" />
+        <Kpi icon="billing" label="Potential sharing" value={suspicious.length} alert={suspicious.length > 0} foot="accounts to review" />
+      </div>
+
+      {/* Suspicious logins */}
+      {suspicious.length > 0 && (
+        <div className="card table-card">
+          <div className="card-head"><h3>⚠ Suspicious login activity</h3><span className="sub">Same account from distant locations within 4 hours</span></div>
+          <div className="table-scroll">
+            <table className="tbl">
+              <thead><tr><th>Restaurant</th><th>City</th><th>IP</th><th>Time</th><th>Distance</th><th></th></tr></thead>
+              <tbody>
+                {suspicious.map(function(e, i) {
+                  var cust = D.CUSTOMERS.find(function(c) { return c.id === e.restaurant_id; }) || {};
+                  return (
+                    <tr key={i}>
+                      <td><div className="cell-main"><RestMark name={cust.name || e.restaurant_id} /><span className="cell-strong">{cust.name || e.restaurant_id}</span></div></td>
+                      <td>{e.city || "Unknown"}</td>
+                      <td className="tnum cell-sub">{e.ip_address || "—"}</td>
+                      <td>{e.created_at ? new Date(e.created_at).toLocaleString("en-GB") : "—"}</td>
+                      <td><span className="badge b-bad plain">Flagged</span></td>
+                      <td className="num"><button className="btn btn-ghost btn-sm" onClick={function() { A.openCustomer(cust.id); }}>View account</button></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Accounts at session limit */}
+      <div className="card table-card">
+        <div className="card-head"><h3>Session usage by account</h3><span className="sub">Active devices per restaurant — limits enforced by plan</span>
+          <span className="spacer" style={{ marginLeft: "auto" }}></span>
+          <button className="btn btn-ghost btn-sm" onClick={function() { A.exportCSV(D.CUSTOMERS.map(function(c) {
+            return { name: c.name, plan: c.plan, sessions: (sessionsByCustomer[c.id] || []).length, limit: planLimits[c.plan] || 3 };
+          }), "sessions"); }}><Icon name="download" size={15} /> Export</button>
+        </div>
+        <div className="table-scroll">
+          <table className="tbl">
+            <thead><tr><th>Restaurant</th><th>Plan</th><th className="num">Sessions</th><th className="num">Limit</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              {D.CUSTOMERS.map(function(c) {
+                var count = (sessionsByCustomer[c.id] || []).length;
+                var limit = planLimits[c.plan] || 3;
+                var pct = limit < 999 ? count / limit : 0;
+                var status = count >= limit ? "at_limit" : pct >= 0.7 ? "near_limit" : "ok";
+                return (
+                  <tr key={c.id} onClick={function() { A.openCustomer(c.id); }}>
+                    <td><div className="cell-main"><RestMark name={c.name} /><div><div className="cell-strong">{c.name}</div><div className="cell-sub">{c.city}</div></div></div></td>
+                    <td>{D.PLANS[c.plan] ? D.PLANS[c.plan].name : c.plan}</td>
+                    <td className="num tnum">{count}</td>
+                    <td className="num tnum">{limit < 999 ? limit : "∞"}</td>
+                    <td>
+                      {status === "at_limit" && <span className="badge b-bad plain">At limit</span>}
+                      {status === "near_limit" && <span className="badge b-warn plain">Near limit</span>}
+                      {status === "ok" && <span className="badge b-good plain">OK</span>}
+                    </td>
+                    <td className="num">
+                      {status === "at_limit" && <button className="btn btn-primary btn-sm" onClick={function(e) { e.stopPropagation(); A.toast("Upsell email queued to " + c.contact); }}>Upsell</button>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Recent login events */}
+      <div className="card table-card">
+        <div className="card-head"><h3>Recent login events</h3><span className="sub">All logins across all accounts, newest first</span></div>
+        {events.length === 0 ? (
+          <div style={{ padding: "32px", textAlign: "center", color: "var(--ink-faint)", fontSize: 14 }}>No login events recorded yet — they appear here once customers log in.</div>
+        ) : (
+          <div className="table-scroll">
+            <table className="tbl">
+              <thead><tr><th>Restaurant</th><th>City</th><th>Device</th><th>IP</th><th>Time</th><th>Flag</th></tr></thead>
+              <tbody>
+                {events.slice(0, 50).map(function(e, i) {
+                  var cust = D.CUSTOMERS.find(function(c) { return c.id === e.restaurant_id; }) || {};
+                  return (
+                    <tr key={i} onClick={function() { if (cust.id) A.openCustomer(cust.id); }}>
+                      <td><div className="cell-main"><RestMark name={cust.name || "?"} /><span>{cust.name || e.restaurant_id}</span></div></td>
+                      <td>{e.city || "—"}</td>
+                      <td className="cell-sub">{e.device_hint || "—"}</td>
+                      <td className="tnum cell-sub">{e.ip_address || "—"}</td>
+                      <td>{e.created_at ? new Date(e.created_at).toLocaleString("en-GB") : "—"}</td>
+                      <td>{e.suspicious ? <span className="badge b-bad plain">⚠ Suspicious</span> : <span className="badge b-good plain">Clean</span>}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 Object.assign(window, {
   computeMetrics: computeMetrics, PLAN_COLORS: PLAN_COLORS,
   OverviewScreen: OverviewScreen, CustomersScreen: CustomersScreen,
-  SubsScreen: SubsScreen, BillingScreen: BillingScreen, WaitlistScreen: WaitlistScreen
+  SubsScreen: SubsScreen, BillingScreen: BillingScreen, WaitlistScreen: WaitlistScreen,
+  SecurityScreen: SecurityScreen
 });

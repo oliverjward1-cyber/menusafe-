@@ -12,35 +12,54 @@ export async function GET() {
 
   const supabase = createAdminClient()
 
-  const [restRes, profileRes, recipeRes, auditRes] = await Promise.all([
-    supabase.from('restaurants').select('id, name, slug, target_gp, created_at').order('created_at', { ascending: false }),
-    supabase.from('profiles').select('restaurant_id, role'),
+  const [restRes, profileRes, recipeRes, auditRes, quizRes, loginEventsRes, sessionsRes] = await Promise.all([
+    supabase.from('restaurants').select('id, name, slug, plan, target_gp, created_at').order('created_at', { ascending: false }),
+    supabase.from('profiles').select('id, restaurant_id, role, full_name').order('created_at', { ascending: true }),
     supabase.from('recipes').select('restaurant_id'),
     supabase.from('kitchen_audits').select('restaurant_id, completed_at').order('completed_at', { ascending: false }),
+    supabase.from('staff_quiz_attempts').select('restaurant_id, staff_name, passed, score, total_questions, completed_at').order('completed_at', { ascending: false }),
+    supabase.from('login_events').select('*').order('created_at', { ascending: false }).limit(200),
+    supabase.from('user_sessions').select('*').order('last_seen', { ascending: false }),
   ])
 
   const restaurants = restRes.data ?? []
   const profiles = profileRes.data ?? []
   const recipes = recipeRes.data ?? []
   const audits = auditRes.data ?? []
+  const quizAttempts = quizRes.data ?? []
+  const loginEvents = loginEventsRes.data ?? []
+  const userSessions = sessionsRes.data ?? []
 
   const customers = restaurants.map(r => {
-    const staffCount = profiles.filter(p => p.restaurant_id === r.id).length
+    const restProfiles = profiles.filter(p => p.restaurant_id === r.id)
+    const owner = restProfiles.find(p => p.role === 'owner')
+    const chef = restProfiles.find(p => p.role === 'chef')
     const dishCount = recipes.filter(rec => rec.restaurant_id === r.id).length
     const lastAudit = audits.find(a => a.restaurant_id === r.id)
+    const restQuizzes = quizAttempts.filter(q => q.restaurant_id === r.id)
+    const trainedStaff = new Set(restQuizzes.filter(q => q.passed).map(q => q.staff_name)).size
+    const totalQuizAttempts = restQuizzes.length
+
     return {
       id: r.id,
       name: r.name,
-      contact: 'Owner',
-      email: `owner@${r.slug}.co.uk`,
+      slug: r.slug,
+      contact: owner?.full_name ?? 'Owner',
+      email: owner?.full_name ? `${owner.full_name.toLowerCase().replace(' ', '.')}@${r.slug}.co.uk` : `owner@${r.slug}.co.uk`,
       city: 'UK',
-      plan: dishCount > 50 ? 'multi' : dishCount > 20 ? 'plus' : 'core',
+      plan: r.plan ?? (dishCount > 50 ? 'multi' : dishCount > 20 ? 'plus' : 'core'),
       status: 'active',
       since: r.created_at.split('T')[0],
       lastActive: lastAudit?.completed_at?.split('T')[0] ?? r.created_at.split('T')[0],
-      seats: Math.max(staffCount, 1),
+      seats: restProfiles.length,
       sites: 1,
       dishes: dishCount,
+      // Extra fields for drawer
+      profiles: restProfiles.map(p => ({ id: p.id, name: p.full_name ?? 'Unknown', role: p.role })),
+      ownerName: owner?.full_name ?? null,
+      chefName: chef?.full_name ?? null,
+      trainedStaff,
+      totalQuizAttempts,
     }
   })
 
@@ -51,6 +70,8 @@ export async function GET() {
       multi: { id: 'multi', name: 'mise Multi-site', price: 129, blurb: 'Everything in Plus across up to 5 venues.' },
     },
     CUSTOMERS: customers,
+    LOGIN_EVENTS: loginEvents,
+    USER_SESSIONS: userSessions,
     MRR_TREND: [
       { m: 'Oct', v: 0 }, { m: 'Nov', v: 0 }, { m: 'Dec', v: 0 },
       { m: 'Jan', v: 0 }, { m: 'Feb', v: 0 }, { m: 'Mar', v: 0 },
