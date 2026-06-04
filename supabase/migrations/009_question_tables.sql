@@ -26,5 +26,6 @@ CREATE POLICY "audit_questions_restaurant" ON public.audit_questions
   FOR ALL USING (restaurant_id = public.my_restaurant_id());
 
 ALTER TABLE public.quiz_questions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "quiz_questions_restaurant" ON public.quiz_questions;
 CREATE POLICY "quiz_questions_restaurant" ON public.quiz_questions
   FOR ALL USING (restaurant_id = public.my_restaurant_id());
