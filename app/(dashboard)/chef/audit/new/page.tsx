@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, ClipboardCheck } from 'lucide-react'
 import { AuditForm } from './AuditForm'
+import { AUDIT_QUESTIONS } from '@/lib/constants/auditQuestions'
 
 export default async function NewAuditPage() {
   const supabase = createClient()
@@ -13,6 +14,16 @@ export default async function NewAuditPage() {
     : { data: null }
   const restaurantId = profile?.restaurant_id ?? cookies().get('msafe_rid')?.value
   if (!restaurantId) redirect('/onboarding')
+
+  const { data: dbQuestions } = await supabase
+    .from('audit_questions')
+    .select('key, label, category, requires_photo_on_fail')
+    .eq('restaurant_id', restaurantId)
+    .order('position')
+
+  const questions = dbQuestions && dbQuestions.length > 0
+    ? dbQuestions.map(q => ({ key: q.key, label: q.label, category: q.category, requiresPhotoOnFail: q.requires_photo_on_fail }))
+    : AUDIT_QUESTIONS
 
   return (
     <div className="max-w-2xl mx-auto space-y-5">
@@ -29,7 +40,7 @@ export default async function NewAuditPage() {
         </div>
       </div>
 
-      <AuditForm restaurantId={restaurantId} />
+      <AuditForm restaurantId={restaurantId} questions={questions} />
     </div>
   )
 }

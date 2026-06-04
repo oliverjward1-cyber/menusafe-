@@ -13,6 +13,8 @@ import {
   BookOpen,
   MenuSquare,
   ClipboardCheck,
+  ClipboardList,
+  GraduationCap,
 } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
 
@@ -24,6 +26,8 @@ const navItems = [
   { href: '/chef/audit', label: 'Kitchen Audit', icon: ClipboardCheck },
   { href: '/owner/staff-quiz', label: 'Staff Quiz', icon: Users },
   { href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode },
+  { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
+  { href: '/owner/quiz-questions', label: 'Quiz Questions', icon: GraduationCap },
 ]
 
 export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: string; restaurantSlug: string }) {

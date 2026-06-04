@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { AUDIT_QUESTIONS, AUDIT_CATEGORIES } from '@/lib/constants/auditQuestions'
 import { CheckCircle2, XCircle, MinusCircle, Camera, Loader2, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react'
 
 type Answer = 'pass' | 'fail' | 'na' | null
@@ -17,15 +16,17 @@ interface AnswerState {
 
 const DEFAULT_STATE: AnswerState = { answer: null, notes: '', photoFile: null, photoPreview: null, uploading: false }
 
-export function AuditForm({ restaurantId }: { restaurantId: string }) {
+export function AuditForm({ restaurantId, questions }: { restaurantId: string; questions: { key: string; label: string; category: string; requiresPhotoOnFail?: boolean }[] }) {
   const router = useRouter()
   const supabaseRef = useRef(createClient())
   const supabase = supabaseRef.current
 
+  const categories = Array.from(new Set(questions.map(q => q.category)))
+
   const [staffName, setStaffName] = useState('')
   const [overallNotes, setOverallNotes] = useState('')
   const [answers, setAnswers] = useState<Record<string, AnswerState>>(
-    Object.fromEntries(AUDIT_QUESTIONS.map(q => [q.key, { ...DEFAULT_STATE }]))
+    Object.fromEntries(questions.map(q => [q.key, { ...DEFAULT_STATE }]))
   )
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [submitting, setSubmitting] = useState(false)
@@ -49,20 +50,20 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
     setAnswers(prev => ({ ...prev, [key]: { ...prev[key], photoFile: file, photoPreview: preview } }))
   }
 
-  const answered = AUDIT_QUESTIONS.filter(q => answers[q.key].answer !== null).length
-  const total = AUDIT_QUESTIONS.length
-  const fails = AUDIT_QUESTIONS.filter(q => answers[q.key].answer === 'fail').length
+  const answered = questions.filter(q => answers[q.key].answer !== null).length
+  const total = questions.length
+  const fails = questions.filter(q => answers[q.key].answer === 'fail').length
 
   async function handleSubmit() {
     if (!staffName.trim()) { setError('Please enter your name before submitting'); return }
-    const unanswered = AUDIT_QUESTIONS.filter(q => answers[q.key].answer === null)
+    const unanswered = questions.filter(q => answers[q.key].answer === null)
     if (unanswered.length > 0) { setError(`${unanswered.length} question${unanswered.length !== 1 ? 's' : ''} not answered yet`); return }
 
     setSubmitting(true)
     setError('')
 
     // Calculate score
-    const applicable = AUDIT_QUESTIONS.filter(q => answers[q.key].answer !== 'na')
+    const applicable = questions.filter(q => answers[q.key].answer !== 'na')
     const passed = applicable.filter(q => answers[q.key].answer === 'pass').length
     const scoreTotal = applicable.length
     const pct = scoreTotal > 0 ? (passed / scoreTotal) * 100 : 100
@@ -70,7 +71,7 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
 
     // Upload photos first
     const photoUrls: Record<string, string> = {}
-    for (const q of AUDIT_QUESTIONS) {
+    for (const q of questions) {
       const a = answers[q.key]
       if (a.photoFile) {
         const ext = a.photoFile.name.split('.').pop() ?? 'jpg'
@@ -85,7 +86,7 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
       }
     }
 
-    const answerRows = AUDIT_QUESTIONS.map(q => ({
+    const answerRows = questions.map(q => ({
       question_key: q.key,
       answer: answers[q.key].answer,
       notes: answers[q.key].notes.trim() || null,
@@ -144,10 +145,10 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
       </div>
 
       {/* Questions by category */}
-      {AUDIT_CATEGORIES.map(cat => {
-        const questions = AUDIT_QUESTIONS.filter(q => q.category === cat)
-        const catAnswered = questions.filter(q => answers[q.key].answer !== null).length
-        const catFails = questions.filter(q => answers[q.key].answer === 'fail').length
+      {categories.map(cat => {
+        const catQuestions = questions.filter(q => q.category === cat)
+        const catAnswered = catQuestions.filter(q => answers[q.key].answer !== null).length
+        const catFails = catQuestions.filter(q => answers[q.key].answer === 'fail').length
         const isCollapsed = collapsed.has(cat)
 
         return (
@@ -163,14 +164,14 @@ export function AuditForm({ restaurantId }: { restaurantId: string }) {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-mise-ink/40">{catAnswered}/{questions.length}</span>
+                <span className="text-xs text-mise-ink/40">{catAnswered}/{catQuestions.length}</span>
                 {isCollapsed ? <ChevronDown className="h-4 w-4 text-mise-ink/40" /> : <ChevronUp className="h-4 w-4 text-mise-ink/40" />}
               </div>
             </button>
 
             {!isCollapsed && (
               <div className="divide-y divide-gray-50 border-t border-gray-100">
-                {questions.map(q => {
+                {catQuestions.map(q => {
                   const a = answers[q.key]
                   return (
                     <div key={q.key} className={`px-5 py-4 transition-colors ${a.answer === 'fail' ? 'bg-red-50/40' : a.answer === 'pass' ? 'bg-green-50/20' : ''}`}>
