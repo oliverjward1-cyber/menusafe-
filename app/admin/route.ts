@@ -42,6 +42,23 @@ export async function GET() {
     const trainedStaff = new Set(restQuizzes.filter(q => q.passed).map(q => q.staff_name)).size
     const totalQuizAttempts = restQuizzes.length
 
+    // Health score: 0-100
+    // +25 if has any recipes
+    // +20 if has a published menu
+    // +20 if has done a quiz attempt in last 30 days
+    // +20 if has done a kitchen audit in last 30 days
+    // +15 if logged in (has a login_event) in last 7 days
+    const recentQuiz = quizAttempts.find(q => q.restaurant_id === r.id && new Date(q.completed_at) > new Date(Date.now() - 30*24*60*60*1000))
+    const recentAudit = audits.find(a => a.restaurant_id === r.id && new Date(a.completed_at) > new Date(Date.now() - 30*24*60*60*1000))
+    const hasPublishedMenu = (menusRes.data ?? []).some(m => m.restaurant_id === r.id && m.is_published)
+    const recentLogin = loginEvents.find(e => e.restaurant_id === r.id && new Date(e.created_at) > new Date(Date.now() - 7*24*60*60*1000))
+    const healthScore =
+      (dishCount > 0 ? 25 : 0) +
+      (hasPublishedMenu ? 20 : 0) +
+      (recentQuiz ? 20 : 0) +
+      (recentAudit ? 20 : 0) +
+      (recentLogin ? 15 : 0)
+
     return {
       id: r.id,
       name: r.name,
@@ -62,6 +79,12 @@ export async function GET() {
       chefName: chef?.full_name ?? null,
       trainedStaff,
       totalQuizAttempts,
+      healthScore,
+      healthStatus: healthScore >= 70 ? 'good' : healthScore >= 40 ? 'warn' : 'bad',
+      acquisitionSource: r.acquisition_source ?? null,
+      referralCode: r.referral_code ?? null,
+      referredBy: r.referred_by ?? null,
+      notes: (notesRes.data ?? []).filter(n => n.restaurant_id === r.id),
     }
   })
 
