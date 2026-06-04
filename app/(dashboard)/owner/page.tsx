@@ -4,7 +4,7 @@ import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
   AlertTriangle, Globe, GlobeLock,
-  Users, Clock, CheckCircle2, ArrowRight, MenuSquare,
+  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck,
 } from 'lucide-react'
 
 function addMonths(date: Date, months: number): Date {
@@ -23,7 +23,7 @@ export default async function OwnerDashboard() {
 
   const rid = profile?.restaurant_id ?? ''
 
-  const [restaurantRes, recipesRes, menusRes, quizRes] = await Promise.all([
+  const [restaurantRes, recipesRes, menusRes, quizRes, auditRes] = await Promise.all([
     supabase.from('restaurants').select('*').eq('id', rid).single(),
     supabase.from('recipes').select(`
       id, name, sell_price, status,
@@ -34,10 +34,17 @@ export default async function OwnerDashboard() {
     supabase.from('staff_quiz_attempts')
       .select('id, staff_name, score, total_questions, passed, completed_at')
       .eq('restaurant_id', rid).order('completed_at', { ascending: false }),
+    supabase.from('kitchen_audits')
+      .select('id, score, total, status, completed_at, completed_by')
+      .eq('restaurant_id', rid)
+      .order('completed_at', { ascending: false })
+      .limit(1)
+      .single(),
   ])
 
   const restaurant = restaurantRes.data
   const targetGp = restaurant?.target_gp ?? 70
+  const lastAudit = auditRes.data
   const allMenus = menusRes.data ?? []
   const publishedMenus = allMenus.filter(m => m.is_published)
   const allAttempts = quizRes.data ?? []
@@ -133,6 +140,55 @@ export default async function OwnerDashboard() {
           <p className="text-xs text-mise-ink/40 mt-2">{pendingCount === 0 ? 'All up to date' : `recipe${pendingCount !== 1 ? 's' : ''} awaiting review`}</p>
         </div>
       </div>
+
+      {/* Kitchen audit card */}
+      {(() => {
+        const auditScore = lastAudit ? Math.round((lastAudit.score / lastAudit.total) * 100) : null
+        const auditDate = lastAudit ? new Date(lastAudit.completed_at) : null
+        const nextDue = auditDate ? addMonths(auditDate, 1) : null
+        const isOverdue = nextDue ? nextDue < now : false
+        const isDueSoon = nextDue ? !isOverdue && nextDue <= new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) : false
+        const statusColour = lastAudit?.status === 'green' ? 'text-green-700' : lastAudit?.status === 'amber' ? 'text-amber-600' : lastAudit?.status === 'red' ? 'text-red-600' : 'text-gray-400'
+        return (
+          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <ClipboardCheck className="h-4 w-4 text-mise-mid" />
+                <h2 className="text-sm font-semibold text-mise-ink">Kitchen Audit</h2>
+              </div>
+              <Link href="/chef/audit" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Run audit →</Link>
+            </div>
+            {!lastAudit ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-mise-ink/40">No audits completed yet</p>
+                <Link href="/chef/audit/new" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+                  Start first audit <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Last score</p>
+                  <p className={`text-2xl font-bold ${statusColour}`}>{auditScore}%</p>
+                  <p className="text-xs text-mise-ink/40 mt-0.5">by {lastAudit.completed_by}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Completed</p>
+                  <p className="text-sm font-semibold text-mise-ink">{auditDate!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Next due</p>
+                  <p className={`text-sm font-semibold ${isOverdue ? 'text-red-600' : isDueSoon ? 'text-amber-600' : 'text-mise-ink'}`}>
+                    {nextDue!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                  {isOverdue && <p className="text-xs text-red-500 mt-0.5">Overdue</p>}
+                  {isDueSoon && !isOverdue && <p className="text-xs text-amber-600 mt-0.5">Due soon</p>}
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       {/* Published menus + staff training row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -100,4 +100,5 @@ export const RECIPE_CATEGORIES = [
   'Drinks',
   'Snacks',
   'Specials',
+  'Events',
 ] as const
