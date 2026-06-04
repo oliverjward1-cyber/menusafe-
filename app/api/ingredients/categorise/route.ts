@@ -47,7 +47,9 @@ ${list}`,
   const text = (message.content[0] as { type: string; text: string }).text.trim()
   let mapping: Record<string, string>
   try {
-    mapping = JSON.parse(text)
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) throw new Error('no JSON found')
+    mapping = JSON.parse(jsonMatch[0])
   } catch {
     return NextResponse.json({ error: 'AI returned invalid JSON' }, { status: 500 })
   }
