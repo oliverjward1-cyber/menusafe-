@@ -183,47 +183,48 @@ export default async function EHOInspectionPage() {
     <div className="min-h-screen bg-white print:bg-white">
 
       {/* Screen-only header bar */}
-      <div className="print:hidden sticky top-0 z-10 bg-mise-ink px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <ShieldCheck className="h-5 w-5 text-mise-fresh" />
-          <span className="text-white font-semibold text-sm">EHO Inspection Mode</span>
-          <span className="text-xs text-gray-400">Live data · {inspectionTime}</span>
+      <div className="print:hidden sticky top-0 z-10 bg-mise-ink px-4 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <ShieldCheck className="h-4 w-4 text-mise-fresh flex-shrink-0" />
+            <span className="text-white font-semibold text-sm truncate">EHO Inspection Mode</span>
+            <span className="text-xs text-gray-400 hidden sm:inline flex-shrink-0">· {inspectionTime}</span>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <PrintButton />
+            <Link href="/owner" className="text-xs text-gray-400 hover:text-white transition-colors whitespace-nowrap">← Back</Link>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <PrintButton />
-          <Link href="/owner" className="text-xs text-gray-400 hover:text-white transition-colors">← Back to dashboard</Link>
-        </div>
+        <p className="text-xs text-gray-500 mt-0.5 sm:hidden">Live data · {inspectionTime}</p>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-10">
 
         {/* ── Cover ── */}
         <div className="border-b border-gray-200 pb-6">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-3xl font-display font-bold text-mise-ink">{restaurant?.name}</h1>
-              <p className="text-mise-ink/50 mt-1">Food Safety & Allergen Compliance Record</p>
+              <h1 className="text-2xl sm:text-3xl font-display font-bold text-mise-ink">{restaurant?.name}</h1>
+              <p className="text-mise-ink/50 mt-1 text-sm">Food Safety & Allergen Compliance Record</p>
               <p className="text-sm text-mise-ink/40 mt-0.5">Inspection date: {inspectionDate}</p>
             </div>
-            <div className="text-right flex-shrink-0">
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold ${badgeConfig[badgeStatus].cls}`}>
-                <ShieldCheck className="h-4 w-4" />
-                {badgeConfig[badgeStatus].label}
-              </div>
-              {/* Status criteria footnote */}
-              <div className="mt-2 max-w-xs text-right">
+            {/* Status badge — full width on mobile */}
+            <div className={`flex items-start gap-3 p-4 rounded-xl ${badgeConfig[badgeStatus].cls}`}>
+              <ShieldCheck className="h-5 w-5 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm">{badgeConfig[badgeStatus].label}</p>
                 {badgeStatus === 'compliant' ? (
-                  <p className="text-xs text-green-600">All checks passed: certs valid, audit current, temps logged today, no critical incidents.</p>
+                  <p className="text-xs mt-0.5 opacity-80">All checks passed: certs valid, audit current, temps logged today, no critical incidents.</p>
                 ) : badgeStatus === 'action' ? (
-                  <ul className="text-xs text-red-600 space-y-0.5">
+                  <ul className="text-xs mt-1 space-y-0.5 opacity-90">
                     {actionReasons.map((r, i) => <li key={i}>• {r}</li>)}
                   </ul>
                 ) : (
-                  <ul className="text-xs text-amber-700 space-y-0.5">
+                  <ul className="text-xs mt-1 space-y-0.5 opacity-90">
                     {reviewReasons.map((r, i) => <li key={i}>• {r}</li>)}
                   </ul>
                 )}
-                <p className="text-xs text-gray-400 mt-1 flex items-center justify-end gap-1">
+                <p className="text-xs mt-1.5 opacity-50 flex items-center gap-1">
                   <Info className="h-3 w-3" /> Status auto-calculated from live data
                 </p>
               </div>
