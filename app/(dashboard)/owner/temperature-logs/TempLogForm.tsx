@@ -16,6 +16,7 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
   const [checkType, setCheckType] = useState('am')
   const [recordedBy, setRecordedBy] = useState(staffName.split('@')[0] ?? '')
   const [notes, setNotes] = useState('')
+  const [correctiveAction, setCorrectiveAction] = useState('')
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -31,6 +32,7 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
         checkType,
         recordedBy,
         notes,
+        correctiveAction,
       }),
     })
     setSaving(false)
@@ -99,12 +101,22 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
         />
       </div>
 
-      <div className="col-span-2 md:col-span-2">
+      <div>
         <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Notes (optional)</label>
         <input
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          placeholder="Any concerns or corrective actions taken"
+          placeholder="Any observations"
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+        />
+      </div>
+
+      <div>
+        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Corrective action (if reading failed)</label>
+        <input
+          value={correctiveAction}
+          onChange={e => setCorrectiveAction(e.target.value)}
+          placeholder="e.g. moved stock, called engineer"
           className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
         />
       </div>

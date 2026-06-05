@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { restaurantId, location, temperature, checkType, recordedBy, notes, correctiveAction, source } = body
+  const { restaurantId, icePoint, boilingPoint, recordedBy, notes, source } = body
 
   const adminSupabase = createAdminClient()
 
@@ -16,19 +16,15 @@ export async function POST(request: Request) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
-    if (profile?.restaurant_id !== restaurantId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    if (profile?.restaurant_id !== restaurantId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const { error } = await adminSupabase.from('temperature_logs').insert({
+  const { error } = await adminSupabase.from('probe_calibrations').insert({
     restaurant_id: restaurantId,
-    location,
-    temperature,
-    check_type: checkType,
+    ice_point: parseFloat(icePoint),
+    boiling_point: parseFloat(boilingPoint),
     recorded_by: recordedBy,
     notes: notes || null,
-    corrective_action: correctiveAction || null,
   })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
