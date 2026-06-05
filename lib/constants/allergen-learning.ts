@@ -639,5 +639,4 @@ export const LAW_MODULES: LawModule[] = [
 
 export const LAW_MODULE_MAP = Object.fromEntries(
   LAW_MODULES.map(m => [m.slug, m])
-)
-) as Record<string, AllergenModule>
+) as Record<string, LawModule>
