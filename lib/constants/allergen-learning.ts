@@ -522,4 +522,122 @@ export const ALLERGEN_MODULES: AllergenModule[] = [
 
 export const ALLERGEN_MODULE_MAP = Object.fromEntries(
   ALLERGEN_MODULES.map(m => [m.slug, m])
+)
+
+// ── Food Law Modules ─────────────────────────────────────────────────────────
+
+export type LawModule = {
+  slug: string
+  name: string
+  emoji: string
+  colour: string
+  tagline: string
+  summary: string
+  keyPoints: string[]
+  whatItMeansForYou: string[]
+  scenario: string
+  ukLaw: string
+  quiz: { q: string; options: string[]; answer: number }[]
+}
+
+export const LAW_MODULES: LawModule[] = [
+  {
+    slug: 'natashas-law',
+    name: "Natasha's Law",
+    emoji: '🏷️',
+    colour: 'bg-purple-100',
+    tagline: 'Full allergen labelling on every prepacked item',
+    summary: "Natasha's Law came into force on 1 October 2021. It is named after Natasha Ednan-Laperouse, who died in 2016 aged 15 after eating a Pret a Manger sesame baguette that carried no allergen warning. The law requires full ingredient lists — with allergens emphasised — on all food prepacked for direct sale (PPDS).",
+    keyPoints: [
+      'Applies to PPDS food — food prepared and packed on the same premises before a customer orders it',
+      'Examples: pre-wrapped sandwiches, salads, pastries, sushi, grab-and-go boxes',
+      'Every PPDS item must show the full ingredient list with the 14 allergens highlighted (bold, italic, or different colour)',
+      'The name of the food must also appear on the label',
+      'Verbal allergen information alone is no longer sufficient for PPDS items',
+      'Non-compliance can result in prosecution and unlimited fines',
+    ],
+    whatItMeansForYou: [
+      'Any pre-wrapped grab-and-go item you make and sell must carry a full ingredient label',
+      'Allergens must be visually emphasised — not just listed in normal text',
+      'You cannot rely on a customer asking staff — the label must speak for itself',
+      'Menus and chalkboards are not sufficient — the label must be on the packaging',
+      'Regularly review labels whenever a recipe or ingredient changes',
+    ],
+    scenario: "A customer picks up a pre-wrapped chicken sandwich from your counter. They have a sesame allergy. The sandwich contains sesame seeds in the dressing. Under Natasha's Law, the label on that sandwich must list all ingredients and highlight SESAME in a way that stands out — bold, italic, or different colour. Without this label, your business is breaking the law.",
+    ukLaw: "Food Information (Amendment) (England) Regulations 2021. In force 1 October 2021. Applies across England, Scotland, Wales and Northern Ireland. Enforced by local authority Trading Standards and Environmental Health officers.",
+    quiz: [
+      { q: "What does PPDS stand for?", options: ['Prepacked for Direct Sale', 'Pre-prepared Dish Standard', 'Packaged Product Disclosure System', 'Premises-Prepared Dietary Standard'], answer: 0 },
+      { q: "Which of these items is covered by Natasha's Law?", options: ['A dish cooked fresh to order', 'A pre-wrapped sandwich made in your kitchen and sold from a chilled cabinet', 'A menu description on a chalkboard', 'A verbally described daily special'], answer: 1 },
+      { q: "How must allergens be shown on a PPDS label?", options: ['Handwritten on a sticker is fine', 'Listed anywhere in the ingredients in normal text', 'Visually emphasised — bold, italic or different colour — within the ingredient list', 'Only the top 3 allergens need highlighting'], answer: 2 },
+    ],
+  },
+  {
+    slug: 'owens-law',
+    name: "Owen's Law",
+    emoji: '📋',
+    colour: 'bg-blue-100',
+    tagline: 'Written allergen information on every restaurant menu',
+    summary: "Owen's Law is a proposed law named after Owen Carey, who died in 2017 aged 18 after eating at Byron Burger. He had a milk allergy and was not made aware that a marinade contained buttermilk. Unlike Natasha's Law (which covers pre-wrapped food), Owen's Law targets eat-in restaurants — requiring written allergen information on the menu itself, not just available on request.",
+    keyPoints: [
+      "Currently (2024), Food Information Regulations 2014 only require restaurants to make allergen info available — verbally is legally sufficient",
+      "Owen's Law would require written allergen information on the menu for every dish",
+      "The campaign has significant parliamentary support and is widely expected to become law",
+      "Many leading restaurant groups are already implementing written allergen menus voluntarily",
+      "Implementing now puts your business ahead of the law and demonstrates duty of care",
+      "Mise already generates a customer-facing allergen matrix for all your approved dishes",
+    ],
+    whatItMeansForYou: [
+      'Start documenting allergens in writing now — use the allergen matrix in the owner portal',
+      'Ensure your published QR menu shows allergen badges for every dish (mise does this automatically)',
+      'Train all FOH staff on how to discuss allergens with customers — verbal training alone is not enough',
+      'When Owen\'s Law passes, restaurants with existing written records will need minimal changes',
+      'Consider adding a printed allergen matrix to your physical menu now as best practice',
+    ],
+    scenario: "A table of four sit down. One guest mentions a dairy allergy when ordering. Under current law, your staff can give verbal information. Under Owen's Law, the menu itself would need to show that the risotto contains milk and the bread contains butter. By having allergen badges on your QR menu and a printed matrix available, you're already compliant with what Owen's Law will require.",
+    ukLaw: "Food Information Regulations 2014 (current law) — allergen info must be available but can be verbal. Owen's Law (proposed) — would require written allergen information on menus. Not yet in force but expected. Businesses should implement written records now as best practice and to prepare for the change.",
+    quiz: [
+      { q: "What does Owen's Law propose to change about allergen information in restaurants?", options: ['Remove the requirement for verbal allergen info', 'Require written allergen information on menus for every dish', 'Limit allergens to the top 8 only', 'Only apply to fast food restaurants'], answer: 1 },
+      { q: "Under current Food Information Regulations (2014), how can restaurants provide allergen info?", options: ['Only in writing on the menu', 'Only through a dedicated allergen menu', 'Verbally — written information is not yet legally required for eat-in restaurants', 'Only via a QR code'], answer: 2 },
+      { q: "Why should your restaurant implement written allergen records now, before Owen's Law passes?", options: ['It is already legally required', 'It demonstrates duty of care, protects customers, and prepares you for when the law changes', 'It replaces the need for staff allergen training', 'It is only relevant to takeaway restaurants'], answer: 1 },
+    ],
+  },
+  {
+    slug: 'customer-communication',
+    name: 'Talking to customers about allergens',
+    emoji: '💬',
+    colour: 'bg-green-100',
+    tagline: 'What to say, what to do, and when to escalate',
+    summary: 'When a customer tells you they have an allergy, how you respond could save their life. This module covers the correct process for handling allergen declarations at the table — from the initial conversation through to service — and explains when to escalate to the chef or manager.',
+    keyPoints: [
+      'Always take every allergy declaration seriously — never minimise or dismiss it',
+      'Do not guess — if you are not 100% certain an ingredient is safe, say so',
+      'The correct phrase is: "I\'ll check with the kitchen for you" — not "I think it should be fine"',
+      'Flag the allergy to the kitchen in writing — verbally is not sufficient in a busy service',
+      'For severe allergies (peanuts, tree nuts, shellfish, sesame), always escalate to the head chef',
+      'If you cannot guarantee a dish is safe, offer alternatives or decline to serve that dish',
+      'Cross-contamination is a real risk — shared fryers, chopping boards and utensils matter',
+      '"May contain" on a menu means the risk is real — do not tell a customer it is probably fine',
+    ],
+    whatItMeansForYou: [
+      'When a customer declares an allergy: stop, listen, and take it seriously',
+      'Check the allergen matrix for the dish they want — do not rely on memory',
+      'Go to the kitchen and speak to the chef directly — do not relay complex allergy info through another server',
+      'Ensure the dish is prepared with clean equipment, clean hands, and no cross-contamination',
+      'Return to the table and confirm what steps were taken before service',
+      'If in doubt, say: "I want to make sure you are safe — I\'d recommend [alternative dish] instead"',
+      'Never argue with a customer about their allergy or intolerance',
+    ],
+    scenario: "A customer tells you they have a severe peanut allergy and wants the satay chicken salad. The satay sauce contains peanuts. The correct response is: 'Thank you for letting me know — the satay sauce does contain peanuts so I can't serve you that dish safely. Can I suggest our grilled chicken salad instead? I'll check with the chef to confirm it's prepared safely for you.' Do not say 'I'll ask them to leave the sauce off' — peanut traces will remain.",
+    ukLaw: "Under the Food Information Regulations 2014, businesses must provide allergen information when asked. Providing false or misleading allergen information is a criminal offence under the Food Safety Act 1990. A customer who suffers a serious allergic reaction due to incorrect information can result in prosecution of both the individual and the business.",
+    quiz: [
+      { q: "A customer says they 'might be a bit intolerant' to nuts but doesn't seem worried. What should you do?", options: ['Treat it the same as a severe allergy — take it seriously and check with the kitchen', 'Use your judgement — if they seem relaxed it\'s probably fine', 'Tell them the dish probably doesn\'t have many nuts', 'Only escalate if they specifically say it\'s a severe allergy'], answer: 0 },
+      { q: "A dish is listed as 'may contain sesame'. A customer with a sesame allergy asks if it's safe. What do you say?", options: ['"May contain" just means it was made in the same factory — it\'s probably fine', '"May contain" is a legal warning that cross-contamination is possible — I cannot guarantee this dish is safe for you', '"May contain" is just a precaution — we always clean the kitchen', 'Check if they\'ve had it before without a reaction'], answer: 1 },
+      { q: "What is the correct way to flag an allergy to the kitchen during a busy service?", options: ['Tell the nearest kitchen staff member verbally', 'Write it clearly on the order ticket and speak directly to the chef preparing the dish', 'Put a note on the table so the chef sees it when they bring the food', 'Send a message via the POS system only'], answer: 1 },
+    ],
+  },
+]
+
+export const LAW_MODULE_MAP = Object.fromEntries(
+  LAW_MODULES.map(m => [m.slug, m])
+)
 ) as Record<string, AllergenModule>

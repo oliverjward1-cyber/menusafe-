@@ -232,6 +232,19 @@ export default async function PublicMenuPage({ params }: Props) {
         </div>
       </div>
 
+      {/* Owen's Law compliance statement */}
+      <div className="bg-gray-900 px-4 py-4">
+        <div className="max-w-2xl mx-auto flex items-start gap-3">
+          <span className="text-green-400 text-base shrink-0 mt-0.5">✓</span>
+          <div>
+            <p className="text-xs font-semibold text-white">Written allergen information provided</p>
+            <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+              {restaurant.name} provides written allergen information for every dish in line with the Food Information Regulations 2014 and in preparation for Owen's Law. Tap any dish to view its full allergen profile.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Footer allergen key */}
       <div className="border-t border-gray-200 bg-gray-50 px-4 py-6">
         <div className="max-w-2xl mx-auto">

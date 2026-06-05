@@ -6,6 +6,11 @@ import {
   AlertTriangle, Globe, GlobeLock,
   Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck, AlertOctagon,
 } from 'lucide-react'
+import RoleViewSwitcher from './RoleViewSwitcher'
+import ManagerView from './views/ManagerView'
+import HeadChefView from './views/HeadChefView'
+import FOHView from './views/FOHView'
+import KitchenStaffView from './views/KitchenStaffView'
 
 function addMonths(date: Date, months: number): Date {
   const d = new Date(date)
@@ -13,7 +18,8 @@ function addMonths(date: Date, months: number): Date {
   return d
 }
 
-export default async function OwnerDashboard() {
+export default async function OwnerDashboard({ searchParams }: { searchParams: { view?: string } }) {
+  const view = searchParams.view ?? 'owner'
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -27,7 +33,7 @@ export default async function OwnerDashboard() {
   const todayStr = now.toISOString().split('T')[0]
   const currentHour = now.getHours()
 
-  const [restaurantRes, recipesRes, menusRes, quizRes, auditRes, tempLogsToday, openIncidentsRes] = await Promise.all([
+  const [restaurantRes, recipesRes, menusRes, quizRes, auditRes, tempLogsToday, openIncidentsRes, profilesRes, cleaningTasksRes, cleaningLogsRes] = await Promise.all([
     supabase.from('restaurants').select('*').eq('id', rid).single(),
     supabase.from('recipes').select(`
       id, name, sell_price, status,
@@ -52,6 +58,9 @@ export default async function OwnerDashboard() {
       .select('id, severity')
       .eq('restaurant_id', rid)
       .eq('resolved', false),
+    supabase.from('profiles').select('full_name, role').eq('restaurant_id', rid),
+    supabase.from('cleaning_tasks').select('id, frequency').eq('restaurant_id', rid).eq('is_active', true),
+    supabase.from('cleaning_logs').select('task_id, completed_at').eq('restaurant_id', rid).order('completed_at', { ascending: false }).limit(100),
   ])
 
   const restaurant = restaurantRes.data
@@ -121,13 +130,66 @@ export default async function OwnerDashboard() {
   const belowTargetCount = recipeStats.filter(r => r.belowTarget).length
   const pendingCount = recipeStats.filter(r => r.status === 'draft').length
 
+  // Cleaning due count (for sub-views)
+  const allCleaningTasks = cleaningTasksRes.data ?? []
+  const allCleaningLogs = cleaningLogsRes.data ?? []
+  const lastSignOff: Record<string, string> = {}
+  for (const log of allCleaningLogs) {
+    if (log.task_id && !lastSignOff[log.task_id]) lastSignOff[log.task_id] = log.completed_at
+  }
+  const cleaningDue = allCleaningTasks.filter(t => {
+    const last = lastSignOff[t.id]
+    if (!last) return true
+    const lastDate = new Date(last)
+    if (t.frequency === 'daily') return lastDate.toISOString().split('T')[0] < todayStr
+    if (t.frequency === 'weekly') return (now.getTime() - lastDate.getTime()) > 7 * 24 * 60 * 60 * 1000
+    if (t.frequency === 'monthly') return (now.getTime() - lastDate.getTime()) > 30 * 24 * 60 * 60 * 1000
+    return false
+  }).length
+
+  const profiles = profilesRes.data ?? []
+
   const DAYPART_LABELS: Record<string, string> = {
     'all-day': 'All day', 'lunch': 'Lunch', 'dinner': 'Dinner',
     'brunch': 'Brunch', 'specials': 'Specials',
   }
 
+  // Shared data bundle for sub-views
+  const sharedData = {
+    restaurant,
+    recipes: recipesRes.data ?? [],
+    menus: allMenus,
+    allAttempts,
+    lastAudit,
+    profiles,
+    tempStatus: { amDone: hasAmCheck, pmDone: hasPmCheck },
+    cleaningDue,
+    openIncidents,
+    criticalIncidents,
+    restaurantSlug: restaurant?.slug ?? '',
+    staffPin: restaurant?.staff_pin ?? null,
+    now,
+  }
+
   return (
     <div className="space-y-6">
+      {/* Role view switcher */}
+      <RoleViewSwitcher current={view} />
+      {/* Role-specific views */}
+      {view === 'manager' && <ManagerView data={sharedData} />}
+      {view === 'head-chef' && <HeadChefView data={sharedData} />}
+      {view === 'foh' && <FOHView data={sharedData} />}
+      {view === 'kitchen' && <KitchenStaffView data={sharedData} />}
+
+      {view !== 'owner' && (
+        <p className="text-xs text-mise-ink/30 text-center pt-2">
+          Showing "{view}" view — switch to Owner to see full dashboard
+        </p>
+      )}
+
+      {/* Owner-only content below */}
+      {view === 'owner' && <>
+
       {/* Open incidents alert */}
       {openIncidents.length > 0 && (
         <Link href="/owner/incidents" className="block">
@@ -397,6 +459,7 @@ export default async function OwnerDashboard() {
         </div>
       </div>
 
+      </>}
     </div>
   )
 }
