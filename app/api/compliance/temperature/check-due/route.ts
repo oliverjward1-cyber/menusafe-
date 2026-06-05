@@ -5,7 +5,7 @@ import { Resend } from 'resend'
 // Called by Vercel Cron — checks all restaurants for missing temp logs and emails owners
 // Cron schedule: "0 10 * * *" (10am) and "0 18 * * *" (6pm)
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() { return new Resend(process.env.RESEND_API_KEY) }
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
     const checkLabel = checkType === 'am' ? 'morning (AM)' : 'afternoon (PM)'
     const checkDeadline = checkType === 'am' ? '10:00 AM' : '6:00 PM'
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'mise <alerts@mise.kitchen>',
       to: ownerEmail,
       subject: `⚠️ ${restaurant.name} — temperature check overdue`,

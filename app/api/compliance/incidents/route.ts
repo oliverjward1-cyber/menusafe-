@@ -3,15 +3,20 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() { return new Resend(process.env.RESEND_API_KEY) }
 
 export async function POST(request: Request) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
   const body = await request.json()
   const { restaurantId, type, severity, title, description, affectedPerson, actionTaken, reportedBy } = body
+
+  if (profile?.restaurant_id !== restaurantId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const { data: incident, error } = await supabase.from('incidents').insert({
     restaurant_id: restaurantId,
@@ -47,7 +52,7 @@ export async function POST(request: Request) {
             contamination: 'Contamination', pest: 'Pest sighting', equipment: 'Equipment failure', other: 'Incident',
           }
 
-          await resend.emails.send({
+          await getResend().emails.send({
             from: 'mise <alerts@mise.kitchen>',
             to: ownerEmail,
             subject: `${severityEmoji} Incident reported at ${restaurant?.name ?? 'your restaurant'}`,
