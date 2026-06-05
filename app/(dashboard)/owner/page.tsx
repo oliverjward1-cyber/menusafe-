@@ -39,8 +39,14 @@ export default async function OwnerDashboard({ searchParams }: { searchParams: {
       id, name, sell_price, status,
       recipe_ingredients ( quantity, ingredients ( cost_per_unit, unit_type ) )
     `).eq('restaurant_id', rid),
-    supabase.from('menus').select('id, name, daypart, is_published, updated_at')
-      .eq('restaurant_id', rid).order('updated_at', { ascending: false }),
+    supabase.from('menus').select(`
+      id, name, daypart, is_published, updated_at,
+      menu_recipes ( recipes ( id, name, sell_price, status, declared_allergens, may_contain_allergens,
+        recipe_ingredients ( ingredients ( allergen_celery, allergen_cereals_gluten, allergen_crustaceans,
+          allergen_eggs, allergen_fish, allergen_lupin, allergen_milk, allergen_molluscs,
+          allergen_mustard, allergen_nuts, allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites ) )
+      ) )
+    `).eq('restaurant_id', rid).order('updated_at', { ascending: false }),
     supabase.from('staff_quiz_attempts')
       .select('id, staff_name, score, total_questions, passed, completed_at')
       .eq('restaurant_id', rid).order('completed_at', { ascending: false }),
@@ -154,11 +160,17 @@ export default async function OwnerDashboard({ searchParams }: { searchParams: {
     'brunch': 'Brunch', 'specials': 'Specials',
   }
 
+  // Flatten menu_recipes so sub-views can access m.recipes directly
+  const menusWithRecipes = (menusRes.data ?? []).map((m: any) => ({
+    ...m,
+    recipes: (m.menu_recipes ?? []).map((mr: any) => mr.recipes).filter(Boolean),
+  }))
+
   // Shared data bundle for sub-views
   const sharedData = {
     restaurant,
     recipes: recipesRes.data ?? [],
-    menus: allMenus,
+    menus: menusWithRecipes,
     allAttempts,
     lastAudit,
     profiles,
