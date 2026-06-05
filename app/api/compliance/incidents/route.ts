@@ -6,19 +6,26 @@ import { Resend } from 'resend'
 function getResend() { return new Resend(process.env.RESEND_API_KEY) }
 
 export async function POST(request: Request) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
   const body = await request.json()
-  const { restaurantId, type, severity, title, description, affectedPerson, actionTaken, reportedBy } = body
+  const { restaurantId, type, severity, title, description, affectedPerson, actionTaken, reportedBy, source } = body
 
-  if (profile?.restaurant_id !== restaurantId) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const adminSupabase = createAdminClient()
+
+  // Staff portal requests have source: 'staff' — verify restaurantId exists instead of user auth
+  if (source === 'staff') {
+    const { data: restaurant } = await adminSupabase.from('restaurants').select('id').eq('id', restaurantId).single()
+    if (!restaurant) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  } else {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
+    if (profile?.restaurant_id !== restaurantId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
   }
 
-  const { data: incident, error } = await supabase.from('incidents').insert({
+  const { data: incident, error } = await adminSupabase.from('incidents').insert({
     restaurant_id: restaurantId,
     type, severity, title, description,
     affected_person: affectedPerson || null,
@@ -31,8 +38,6 @@ export async function POST(request: Request) {
   // Notify owner by email for medium/high/critical incidents
   if (severity !== 'low') {
     try {
-      const adminSupabase = createAdminClient()
-
       // Get restaurant name
       const { data: restaurant } = await adminSupabase
         .from('restaurants').select('name').eq('id', restaurantId).single()
@@ -83,7 +88,7 @@ export async function POST(request: Request) {
           })
 
           // Mark as notified
-          await supabase.from('incidents').update({ notified_owner: true }).eq('id', incident.id)
+          await adminSupabase.from('incidents').update({ notified_owner: true }).eq('id', incident.id)
         }
       }
     } catch {

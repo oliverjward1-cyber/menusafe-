@@ -21,6 +21,7 @@ import {
   Truck,
   ShieldCheck,
   AlertOctagon,
+  Tablet,
 } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
 
@@ -95,6 +96,7 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
           { href: '/owner/deliveries', label: 'Deliveries', icon: Truck },
           { href: '/owner/incidents', label: 'Incidents', icon: AlertOctagon },
           { href: '/owner/eho', label: 'EHO Mode', icon: ShieldCheck },
+          { href: '/owner/kitchen-settings', label: 'Kitchen Portal', icon: Tablet },
         ]} />
       </nav>
 

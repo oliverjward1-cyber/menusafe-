@@ -1,20 +1,27 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
   const body = await request.json()
-  const { restaurantId, supplier, items, temperature, tempAcceptable, condition, batchCodes, receivedBy, notes } = body
+  const { restaurantId, supplier, items, temperature, tempAcceptable, condition, batchCodes, receivedBy, notes, source } = body
 
-  if (profile?.restaurant_id !== restaurantId) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const adminSupabase = createAdminClient()
+
+  if (source === 'staff') {
+    const { data: restaurant } = await adminSupabase.from('restaurants').select('id').eq('id', restaurantId).single()
+    if (!restaurant) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  } else {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
+    if (profile?.restaurant_id !== restaurantId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
   }
 
-  const { error } = await supabase.from('delivery_records').insert({
+  const { error } = await adminSupabase.from('delivery_records').insert({
     restaurant_id: restaurantId,
     supplier,
     items,
