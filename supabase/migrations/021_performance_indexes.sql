@@ -1,0 +1,28 @@
+-- Performance indexes for restaurant_id filtering (most common query pattern)
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_recipes_restaurant_id ON public.recipes(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_recipes_restaurant_status ON public.recipes(restaurant_id, status);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_ingredients_restaurant_id ON public.ingredients(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_recipe_ingredients_recipe_id ON public.recipe_ingredients(recipe_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_recipe_ingredients_ingredient_id ON public.recipe_ingredients(ingredient_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_menus_restaurant_id ON public.menus(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_menus_restaurant_published ON public.menus(restaurant_id, is_published);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_menu_recipes_menu_id ON public.menu_recipes(menu_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_menu_recipes_recipe_id ON public.menu_recipes(recipe_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_profiles_restaurant_id ON public.profiles(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_temperature_logs_restaurant_id ON public.temperature_logs(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_temperature_logs_restaurant_date ON public.temperature_logs(restaurant_id, logged_at DESC);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_cleaning_tasks_restaurant_id ON public.cleaning_tasks(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_cleaning_logs_restaurant_id ON public.cleaning_logs(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_cleaning_logs_restaurant_date ON public.cleaning_logs(restaurant_id, completed_at DESC);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_incidents_restaurant_id ON public.incidents(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_incidents_restaurant_resolved ON public.incidents(restaurant_id, resolved);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_kitchen_audits_restaurant_id ON public.kitchen_audits(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_kitchen_audits_restaurant_date ON public.kitchen_audits(restaurant_id, completed_at DESC);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_staff_quiz_attempts_restaurant_id ON public.staff_quiz_attempts(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_staff_quiz_attempts_restaurant_date ON public.staff_quiz_attempts(restaurant_id, completed_at DESC);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_delivery_records_restaurant_id ON public.delivery_records(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_haccp_plans_restaurant_id ON public.haccp_plans(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_probe_calibrations_restaurant_id ON public.probe_calibrations(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_ai_usage_logs_created_at ON public.ai_usage_logs(created_at DESC);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_login_events_restaurant_id ON public.login_events(restaurant_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_login_events_created_at ON public.login_events(created_at DESC);

@@ -23,6 +23,7 @@ import {
   AlertOctagon,
   Tablet,
   FlaskConical,
+  Grid3x3,
 } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
 
@@ -74,32 +75,42 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
 
         <NavSection label="People" pathname={pathname} items={[
           { href: '/owner/team', label: 'Team', icon: Users2 },
+          { href: '/owner/kitchen-settings', label: 'Kitchen Portal', icon: Tablet },
+          { href: '/owner/staff-quiz', label: 'Staff Quiz', icon: Users },
         ]} />
 
-        <NavSection label="Food" pathname={pathname} items={[
+        <NavSection label="Menu" pathname={pathname} items={[
           { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
           { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
           { href: '/chef/menus', label: 'Menus', icon: MenuSquare },
           { href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode },
-          { href: '/chef/audit', label: 'Kitchen Audit', icon: ClipboardCheck },
-          { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
+          { href: '/owner/allergen-matrix', label: 'Allergen Matrix', icon: Grid3x3 },
         ]} />
 
-        <NavSection label="Allergens" pathname={pathname} items={[
+        <NavSection label="Training" pathname={pathname} items={[
           { href: '/owner/learn', label: 'Learning Hub', icon: BookOpen },
-          { href: '/owner/staff-quiz', label: 'Staff Quiz', icon: Users },
           { href: '/owner/quiz-questions', label: 'Quiz Questions', icon: GraduationCap },
         ]} />
 
-        <NavSection label="Compliance" pathname={pathname} items={[
+        <NavSection label="Daily Ops" pathname={pathname} items={[
           { href: '/owner/temperature-logs', label: 'Temp Logs', icon: Thermometer },
           { href: '/owner/cleaning', label: 'Cleaning', icon: Sparkles },
           { href: '/owner/deliveries', label: 'Deliveries', icon: Truck },
-          { href: '/owner/incidents', label: 'Incidents', icon: AlertOctagon },
-          { href: '/owner/haccp', label: 'HACCP & Calibration', icon: FlaskConical },
-          { href: '/owner/eho', label: 'EHO Mode', icon: ShieldCheck },
-          { href: '/owner/kitchen-settings', label: 'Kitchen Portal', icon: Tablet },
         ]} />
+
+        <NavSection label="Incidents & Audit" pathname={pathname} items={[
+          { href: '/owner/incidents', label: 'Incidents', icon: AlertOctagon },
+          { href: '/chef/audit', label: 'Kitchen Audit', icon: ClipboardCheck },
+          { href: '/owner/haccp', label: 'HACCP & Calibration', icon: FlaskConical },
+          { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
+        ]} />
+
+        {/* EHO Mode — standalone prominent link */}
+        <div>
+          <Link href="/owner/eho" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-green-900/50 border border-green-700/30', pathname.startsWith('/owner/eho') ? 'text-white' : 'text-green-300 hover:bg-green-900/70 hover:text-white')}>
+            <ShieldCheck className="h-4 w-4" /> EHO Mode
+          </Link>
+        </div>
       </nav>
 
       <div className="p-4 border-t border-gray-700">

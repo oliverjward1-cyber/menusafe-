@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { unstable_cache } from 'next/cache'
 import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
@@ -29,24 +30,48 @@ export default async function OwnerDashboard({ searchParams }: { searchParams: {
 
   const rid = profile?.restaurant_id ?? ''
 
+  // Cache restaurant row and recipes for 30s — they change rarely during a session
+  const getRestaurant = unstable_cache(
+    async (id: string) => {
+      const { data } = await supabase.from('restaurants').select('id, name, slug, target_gp, staff_pin, plan').eq('id', id).single()
+      return data
+    },
+    ['restaurant', rid],
+    { revalidate: 30 }
+  )
+
+  const getRecipes = unstable_cache(
+    async (id: string) => {
+      const { data } = await supabase.from('recipes').select(`
+        id, name, sell_price, status,
+        recipe_ingredients ( quantity, ingredients ( cost_per_unit, unit_type ) )
+      `).eq('restaurant_id', id)
+      return data ?? []
+    },
+    ['recipes', rid],
+    { revalidate: 30 }
+  )
+
   const now = new Date()
   const todayStr = now.toISOString().split('T')[0]
   const currentHour = now.getHours()
 
-  const [restaurantRes, recipesRes, menusRes, quizRes, auditRes, tempLogsToday, openIncidentsRes, profilesRes, cleaningTasksRes, cleaningLogsRes] = await Promise.all([
-    supabase.from('restaurants').select('*').eq('id', rid).single(),
-    supabase.from('recipes').select(`
-      id, name, sell_price, status,
-      recipe_ingredients ( quantity, ingredients ( cost_per_unit, unit_type ) )
-    `).eq('restaurant_id', rid),
-    supabase.from('menus').select(`
-      id, name, daypart, is_published, updated_at,
-      menu_recipes ( recipes ( id, name, sell_price, status, declared_allergens, may_contain_allergens,
-        recipe_ingredients ( ingredients ( allergen_celery, allergen_cereals_gluten, allergen_crustaceans,
-          allergen_eggs, allergen_fish, allergen_lupin, allergen_milk, allergen_molluscs,
-          allergen_mustard, allergen_nuts, allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites ) )
-      ) )
-    `).eq('restaurant_id', rid).order('updated_at', { ascending: false }),
+  // Only fetch the heavy allergen join when the FOH or Head Chef view needs it
+  const needsMenuRecipes = view === 'foh' || view === 'head-chef'
+
+  const [restaurantData, recipesData, menusRes, quizRes, auditRes, tempLogsToday, openIncidentsRes, profilesRes, cleaningTasksRes, cleaningLogsRes] = await Promise.all([
+    getRestaurant(rid),
+    getRecipes(rid),
+    needsMenuRecipes
+      ? supabase.from('menus').select(`
+          id, name, daypart, is_published, updated_at,
+          menu_recipes ( recipes ( id, name, sell_price, status, declared_allergens, may_contain_allergens,
+            recipe_ingredients ( ingredients ( allergen_celery, allergen_cereals_gluten, allergen_crustaceans,
+              allergen_eggs, allergen_fish, allergen_lupin, allergen_milk, allergen_molluscs,
+              allergen_mustard, allergen_nuts, allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites ) )
+          ) )
+        `).eq('restaurant_id', rid).order('updated_at', { ascending: false })
+      : supabase.from('menus').select('id, name, daypart, is_published, updated_at').eq('restaurant_id', rid).order('updated_at', { ascending: false }),
     supabase.from('staff_quiz_attempts')
       .select('id, staff_name, score, total_questions, passed, completed_at')
       .eq('restaurant_id', rid).order('completed_at', { ascending: false }),
@@ -69,7 +94,7 @@ export default async function OwnerDashboard({ searchParams }: { searchParams: {
     supabase.from('cleaning_logs').select('task_id, completed_at').eq('restaurant_id', rid).order('completed_at', { ascending: false }).limit(100),
   ])
 
-  const restaurant = restaurantRes.data
+  const restaurant = restaurantData
   const targetGp = restaurant?.target_gp ?? 70
   const lastAudit = auditRes.data
   const allMenus = menusRes.data ?? []
@@ -107,7 +132,7 @@ export default async function OwnerDashboard({ searchParams }: { searchParams: {
     return addMonths(new Date(s.completed_at), 6) < now
   })
 
-  function calcFoodCost(recipe: NonNullable<typeof recipesRes.data>[number]): number {
+  function calcFoodCost(recipe: NonNullable<typeof recipesData>[number]): number {
     if (!recipe?.recipe_ingredients) return 0
     return recipe.recipe_ingredients.reduce((sum: number, ri: any) => {
       if (!ri.ingredients) return sum
@@ -121,7 +146,7 @@ export default async function OwnerDashboard({ searchParams }: { searchParams: {
     }, 0)
   }
 
-  const recipeStats = (recipesRes.data ?? []).map(r => {
+  const recipeStats = (recipesData ?? []).map(r => {
     const foodCost = calcFoodCost(r)
     const sellPrice = r.sell_price ?? 0
     const gp = sellPrice > 0 ? calcGpPercent(foodCost, sellPrice) : null
@@ -169,7 +194,7 @@ export default async function OwnerDashboard({ searchParams }: { searchParams: {
   // Shared data bundle for sub-views
   const sharedData = {
     restaurant,
-    recipes: recipesRes.data ?? [],
+    recipes: recipesData ?? [],
     menus: menusWithRecipes,
     allAttempts,
     lastAudit,

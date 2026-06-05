@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { unstable_cache } from 'next/cache'
 import Link from 'next/link'
 import PrintButton from './PrintButton'
 import {
@@ -57,17 +58,29 @@ export default async function EHOInspectionPage() {
   const todayStr = now.toISOString().split('T')[0]
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
+  // Cache stable data (restaurant info, recipes, menus) for 30s
+  const getEHOStable = unstable_cache(
+    async (id: string) => {
+      const [rRes, recRes, mRes] = await Promise.all([
+        supabase.from('restaurants').select('id, name, slug, plan').eq('id', id).single(),
+        supabase.from('recipes').select(`
+          id, name, status, sell_price,
+          recipe_ingredients(quantity, ingredients(cost_per_unit, unit_type, allergen_celery, allergen_cereals_gluten, allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin, allergen_milk, allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites))
+        `).eq('restaurant_id', id),
+        supabase.from('menus').select('id, name, daypart, is_published, updated_at').eq('restaurant_id', id),
+      ])
+      return { restaurant: rRes.data, recipes: recRes.data ?? [], menus: mRes.data ?? [] }
+    },
+    ['eho-stable', rid],
+    { revalidate: 30 }
+  )
+
   const [
-    restaurantRes, recipesRes, menusRes, quizRes, auditRes, profilesRes,
+    stableData, quizRes, auditRes, profilesRes,
     tempLogsRes, cleaningLogsRes, deliveriesRes, incidentsRes,
     haccpRes, calibrationsRes,
   ] = await Promise.all([
-    supabase.from('restaurants').select('*').eq('id', rid).single(),
-    supabase.from('recipes').select(`
-      id, name, status, sell_price,
-      recipe_ingredients(quantity, ingredients(cost_per_unit, unit_type, allergen_celery, allergen_cereals_gluten, allergen_crustaceans, allergen_eggs, allergen_fish, allergen_lupin, allergen_milk, allergen_molluscs, allergen_mustard, allergen_nuts, allergen_peanuts, allergen_sesame, allergen_soya, allergen_sulphites))
-    `).eq('restaurant_id', rid),
-    supabase.from('menus').select('id, name, daypart, is_published, updated_at').eq('restaurant_id', rid),
+    getEHOStable(rid),
     supabase.from('staff_quiz_attempts')
       .select('id, staff_name, score, total_questions, passed, completed_at, quiz_type, assessment_type')
       .eq('restaurant_id', rid).order('completed_at', { ascending: false }),
@@ -87,9 +100,7 @@ export default async function EHOInspectionPage() {
     supabase.from('probe_calibrations').select('*').eq('restaurant_id', rid).order('calibrated_at', { ascending: false }).limit(10),
   ])
 
-  const restaurant = restaurantRes.data
-  const recipes = recipesRes.data ?? []
-  const menus = menusRes.data ?? []
+  const { restaurant, recipes, menus } = stableData
   const allAttempts = quizRes.data ?? []
   const audits = auditRes.data ?? []
   const tempLogs = tempLogsRes.data ?? []
