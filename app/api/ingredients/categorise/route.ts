@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { logAiUsage } from '@/lib/ai-usage'
 
 const anthropic = new Anthropic()
 
@@ -43,6 +44,8 @@ Ingredients:
 ${list}`,
     }],
   })
+
+  await logAiUsage({ endpoint: 'categorise', restaurantId: rid, model: 'claude-haiku-4-5-20251001', inputTokens: message.usage.input_tokens, outputTokens: message.usage.output_tokens })
 
   const text = (message.content[0] as { type: string; text: string }).text.trim()
   let mapping: Record<string, string>

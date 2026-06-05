@@ -6,7 +6,8 @@ var NAV = [
   { id: "subs",      label: "Subscriptions", icon: "subs" },
   { id: "billing",   label: "Billing",       icon: "billing" },
   { id: "waitlist",  label: "Waitlist",      icon: "waitlist" },
-  { id: "security",  label: "Security",      icon: "alert" }
+  { id: "security",  label: "Security",      icon: "alert" },
+  { id: "aicosts",   label: "AI Costs",       icon: "billing" }
 ];
 var TITLES = {
   overview:  ["Overview", "How the business is doing today"],
@@ -14,7 +15,8 @@ var TITLES = {
   subs:      ["Subscriptions & plans", "Who's on what, and your plan mix"],
   billing:   ["Billing", "Payments, invoices & refunds"],
   waitlist:  ["Waitlist", "Early-access signups to invite"],
-  security:  ["Security & sessions", "Login activity, suspicious access and plan enforcement"]
+  security:  ["Security & sessions", "Login activity, suspicious access and plan enforcement"],
+  aicosts:   ["AI Costs", "Anthropic API usage and spend — last 30 days"]
 };
 
 var MiseMark = (
@@ -120,6 +122,7 @@ function App() {
     if (route === "billing") return <BillingScreen data={D} actions={A} />;
     if (route === "waitlist") return <WaitlistScreen data={D} actions={A} />;
     if (route === "security") return <SecurityScreen data={D} actions={A} />;
+    if (route === "aicosts") return <AiCostsScreen data={D} actions={A} />;
     return null;
   }
 

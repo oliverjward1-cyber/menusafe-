@@ -490,9 +490,124 @@ function SecurityScreen(props) {
   );
 }
 
+/* ============ AI COSTS ============ */
+function AiCostsScreen(props) {
+  var D = props.data;
+  var U = D.AI_USAGE || { totalCostUsd: 0, totalCalls: 0, byEndpoint: [], dailyCost: [], model: 'claude-haiku-4-5-20251001', inputCostPerM: 0.80, outputCostPerM: 4.00 };
+
+  var ENDPOINT_LABELS = {
+    'invoice': 'Invoice scanner',
+    'ai-describe': 'Recipe AI describe',
+    'allergen-import': 'Allergen sheet import',
+    'menu-import': 'Menu photo import',
+    'categorise': 'Ingredient categoriser',
+  };
+
+  var maxDaily = Math.max.apply(null, U.dailyCost.map(function (d) { return d.cost; }).concat([0.001]));
+
+  return (
+    <div className="space-y" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* KPI row */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
+        <div className="card" style={{ padding: "20px 24px" }}>
+          <div className="cell-sub" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>30-day spend</div>
+          <div style={{ fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display)", color: U.totalCostUsd > 10 ? "var(--bad)" : U.totalCostUsd > 2 ? "var(--warn)" : "var(--good)" }}>
+            ${U.totalCostUsd.toFixed(4)}
+          </div>
+          <div className="cell-sub" style={{ marginTop: 4 }}>USD · Anthropic API</div>
+        </div>
+        <div className="card" style={{ padding: "20px 24px" }}>
+          <div className="cell-sub" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Total AI calls</div>
+          <div style={{ fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display)" }}>{U.totalCalls}</div>
+          <div className="cell-sub" style={{ marginTop: 4 }}>last 30 days</div>
+        </div>
+        <div className="card" style={{ padding: "20px 24px" }}>
+          <div className="cell-sub" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Avg cost/call</div>
+          <div style={{ fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display)" }}>
+            {U.totalCalls > 0 ? ("$" + (U.totalCostUsd / U.totalCalls).toFixed(5)) : "—"}
+          </div>
+          <div className="cell-sub" style={{ marginTop: 4 }}>USD</div>
+        </div>
+      </div>
+
+      {/* Daily cost bar chart */}
+      <div className="card">
+        <div className="card-head"><h3>Daily cost — last 14 days</h3><span className="sub">{U.model}</span></div>
+        <div className="card-body">
+          {U.dailyCost.length === 0 ? (
+            <p className="cell-sub" style={{ textAlign: "center", padding: "24px 0" }}>No AI calls recorded yet</p>
+          ) : (
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 80 }}>
+              {U.dailyCost.map(function (d) {
+                var pct = maxDaily > 0 ? (d.cost / maxDaily) * 100 : 0;
+                return (
+                  <div key={d.date} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                    <div title={"$" + d.cost.toFixed(5)} style={{ width: "100%", height: Math.max(pct * 0.6, d.cost > 0 ? 3 : 0) + "px", background: d.cost > 0 ? "var(--accent)" : "var(--hairline-2)", borderRadius: 3, transition: "height .2s" }}></div>
+                    <div style={{ fontSize: 9, color: "var(--ink-faint)", whiteSpace: "nowrap" }}>{d.date}</div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* By endpoint */}
+      <div className="card">
+        <div className="card-head"><h3>Cost by feature</h3><span className="sub">last 30 days</span></div>
+        {U.byEndpoint.length === 0 ? (
+          <div className="card-body"><p className="cell-sub" style={{ textAlign: "center", padding: "16px 0" }}>No AI calls yet — costs will appear here after first use</p></div>
+        ) : (
+          <div className="table-wrap">
+            <table className="table">
+              <thead><tr>
+                <th>Feature</th>
+                <th className="tnum">Calls</th>
+                <th className="tnum">Input tokens</th>
+                <th className="tnum">Output tokens</th>
+                <th className="tnum">Cost (USD)</th>
+                <th className="tnum">Avg/call</th>
+              </tr></thead>
+              <tbody>
+                {U.byEndpoint.sort(function (a, b) { return b.cost - a.cost; }).map(function (ep) {
+                  return (
+                    <tr key={ep.endpoint}>
+                      <td><span style={{ fontWeight: 500 }}>{ENDPOINT_LABELS[ep.endpoint] || ep.endpoint}</span></td>
+                      <td className="tnum">{ep.calls}</td>
+                      <td className="tnum">{ep.inputTokens.toLocaleString()}</td>
+                      <td className="tnum">{ep.outputTokens.toLocaleString()}</td>
+                      <td className="tnum" style={{ fontWeight: 600 }}>${ep.cost.toFixed(4)}</td>
+                      <td className="tnum cell-sub">${(ep.cost / ep.calls).toFixed(5)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Pricing reference */}
+      <div className="card">
+        <div className="card-head"><h3>Pricing reference</h3><span className="sub">Anthropic {U.model}</span></div>
+        <div className="card-body" style={{ display: "flex", gap: 24 }}>
+          <div>
+            <div className="cell-sub" style={{ fontSize: 11, marginBottom: 4 }}>Input tokens</div>
+            <div style={{ fontWeight: 600 }}>${U.inputCostPerM} <span className="cell-sub">/ million</span></div>
+          </div>
+          <div>
+            <div className="cell-sub" style={{ fontSize: 11, marginBottom: 4 }}>Output tokens</div>
+            <div style={{ fontWeight: 600 }}>${U.outputCostPerM} <span className="cell-sub">/ million</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 Object.assign(window, {
   computeMetrics: computeMetrics, PLAN_COLORS: PLAN_COLORS,
   OverviewScreen: OverviewScreen, CustomersScreen: CustomersScreen,
   SubsScreen: SubsScreen, BillingScreen: BillingScreen, WaitlistScreen: WaitlistScreen,
-  SecurityScreen: SecurityScreen
+  SecurityScreen: SecurityScreen, AiCostsScreen: AiCostsScreen
 });

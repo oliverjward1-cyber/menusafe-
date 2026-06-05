@@ -2,6 +2,11 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { createHmac } from 'crypto'
+
+function adminToken(password: string): string {
+  return createHmac('sha256', 'mise-admin-v1').update(password).digest('hex')
+}
 
 function generateDemoInvoices(demos: any[]) {
   const invoices: any[] = []
@@ -25,13 +30,15 @@ function generateDemoInvoices(demos: any[]) {
 export async function GET() {
   const cookieStore = cookies()
   const token = cookieStore.get('admin_auth')?.value
-  if (!token || token !== process.env.ADMIN_PASSWORD) {
+  const correct = process.env.ADMIN_PASSWORD
+  if (!token || !correct || token !== adminToken(correct)) {
     redirect('/admin/login')
   }
 
   const supabase = createAdminClient()
 
-  const [restRes, profileRes, recipeRes, auditRes, quizRes, loginEventsRes, sessionsRes, notesRes, menusRes] = await Promise.all([
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  const [restRes, profileRes, recipeRes, auditRes, quizRes, loginEventsRes, sessionsRes, notesRes, menusRes, aiUsageRes] = await Promise.all([
     supabase.from('restaurants').select('id, name, slug, plan, target_gp, created_at, acquisition_source, referral_code, referred_by').order('created_at', { ascending: false }),
     supabase.from('profiles').select('id, restaurant_id, role, full_name').order('created_at', { ascending: true }),
     supabase.from('recipes').select('restaurant_id'),
@@ -41,6 +48,7 @@ export async function GET() {
     supabase.from('user_sessions').select('*').order('last_seen', { ascending: false }),
     supabase.from('customer_notes').select('restaurant_id, note, created_by, created_at').order('created_at', { ascending: false }),
     supabase.from('menus').select('restaurant_id, is_published'),
+    supabase.from('ai_usage_logs').select('endpoint, model, input_tokens, output_tokens, cost_usd, created_at').gte('created_at', thirtyDaysAgo).order('created_at', { ascending: false }),
   ])
 
   const restaurants = restRes.data ?? []
@@ -155,6 +163,29 @@ export async function GET() {
     mrrByMonth[m] = activeByMonth.reduce((sum, c) => sum + (planPrice[c.plan] ?? 49), 0)
   }
 
+  // Aggregate AI usage for the last 30 days
+  const aiLogs = aiUsageRes.data ?? []
+  const aiTotalCost = aiLogs.reduce((s, l) => s + Number(l.cost_usd), 0)
+  const aiTotalCalls = aiLogs.length
+  const aiByEndpoint = aiLogs.reduce((acc: Record<string, { calls: number; cost: number; inputTokens: number; outputTokens: number }>, l) => {
+    if (!acc[l.endpoint]) acc[l.endpoint] = { calls: 0, cost: 0, inputTokens: 0, outputTokens: 0 }
+    acc[l.endpoint].calls++
+    acc[l.endpoint].cost += Number(l.cost_usd)
+    acc[l.endpoint].inputTokens += l.input_tokens
+    acc[l.endpoint].outputTokens += l.output_tokens
+    return acc
+  }, {})
+  // Daily cost for last 14 days
+  const dailyCost: Record<string, number> = {}
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    dailyCost[d] = 0
+  }
+  for (const l of aiLogs) {
+    const d = l.created_at.split('T')[0]
+    if (dailyCost[d] !== undefined) dailyCost[d] += Number(l.cost_usd)
+  }
+
   const miseData = JSON.stringify({
     PLANS: {
       core:  { id: 'core',  name: 'mise Core',       price: 49,  blurb: 'Allergens, menus & QR for a single site.' },
@@ -180,6 +211,15 @@ export async function GET() {
       return Object.entries(sources).map(([source, count]) => ({ source, count }))
     })(),
     INVOICES: generateDemoInvoices(DEMO_CUSTOMERS),
+    AI_USAGE: {
+      totalCostUsd: aiTotalCost,
+      totalCalls: aiTotalCalls,
+      byEndpoint: Object.entries(aiByEndpoint).map(([endpoint, stats]) => ({ endpoint, ...stats })),
+      dailyCost: Object.entries(dailyCost).map(([date, cost]) => ({ date: date.slice(5), cost })),
+      model: 'claude-haiku-4-5-20251001',
+      inputCostPerM: 0.80,
+      outputCostPerM: 4.00,
+    },
     WAITLIST: [
       { id:'w1',name:'La Petite Maison',email:'contact@lapetitemaison.co.uk',city:'London',plan:'plus',signed:'2025-05-28',status:'pending' },
       { id:'w2',name:'Temper Soho',email:'info@temper.co.uk',city:'London',plan:'core',signed:'2025-05-29',status:'pending' },

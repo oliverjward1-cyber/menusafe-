@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
+import { logAiUsage } from '@/lib/ai-usage'
 
 const client = new Anthropic()
 
@@ -29,10 +30,7 @@ export async function POST(req: NextRequest) {
       {
         role: 'user',
         content: [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: mediaType, data: base64 },
-          },
+          { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
           {
             type: 'text',
             text: `This is a restaurant menu. Extract every dish you can see.
@@ -51,13 +49,14 @@ Example: [{"name":"Pan-roasted hake","category":"Mains","price":18.50,"descripti
     ],
   })
 
+  await logAiUsage({ endpoint: 'menu-import', restaurantId: profile.restaurant_id, model: 'claude-haiku-4-5-20251001', inputTokens: message.usage.input_tokens, outputTokens: message.usage.output_tokens })
+
   const text = message.content[0].type === 'text' ? message.content[0].text : ''
 
   try {
     const dishes = JSON.parse(text)
     return NextResponse.json({ dishes })
   } catch {
-    // Try to extract JSON if wrapped in any extra text
     const match = text.match(/\[[\s\S]*\]/)
     if (match) {
       try {

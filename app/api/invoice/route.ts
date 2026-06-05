@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { logAiUsage } from '@/lib/ai-usage'
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -138,6 +139,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    await logAiUsage({ endpoint: 'invoice', restaurantId: null, model: 'claude-haiku-4-5-20251001', inputTokens: message.usage.input_tokens, outputTokens: message.usage.output_tokens })
     return NextResponse.json({ items })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Something went wrong'

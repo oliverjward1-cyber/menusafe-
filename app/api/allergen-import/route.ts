@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
+import { logAiUsage } from '@/lib/ai-usage'
 
 const client = new Anthropic()
 
@@ -31,10 +32,7 @@ export async function POST(req: NextRequest) {
       {
         role: 'user',
         content: [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: mediaType, data: base64 },
-          },
+          { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
           {
             type: 'text',
             text: `This is a restaurant allergen information sheet. It shows which dishes contain which allergens.
@@ -67,6 +65,8 @@ Return ONLY valid JSON. No explanation, no markdown.`,
       },
     ],
   })
+
+  await logAiUsage({ endpoint: 'allergen-import', restaurantId: profile.restaurant_id, model: 'claude-haiku-4-5-20251001', inputTokens: message.usage.input_tokens, outputTokens: message.usage.output_tokens })
 
   const text = message.content[0].type === 'text' ? message.content[0].text : ''
 

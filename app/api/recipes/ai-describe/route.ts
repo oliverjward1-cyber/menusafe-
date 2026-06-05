@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { logAiUsage } from '@/lib/ai-usage'
 
 const anthropic = new Anthropic()
 
@@ -8,6 +9,8 @@ export async function POST(req: NextRequest) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
+
+  const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
 
   const { description } = await req.json()
   if (!description?.trim()) return NextResponse.json({ error: 'No description provided' }, { status: 400 })
@@ -33,6 +36,8 @@ Return ONLY a JSON object with these fields (use null for anything unknown):
 No other text. Just the JSON.`,
     }],
   })
+
+  await logAiUsage({ endpoint: 'ai-describe', restaurantId: profile?.restaurant_id, model: 'claude-haiku-4-5-20251001', inputTokens: message.usage.input_tokens, outputTokens: message.usage.output_tokens })
 
   const text = (message.content[0] as { type: string; text: string }).text.trim()
   try {
