@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import PrintButton from './PrintButton'
 import {
   CheckCircle2, AlertTriangle, XCircle, ClipboardCheck,
-  Users, ChefHat, BookOpen, ShieldCheck, Printer,
+  Users, ChefHat, BookOpen, ShieldCheck,
 } from 'lucide-react'
 import { ALLERGENS } from '@/lib/constants/allergens'
 
@@ -103,12 +104,7 @@ export default async function EHOInspectionPage() {
           <span className="text-xs text-gray-400">Live data · {inspectionTime}</span>
         </div>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 text-xs text-gray-300 hover:text-white border border-white/20 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            <Printer className="h-3.5 w-3.5" /> Print / Save PDF
-          </button>
+          <PrintButton />
           <Link href="/owner" className="text-xs text-gray-400 hover:text-white transition-colors">← Back to dashboard</Link>
         </div>
       </div>
