@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { getStaffRestaurantId } from '@/lib/staff-session'
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -9,8 +10,8 @@ export async function POST(request: Request) {
   const adminSupabase = createAdminClient()
 
   if (source === 'staff') {
-    const { data: restaurant } = await adminSupabase.from('restaurants').select('id').eq('id', restaurantId).single()
-    if (!restaurant) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const staffRid = getStaffRestaurantId()
+    if (!staffRid || staffRid !== restaurantId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   } else {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()

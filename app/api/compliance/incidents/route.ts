@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { getStaffRestaurantId, escapeHtml } from '@/lib/staff-session'
 
 function getResend() { return new Resend(process.env.RESEND_API_KEY) }
 
@@ -11,10 +12,9 @@ export async function POST(request: Request) {
 
   const adminSupabase = createAdminClient()
 
-  // Staff portal requests have source: 'staff' — verify restaurantId exists instead of user auth
   if (source === 'staff') {
-    const { data: restaurant } = await adminSupabase.from('restaurants').select('id').eq('id', restaurantId).single()
-    if (!restaurant) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const staffRid = getStaffRestaurantId()
+    if (!staffRid || staffRid !== restaurantId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   } else {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -38,11 +38,9 @@ export async function POST(request: Request) {
   // Notify owner by email for medium/high/critical incidents
   if (severity !== 'low') {
     try {
-      // Get restaurant name
       const { data: restaurant } = await adminSupabase
         .from('restaurants').select('name').eq('id', restaurantId).single()
 
-      // Get owner email
       const { data: ownerProfile } = await adminSupabase
         .from('profiles').select('id').eq('restaurant_id', restaurantId).eq('role', 'owner').limit(1).maybeSingle()
 
@@ -57,24 +55,32 @@ export async function POST(request: Request) {
             contamination: 'Contamination', pest: 'Pest sighting', equipment: 'Equipment failure', other: 'Incident',
           }
 
+          // HTML-escape all user-supplied content before embedding in email
+          const safeTitle = escapeHtml(title ?? '')
+          const safeDescription = escapeHtml(description ?? '')
+          const safeAffectedPerson = affectedPerson ? escapeHtml(affectedPerson) : null
+          const safeActionTaken = actionTaken ? escapeHtml(actionTaken) : null
+          const safeReportedBy = escapeHtml(reportedBy ?? '')
+          const safeRestaurantName = escapeHtml(restaurant?.name ?? '')
+
           await getResend().emails.send({
             from: 'mise <alerts@mise.kitchen>',
             to: ownerEmail,
-            subject: `${severityEmoji} Incident reported at ${restaurant?.name ?? 'your restaurant'}`,
+            subject: `${severityEmoji} Incident reported at ${safeRestaurantName}`,
             html: `
               <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
                 <h2 style="color: #991b1b; margin-bottom: 4px;">${severityEmoji} ${typeLabels[type] ?? 'Incident'} reported</h2>
-                <p style="color: #555; font-size: 13px; margin-bottom: 16px;">${restaurant?.name ?? ''}</p>
+                <p style="color: #555; font-size: 13px; margin-bottom: 16px;">${safeRestaurantName}</p>
 
                 <div style="background: #fff7f7; border: 1px solid #fecaca; border-radius: 10px; padding: 16px; margin-bottom: 20px;">
-                  <p style="margin: 0 0 8px; font-weight: 600; color: #1a1a1a;">${title}</p>
-                  <p style="margin: 0 0 8px; color: #555; font-size: 13px;">${description}</p>
-                  ${affectedPerson ? `<p style="margin: 0 0 4px; font-size: 12px; color: #777;">Person affected: ${affectedPerson}</p>` : ''}
-                  ${actionTaken ? `<p style="margin: 0; font-size: 12px; color: #166534;">Action taken: ${actionTaken}</p>` : ''}
+                  <p style="margin: 0 0 8px; font-weight: 600; color: #1a1a1a;">${safeTitle}</p>
+                  <p style="margin: 0 0 8px; color: #555; font-size: 13px;">${safeDescription}</p>
+                  ${safeAffectedPerson ? `<p style="margin: 0 0 4px; font-size: 12px; color: #777;">Person affected: ${safeAffectedPerson}</p>` : ''}
+                  ${safeActionTaken ? `<p style="margin: 0; font-size: 12px; color: #166534;">Action taken: ${safeActionTaken}</p>` : ''}
                 </div>
 
                 <p style="color: #555; font-size: 13px; margin-bottom: 20px;">
-                  Reported by <strong>${reportedBy}</strong> at ${new Date().toLocaleString('en-GB')}.
+                  Reported by <strong>${safeReportedBy}</strong> at ${new Date().toLocaleString('en-GB')}.
                   ${severity === 'critical' ? '<br/><strong style="color:#991b1b">This is a critical incident — please respond immediately.</strong>' : ''}
                 </p>
 
@@ -87,7 +93,6 @@ export async function POST(request: Request) {
             `,
           })
 
-          // Mark as notified
           await adminSupabase.from('incidents').update({ notified_owner: true }).eq('id', incident.id)
         }
       }

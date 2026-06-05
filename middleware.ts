@@ -1,5 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { createHmac } from 'crypto'
+
+function adminToken(password: string): string {
+  return createHmac('sha256', 'mise-admin-v1').update(password).digest('hex')
+}
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request: { headers: request.headers } })
@@ -24,7 +29,8 @@ export async function middleware(request: NextRequest) {
 
   if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
     const token = request.cookies.get('admin_auth')?.value
-    if (!token || token !== process.env.ADMIN_PASSWORD) {
+    const correct = process.env.ADMIN_PASSWORD
+    if (!token || !correct || token !== adminToken(correct)) {
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }

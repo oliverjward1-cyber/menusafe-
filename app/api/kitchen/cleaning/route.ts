@@ -1,10 +1,21 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { getStaffRestaurantId } from '@/lib/staff-session'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const restaurantId = searchParams.get('restaurantId')
   if (!restaurantId) return NextResponse.json({ error: 'Missing restaurantId' }, { status: 400 })
+
+  const staffRid = getStaffRestaurantId()
+  if (!staffRid || staffRid !== restaurantId) {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
+    if (profile?.restaurant_id !== restaurantId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const supabase = createAdminClient()
   const todayStr = new Date().toISOString().split('T')[0]

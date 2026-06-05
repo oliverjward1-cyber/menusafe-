@@ -10,6 +10,8 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   // Check slug not already taken
   const { data: existing } = await supabase
@@ -33,7 +35,7 @@ export async function POST(req: NextRequest) {
       acquisition_medium: utmMedium || null,
       acquisition_campaign: utmCampaign || null,
       referred_by: referralCode || null,
-      referral_code: Math.random().toString(36).slice(2, 10).toUpperCase(),
+      referral_code: require('crypto').randomBytes(4).toString('hex').toUpperCase(),
     })
     .select('id, slug')
     .single()

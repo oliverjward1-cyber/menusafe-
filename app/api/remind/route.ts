@@ -1,19 +1,31 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
+import { escapeHtml } from '@/lib/staff-session'
+
+const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mise.kitchen'
+
+function isSafeQuizUrl(url: string): boolean {
+  if (url.startsWith('/')) return true
+  try {
+    const parsed = new URL(url)
+    const allowed = new URL(ALLOWED_ORIGIN)
+    return parsed.origin === allowed.origin
+  } catch {
+    return false
+  }
+}
 
 export async function POST(req: Request) {
   const { staffName, staffEmail, restaurantName, quizUrl } = await req.json()
 
   const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, restaurant_id')
     .eq('id', user.id)
     .single()
   if (profile?.role !== 'owner')
@@ -22,23 +34,27 @@ export async function POST(req: Request) {
   if (!staffEmail || !staffName)
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
 
+  if (!quizUrl || !isSafeQuizUrl(quizUrl))
+    return NextResponse.json({ error: 'Invalid quiz URL' }, { status: 400 })
+
+  // Validate email is a basic format (not a domain check, but prevents obvious abuse)
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(staffEmail))
+    return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+
   const resend = new Resend(process.env.RESEND_API_KEY)
+  const resolvedUrl = quizUrl.startsWith('/') ? `${ALLOWED_ORIGIN}${quizUrl}` : quizUrl
 
   await resend.emails.send({
     from: 'mise <noreply@mise.app>',
     to: staffEmail,
-    subject: `${restaurantName} — Your allergen training is due for renewal`,
-    html: buildReminderEmail(staffName, restaurantName, quizUrl),
+    subject: `${escapeHtml(restaurantName)} — Your allergen training is due for renewal`,
+    html: buildReminderEmail(escapeHtml(staffName), escapeHtml(restaurantName), resolvedUrl),
   })
 
   return NextResponse.json({ ok: true })
 }
 
-function buildReminderEmail(
-  staffName: string,
-  restaurantName: string,
-  quizUrl: string
-): string {
+function buildReminderEmail(staffName: string, restaurantName: string, quizUrl: string): string {
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,sans-serif;">
   <table width="100%" style="padding:40px 0;background:#f4f4f4;"><tr><td align="center">
   <table width="600" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">

@@ -72,6 +72,11 @@ Example format:
 If you cannot read the invoice or find no items, return an empty array: []`
 
 export async function POST(req: NextRequest) {
+  const { createClient } = await import('@/lib/supabase/server')
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json(
       { error: 'ANTHROPIC_API_KEY is not configured. Add it to your environment variables.' },

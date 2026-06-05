@@ -30,7 +30,13 @@ export async function POST(req: NextRequest) {
   if (answers?.length > 0) {
     const { error: answersErr } = await adminSupabase
       .from('kitchen_audit_answers')
-      .insert(answers.map((a: any) => ({ ...a, audit_id: audit.id })))
+      .insert(answers.map((a: any) => ({
+        audit_id: audit.id,
+        question_id: a.question_id,
+        question_text: a.question_text,
+        answer: a.answer,
+        notes: a.notes ?? null,
+      })))
 
     if (answersErr) {
       return NextResponse.json({ error: answersErr.message }, { status: 500 })

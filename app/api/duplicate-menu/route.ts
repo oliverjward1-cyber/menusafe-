@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
 
 export async function POST(req: NextRequest) {
   const { menuId } = await req.json()
@@ -8,10 +7,9 @@ export async function POST(req: NextRequest) {
 
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const { data: profile } = user
-    ? await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
-    : { data: null }
-  const rid = profile?.restaurant_id ?? cookies().get('msafe_rid')?.value
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
+  const rid = profile?.restaurant_id
   if (!rid) return NextResponse.json({ error: 'No restaurant found' }, { status: 400 })
 
   const { data: menu } = await supabase
