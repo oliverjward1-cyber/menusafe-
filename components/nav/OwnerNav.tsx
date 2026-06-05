@@ -24,6 +24,7 @@ import {
   Tablet,
   FlaskConical,
   Grid3x3,
+  CreditCard,
 } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
 
@@ -103,6 +104,11 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
           { href: '/chef/audit', label: 'Kitchen Audit', icon: ClipboardCheck },
           { href: '/owner/haccp', label: 'HACCP & Calibration', icon: FlaskConical },
           { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
+        ]} />
+
+        {/* Billing */}
+        <NavSection label="Account" items={[
+          { href: '/owner/billing', label: 'Billing', icon: CreditCard },
         ]} />
 
         {/* EHO Mode — standalone prominent link */}
