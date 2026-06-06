@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mise — Full Page Map</title>
+<style>
+  :root {
+    --ink: #1C3A2E;
+    --gold: #C8971A;
+    --cream: #F5F0E8;
+    --mid: #2d5a43;
+    --fresh: #4a8c6a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0ede8; color: #1C3A2E; }
+
+  header { background: #1C3A2E; color: white; padding: 24px 32px; display: flex; align-items: center; gap: 12px; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 28px; height: 28px; }
+  .logo-grid div { border-radius: 3px; background: white; }
+  .logo-grid div:last-child { background: #C8971A; }
+  .logo span { font-size: 20px; font-weight: 500; letter-spacing: 0.05em; }
+  header p { color: rgba(255,255,255,0.5); font-size: 13px; margin-left: auto; }
+
+  .section { padding: 32px; }
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #C8971A; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: #C8971A44; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+
+  .card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); transition: box-shadow 0.2s; }
+  .card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.14); }
+  .card-label { padding: 10px 14px; background: #f8f6f2; border-top: 1px solid #eee; }
+  .card-label .route { font-size: 11px; font-family: monospace; color: #C8971A; font-weight: 600; }
+  .card-label .name { font-size: 12px; font-weight: 600; color: #1C3A2E; margin-top: 1px; }
+
+  /* Mockup frame */
+  .mockup { height: 200px; overflow: hidden; position: relative; background: #f5f0e8; }
+  .mockup-inner { transform-origin: top left; transform: scale(0.35); width: 285.7%; height: 285.7%; pointer-events: none; }
+
+  /* ── SHARED COMPONENTS ── */
+  .m-nav { height: 48px; background: #1C3A2E; display: flex; align-items: center; padding: 0 16px; gap: 8px; }
+  .m-nav-logo { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px; }
+  .m-nav-logo div { border-radius: 2px; background: rgba(255,255,255,0.8); }
+  .m-nav-logo div:last-child { background: #C8971A; }
+  .m-nav span { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 500; letter-spacing: 0.04em; }
+  .m-nav-links { margin-left: auto; display: flex; gap: 16px; }
+  .m-nav-links a { color: rgba(255,255,255,0.6); font-size: 11px; }
+
+  .m-sidebar { width: 180px; background: #f8f6f3; border-right: 1px solid #e8e4de; padding: 12px 0; flex-shrink: 0; }
+  .m-sidebar-section { padding: 6px 12px 2px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #999; }
+  .m-sidebar-item { padding: 6px 12px; font-size: 11px; color: #444; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .m-sidebar-item.active { background: #1C3A2E10; color: #1C3A2E; font-weight: 600; border-left: 2px solid #1C3A2E; }
+  .m-sidebar-item .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.4; }
+
+  .m-content { flex: 1; padding: 20px; overflow: hidden; }
+  .m-layout { display: flex; height: calc(100% - 48px); }
+
+  .m-page-dark { background: #1C3A2E; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+  .m-page-cream { background: #F5F0E8; min-height: 100%; }
+
+  .m-btn { border-radius: 20px; padding: 8px 18px; font-size: 11px; font-weight: 600; display: inline-block; }
+  .m-btn-gold { background: #C8971A; color: white; }
+  .m-btn-outline { border: 1px solid #1C3A2E30; color: #1C3A2E; }
+  .m-btn-green { background: #1C3A2E; color: white; }
+
+  .m-card { background: white; border-radius: 10px; padding: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .m-stat { background: white; border-radius: 8px; padding: 10px 12px; }
+  .m-stat-val { font-size: 20px; font-weight: 700; color: #1C3A2E; }
+  .m-stat-lbl { font-size: 9px; color: #888; margin-top: 2px; }
+
+  .m-tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 9px; font-weight: 600; }
+  .m-tag-green { background: #d1fae5; color: #065f46; }
+  .m-tag-amber { background: #fef3c7; color: #92400e; }
+  .m-tag-red { background: #fee2e2; color: #991b1b; }
+  .m-tag-blue { background: #dbeafe; color: #1e40af; }
+
+  .m-input { border: 1px solid #ddd; border-radius: 6px; padding: 7px 10px; font-size: 11px; width: 100%; color: #aaa; background: white; }
+  .m-label { font-size: 10px; font-weight: 600; color: #555; margin-bottom: 3px; }
+
+  .m-h1 { font-size: 22px; font-weight: 700; color: #1C3A2E; }
+  .m-h2 { font-size: 15px; font-weight: 700; color: #1C3A2E; }
+  .m-h3 { font-size: 12px; font-weight: 600; color: #1C3A2E; }
+  .m-p { font-size: 10px; color: #666; line-height: 1.5; }
+  .m-sm { font-size: 9px; color: #999; }
+
+  .m-table { width: 100%; border-collapse: collapse; }
+  .m-table th { font-size: 9px; text-transform: uppercase; color: #999; font-weight: 600; padding: 4px 8px; border-bottom: 1px solid #eee; text-align: left; }
+  .m-table td { font-size: 10px; padding: 6px 8px; border-bottom: 1px solid #f5f5f5; color: #333; }
+
+  .m-dot-row { display: flex; gap: 4px; }
+  .m-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .m-dot-on { background: #1C3A2E; }
+  .m-dot-off { background: #ddd; }
+
+  .m-gold-line { width: 24px; height: 2px; background: #C8971A; display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .m-eyebrow { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #C8971A; display: flex; align-items: center; margin-bottom: 6px; }
+
+  .m-check { color: #C8971A; font-weight: 700; margin-right: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-grid"><div></div><div></div><div></div><div></div></div>
+    <span>mise</span>
+  </div>
+  <p>Full Page Map · 53 pages</p>
+</header>
+
+<!-- ══════════════════════════════════════════════════════ PUBLIC -->
+<div class="section">
+  <div class="section-label">Public</div>
+  <div class="grid">
+
+    <!-- Landing -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#F5F0E8;">
+          <div class="m-nav" style="background:#F5F0E8;border-bottom:1px solid #1C3A2E22;">
+            <div class="m-nav-logo"><div></div><div></div><div></div><div></div></div>
+            <span style="color:#1C3A2E;">mise</span>
+            <div class="m-nav-links"><a style="color:#1C3A2E88;">Why mise</a><a style="color:#1C3A2E88;">Features</a><a style="color:#1C3A2E88;">Pricing</a></div>
+            <div style="margin-left:8px;" class="m-btn m-btn-gold" style="font-size:9px;padding:4px 10px;">Join waitlist</div>
+          </div>
+          <div style="padding:24px 20px;text-align:center;">
+            <div class="m-eyebrow" style="justify-content:center;">Built for UK kitchens</div>
+            <div class="m-h1" style="font-size:18px;line-height:1.3;margin-bottom:8px;">The kitchen management platform that keeps you safe.</div>
+            <div class="m-p" style="margin-bottom:12px;">Allergens, recipe costing, staff training and QR menus.</div>
+            <div class="m-btn m-btn-gold" style="margin-right:6px;">Book a demo</div>
+            <div class="m-btn m-btn-outline">See how it works</div>
+            <div class="m-card" style="margin-top:14px;text-align:left;max-width:200px;margin-left:auto;margin-right:auto;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span class="m-sm">mise · the harbour kitchen</span>
+                <span class="m-tag m-tag-green" style="font-size:8px;">LIVE</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <div><div class="m-h3">Pan-roasted hake</div><div class="m-sm">Sea salt, brown shrimp butter</div></div>
+                <div style="text-align:right;"><span style="font-size:18px;font-weight:700;color:#1C3A2E;">71%</span><div class="m-sm">GP</div></div>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">
+                <span class="m-tag" style="background:#f0ede8;color:#1C3A2E;">Fish</span>
+                <span class="m-tag" style="background:#f0ede8;color:#1C3A2E;">Milk</span>
+                <span class="m-tag" style="background:#f0ede8;color:#1C3A2E;">Gluten</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/</div><div class="name">Landing / Sales Page</div></div>
+    </div>
+
+    <!-- Login -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;width:28px;height:28px;margin-bottom:8px;">
+            <div style="border-radius:3px;background:rgba(255,255,255,0.8);"></div><div style="border-radius:3px;background:rgba(255,255,255,0.8);"></div>
+            <div style="border-radius:3px;background:rgba(255,255,255,0.8);"></div><div style="border-radius:3px;background:#C8971A;"></div>
+          </div>
+          <div style="color:rgba(255,255,255,0.6);font-size:10px;margin-bottom:16px;">Sign in to your account</div>
+          <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px;width:100%;max-width:220px;">
+            <div class="m-label" style="color:#aaa;">Email address</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:10px;">you@restaurant.com</div>
+            <div class="m-label" style="color:#aaa;">Password</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:12px;">••••••••</div>
+            <div class="m-btn m-btn-gold" style="width:100%;text-align:center;display:block;">Sign in</div>
+          </div>
+          <div style="color:rgba(255,255,255,0.4);font-size:9px;margin-top:10px;">Don't have an account? <span style="color:#C8971A;">Create one</span></div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/login</div><div class="name">Login</div></div>
+    </div>
+
+    <!-- Signup -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+          <div style="color:rgba(255,255,255,0.6);font-size:10px;margin-bottom:12px;">Create your account</div>
+          <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;width:100%;max-width:220px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+              <div style="border:2px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px;text-align:center;font-size:10px;color:#aaa;">👤 Owner</div>
+              <div style="border:2px solid #4a8c6a;border-radius:8px;padding:6px;text-align:center;font-size:10px;color:white;background:rgba(74,140,106,0.2);">👨‍🍳 Chef</div>
+            </div>
+            <div class="m-label" style="color:#aaa;">Full name</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:8px;">Jane Smith</div>
+            <div class="m-label" style="color:#aaa;">Email address</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:8px;">you@restaurant.com</div>
+            <div class="m-btn m-btn-gold" style="width:100%;text-align:center;display:block;margin-top:4px;">Create account</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/signup</div><div class="name">Sign Up</div></div>
+    </div>
+
+    <!-- Onboarding -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+          <div style="color:white;font-size:14px;font-weight:700;margin-bottom:6px;">Welcome to mise</div>
+          <div style="color:rgba(255,255,255,0.5);font-size:10px;margin-bottom:16px;text-align:center;">Let's get your kitchen set up</div>
+          <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;width:100%;max-width:220px;">
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+              <div style="flex:1;height:3px;border-radius:2px;background:#C8971A;"></div>
+              <div style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.2);"></div>
+              <div style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.2);"></div>
+            </div>
+            <div class="m-label" style="color:#aaa;">Restaurant name</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:8px;">The Crown & Anchor</div>
+            <div class="m-label" style="color:#aaa;">Target GP %</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:10px;">70%</div>
+            <div class="m-btn m-btn-gold" style="width:100%;text-align:center;display:block;">Continue →</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/onboarding</div><div class="name">Onboarding</div></div>
+    </div>
+
+    <!-- Public QR Menu -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#f8f6f2;padding:20px;">
+          <div style="text-align:center;margin-bottom:12px;">
+            <div class="m-eyebrow" style="justify-content:center;">The Harbour Kitchen</div>
+            <div class="m-h2" style="font-size:14px;">Our Menu</div>
+          </div>
+          <div class="m-card" style="margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div><div class="m-h3">Pan-roasted hake</div><div class="m-sm">Sea salt, brown shrimp butter, greens</div></div>
+            </div>
+            <div style="display:flex;gap:3px;margin-top:6px;flex-wrap:wrap;">
+              <span class="m-tag" style="background:#fee2e2;color:#991b1b;font-size:8px;">Fish</span>
+              <span class="m-tag" style="background:#fef3c7;color:#92400e;font-size:8px;">Milk</span>
+              <span class="m-tag" style="background:#dbeafe;color:#1e40af;font-size:8px;">Crustaceans</span>
+            </div>
+          </div>
+          <div class="m-card" style="margin-bottom:8px;">
+            <div class="m-h3">Beef tartare</div>
+            <div class="m-sm" style="margin-bottom:4px;">Capers, cornichons, sourdough</div>
+            <div style="display:flex;gap:3px;flex-wrap:wrap;">
+              <span class="m-tag" style="background:#fef3c7;color:#92400e;font-size:8px;">Eggs</span>
+              <span class="m-tag" style="background:#dbeafe;color:#1e40af;font-size:8px;">Gluten</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/menu/[slug]</div><div class="name">Public QR Allergen Menu</div></div>
+    </div>
+
+    <!-- Staff Quiz -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;padding:20px;">
+          <div style="text-align:center;margin-bottom:14px;">
+            <div style="color:rgba(255,255,255,0.5);font-size:9px;margin-bottom:4px;">STAFF ALLERGEN QUIZ</div>
+            <div style="color:white;font-size:13px;font-weight:700;">Question 3 of 8</div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:4px;margin:8px 0;"><div style="background:#C8971A;width:37%;height:100%;border-radius:4px;"></div></div>
+          </div>
+          <div class="m-card" style="margin-bottom:10px;">
+            <div class="m-h3" style="margin-bottom:10px;">Which of the following contains a celery allergen?</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="border:1px solid #ddd;border-radius:6px;padding:6px 10px;font-size:10px;">Tomato soup</div>
+              <div style="border:2px solid #1C3A2E;border-radius:6px;padding:6px 10px;font-size:10px;background:#1C3A2E10;font-weight:600;">Vegetable stock ✓</div>
+              <div style="border:1px solid #ddd;border-radius:6px;padding:6px 10px;font-size:10px;">Potato wedges</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/quiz/[slug]</div><div class="name">Staff Allergen Quiz</div></div>
+    </div>
+
+    <!-- Terms -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:white;padding:24px;">
+          <div class="m-h2" style="margin-bottom:8px;">Terms of Service</div>
+          <div style="height:3px;width:32px;background:#C8971A;border-radius:2px;margin-bottom:10px;"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="height:8px;background:#eee;border-radius:3px;width:100%;"></div>
+            <div style="height:8px;background:#eee;border-radius:3px;width:90%;"></div>
+            <div style="height:8px;background:#eee;border-radius:3px;width:95%;"></div>
+            <div style="height:8px;background:#eee;border-radius:3px;width:80%;"></div>
+            <div style="margin-top:6px;height:8px;background:#eee;border-radius:3px;width:100%;"></div>
+            <div style="height:8px;background:#eee;border-radius:3px;width:88%;"></div>
+          </div>
+          <div style="margin-top:10px;font-size:9px;color:#999;">© 2026 mise Ltd. Compliance support, not legal advice.</div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/terms</div><div class="name">Terms of Service</div></div>
+    </div>
+
+    <!-- Invite -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;display:flex;align-items:center;justify-content:center;padding:24px;">
+          <div style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:8px;">✉️</div>
+            <div style="color:white;font-size:13px;font-weight:700;margin-bottom:4px;">You've been invited</div>
+            <div style="color:rgba(255,255,255,0.5);font-size:10px;margin-bottom:14px;">Join The Harbour Kitchen on mise</div>
+            <div class="m-btn m-btn-gold">Accept invite</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/invite/[token]</div><div class="name">Accept Invite</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ OWNER DASHBOARD -->
+<div class="section" style="background:#fff;">
+  <div class="section-label">Owner Dashboard</div>
+  <div class="grid">
+
+    <!-- Owner Home -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar">
+              <div class="m-sidebar-section">Menu</div>
+              <div class="m-sidebar-item active"><div class="dot"></div>Dashboard</div>
+              <div class="m-sidebar-item">Recipes</div>
+              <div class="m-sidebar-item">Menus</div>
+              <div class="m-sidebar-section" style="margin-top:6px;">Daily Ops</div>
+              <div class="m-sidebar-item">Temp Logs</div>
+              <div class="m-sidebar-item">Cleaning</div>
+            </div>
+            <div class="m-content">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <div class="m-h2">Dashboard</div>
+                <div class="m-tag m-tag-blue">Manager View</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+                <div class="m-stat"><div class="m-stat-val">24</div><div class="m-stat-lbl">Total dishes</div></div>
+                <div class="m-stat"><div class="m-stat-val" style="color:#C8971A;">68%</div><div class="m-stat-lbl">Avg GP</div></div>
+                <div class="m-stat"><div class="m-stat-val" style="color:#ef4444;">3</div><div class="m-stat-lbl">Below target</div></div>
+                <div class="m-stat"><div class="m-stat-val">12</div><div class="m-stat-lbl">Signed off</div></div>
+              </div>
+              <div class="m-card">
+                <div style="display:flex;justify-content:space-between;"><div class="m-h3">Kitchen Audit</div><div class="m-tag m-tag-green">Pass</div></div>
+                <div class="m-sm" style="margin-top:3px;">Last: 14 May 2026 · Score: 94%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner</div><div class="name">Owner Dashboard</div></div>
+    </div>
+
+    <!-- Billing -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar">
+              <div class="m-sidebar-section">Account</div>
+              <div class="m-sidebar-item active">Billing</div>
+            </div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:12px;">Billing</div>
+              <div class="m-card" style="margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;"><div><div class="m-sm">Current plan</div><div class="m-h3">mise Core</div></div><span class="m-tag m-tag-blue">Trial</span></div>
+                <div style="margin-top:8px;font-size:10px;color:#888;">Trial ends 20 Jun 2026</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                <div class="m-card" style="border:2px solid #1C3A2E;"><div class="m-h3">Core</div><div style="font-size:16px;font-weight:700;">£49</div><div class="m-sm">/mo</div></div>
+                <div class="m-card"><div class="m-h3">Plus</div><div style="font-size:16px;font-weight:700;">£79</div><div class="m-sm">/mo</div></div>
+                <div class="m-card"><div class="m-h3">Multi</div><div style="font-size:16px;font-weight:700;">£129</div><div class="m-sm">/mo</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/billing</div><div class="name">Billing & Subscription</div></div>
+    </div>
+
+    <!-- Team -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Team</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">Team</div>
+              <div class="m-card" style="margin-bottom:8px;">
+                <div class="m-h3" style="margin-bottom:8px;">Members · 3</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;">Jane Smith</span><span class="m-tag m-tag-amber">Owner</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;">Tom Baker</span><span class="m-tag m-tag-green">Chef</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;">Sarah Lee</span><span class="m-tag m-tag-green">Chef</span></div>
+                </div>
+              </div>
+              <div class="m-card">
+                <div class="m-h3" style="margin-bottom:6px;">Invite someone</div>
+                <div class="m-input" style="margin-bottom:6px;">chef@restaurant.com</div>
+                <div class="m-btn m-btn-green" style="font-size:9px;padding:5px 10px;">Send invite</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/team</div><div class="name">Team Members</div></div>
+    </div>
+
+    <!-- Allergen Matrix -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Allergen Matrix</div></div>
+            <div class="m-content" style="padding:12px;overflow:auto;">
+              <div class="m-h2" style="margin-bottom:8px;">Allergen Matrix</div>
+              <table class="m-table">
+                <thead><tr><th>Dish</th><th>Fish</th><th>Milk</th><th>Gluten</th><th>Eggs</th><th>Nuts</th></tr></thead>
+                <tbody>
+                  <tr><td>Pan-roasted hake</td><td>🟢</td><td>🟢</td><td>⚪</td><td>⚪</td><td>⚪</td></tr>
+                  <tr><td>Beef tartare</td><td>⚪</td><td>⚪</td><td>🟢</td><td>🟢</td><td>⚪</td></tr>
+                  <tr><td>Lemon tart</td><td>⚪</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td></tr>
+                  <tr><td>Soda bread</td><td>⚪</td><td>🟢</td><td>🟢</td><td>⚪</td><td>⚪</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/allergen-matrix</div><div class="name">Allergen Matrix</div></div>
+    </div>
+
+    <!-- QR Menu -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">QR Menu</div></div>
+            <div class="m-content" style="text-align:center;padding-top:20px;">
+              <div class="m-h2" style="margin-bottom:6px;">QR Code</div>
+              <div class="m-p" style="margin-bottom:12px;">Guests scan to see your live allergen menu</div>
+              <div style="width:80px;height:80px;background:#1C3A2E;border-radius:8px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;">
+                <div style="width:50px;height:50px;background:white;border-radius:4px;"></div>
+              </div>
+              <div class="m-btn m-btn-gold">Download QR</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/qr-menu</div><div class="name">QR Code Generator</div></div>
+    </div>
+
+    <!-- Incidents -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Incidents</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">Incidents</div>
+              <div class="m-card" style="margin-bottom:6px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div><div class="m-h3">Allergen near-miss</div><div class="m-sm">14 May · Kitchen</div></div>
+                  <span class="m-tag m-tag-amber">Open</span>
+                </div>
+              </div>
+              <div class="m-card" style="margin-bottom:6px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div><div class="m-h3">Delivery rejection</div><div class="m-sm">12 May · Goods in</div></div>
+                  <span class="m-tag m-tag-green">Closed</span>
+                </div>
+              </div>
+              <div class="m-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div><div class="m-h3">Temperature breach</div><div class="m-sm">10 May · Fridge 2</div></div>
+                  <span class="m-tag m-tag-red">Escalated</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/incidents</div><div class="name">Incident Reports</div></div>
+    </div>
+
+    <!-- Temperature Logs -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Temp Logs</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">Temperature Logs</div>
+              <table class="m-table">
+                <thead><tr><th>Location</th><th>Temp</th><th>Time</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Fridge 1</td><td>3°C</td><td>08:00</td><td><span class="m-tag m-tag-green">✓</span></td></tr>
+                  <tr><td>Fridge 2</td><td>6°C</td><td>08:02</td><td><span class="m-tag m-tag-amber">!</span></td></tr>
+                  <tr><td>Freezer</td><td>-18°C</td><td>08:05</td><td><span class="m-tag m-tag-green">✓</span></td></tr>
+                  <tr><td>Hot hold</td><td>72°C</td><td>12:00</td><td><span class="m-tag m-tag-green">✓</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/temperature-logs</div><div class="name">Temperature Logs</div></div>
+    </div>
+
+    <!-- Cleaning -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Cleaning</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">Cleaning Schedule</div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;">Grill surfaces</span><span class="m-tag m-tag-green">✓ Signed off</span></div>
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;">Cold room</span><span class="m-tag m-tag-amber">Pending</span></div>
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;">Fryer drain</span><span class="m-tag m-tag-green">✓ Signed off</span></div>
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;">Oven interiors</span><span class="m-tag m-tag-red">Overdue</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/cleaning</div><div class="name">Cleaning Schedule</div></div>
+    </div>
+
+    <!-- Deliveries -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Deliveries</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">Delivery Log</div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div class="m-card"><div style="display:flex;justify-content:space-between;"><div><div class="m-h3">Bidfood</div><div class="m-sm">14 May · 07:30</div></div><span class="m-tag m-tag-green">Accepted</span></div></div>
+                <div class="m-card"><div style="display:flex;justify-content:space-between;"><div><div class="m-h3">Fresh Direct</div><div class="m-sm">13 May · 08:00</div></div><span class="m-tag m-tag-red">Rejected</span></div></div>
+                <div class="m-card"><div style="display:flex;justify-content:space-between;"><div><div class="m-h3">Brakes</div><div class="m-sm">12 May · 07:45</div></div><span class="m-tag m-tag-green">Accepted</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/deliveries</div><div class="name">Delivery Log</div></div>
+    </div>
+
+    <!-- Audit -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Kitchen Audit</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">Kitchen Audit</div>
+              <div class="m-card" style="margin-bottom:8px;background:#f0fdf4;">
+                <div style="display:flex;justify-content:space-between;"><div class="m-h3">May Audit</div><span class="m-tag m-tag-green">94% Pass</span></div>
+                <div class="m-sm" style="margin-top:2px;">14 May 2026</div>
+              </div>
+              <div class="m-card" style="margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;"><div class="m-h3">April Audit</div><span class="m-tag m-tag-amber">88%</span></div>
+              </div>
+              <div class="m-btn m-btn-green" style="font-size:9px;padding:6px 12px;">+ New Audit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/audit</div><div class="name">Kitchen Audit</div></div>
+    </div>
+
+    <!-- HACCP -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">HACCP</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">HACCP & Probe Cal.</div>
+              <div class="m-card" style="margin-bottom:6px;">
+                <div class="m-h3" style="margin-bottom:4px;">Probe Calibration</div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;"><span>Probe #1</span><span class="m-tag m-tag-green">In spec</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:4px;"><span>Probe #2</span><span class="m-tag m-tag-amber">Due</span></div>
+              </div>
+              <div class="m-card">
+                <div class="m-h3" style="margin-bottom:4px;">HACCP Plans</div>
+                <div style="font-size:10px;color:#666;">3 plans active · Last reviewed 1 May</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/haccp</div><div class="name">HACCP & Probe Calibration</div></div>
+    </div>
+
+    <!-- Learning Hub -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Learning Hub</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">Allergen Learning</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <div class="m-card" style="text-align:center;"><div style="font-size:16px;">🐟</div><div class="m-h3" style="font-size:10px;">Fish</div></div>
+                <div class="m-card" style="text-align:center;"><div style="font-size:16px;">🥛</div><div class="m-h3" style="font-size:10px;">Milk</div></div>
+                <div class="m-card" style="text-align:center;"><div style="font-size:16px;">🌾</div><div class="m-h3" style="font-size:10px;">Gluten</div></div>
+                <div class="m-card" style="text-align:center;"><div style="font-size:16px;">🥚</div><div class="m-h3" style="font-size:10px;">Eggs</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/learn</div><div class="name">Allergen Learning Hub</div></div>
+    </div>
+
+    <!-- EHO Mode -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav" style="background:#064e3b;"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>EHO Inspection Mode</span></div>
+          <div style="background:#f0fdf4;padding:12px;height:calc(100% - 48px);overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+              <div style="color:#065f46;font-size:11px;font-weight:700;">🛡 EHO Mode Active</div>
+              <span class="m-tag m-tag-green">Print ready</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div class="m-card"><div style="display:flex;justify-content:space-between;"><span style="font-size:10px;">Kitchen Audit</span><span class="m-tag m-tag-green">94%</span></div></div>
+              <div class="m-card"><div style="display:flex;justify-content:space-between;"><span style="font-size:10px;">Staff Training</span><span class="m-tag m-tag-green">6/6</span></div></div>
+              <div class="m-card"><div style="display:flex;justify-content:space-between;"><span style="font-size:10px;">Allergen Matrix</span><span class="m-tag m-tag-green">✓</span></div></div>
+              <div class="m-card"><div style="display:flex;justify-content:space-between;"><span style="font-size:10px;">Temp Monitoring</span><span class="m-tag m-tag-amber">1 alert</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/eho</div><div class="name">EHO Inspection Mode</div></div>
+    </div>
+
+    <!-- Kitchen Settings -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Settings</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">Kitchen Settings</div>
+              <div class="m-card" style="margin-bottom:8px;">
+                <div class="m-label">Restaurant name</div>
+                <div class="m-input" style="margin-bottom:8px;">The Harbour Kitchen</div>
+                <div class="m-label">Target GP %</div>
+                <div class="m-input" style="margin-bottom:8px;">70%</div>
+                <div class="m-label">Staff PIN</div>
+                <div class="m-input">••••</div>
+              </div>
+              <div class="m-btn m-btn-green" style="font-size:9px;">Save changes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/owner/kitchen-settings</div><div class="name">Kitchen Settings</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ CHEF DASHBOARD -->
+<div class="section">
+  <div class="section-label">Chef Dashboard</div>
+  <div class="grid">
+
+    <!-- Chef Home -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar">
+              <div class="m-sidebar-item active">Home</div>
+              <div class="m-sidebar-item">Ingredients</div>
+              <div class="m-sidebar-item">Recipes</div>
+              <div class="m-sidebar-item">Menus</div>
+            </div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:10px;">Good morning, Tom 👨‍🍳</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+                <div class="m-stat"><div class="m-stat-val">42</div><div class="m-stat-lbl">Recipes</div></div>
+                <div class="m-stat"><div class="m-stat-val">6</div><div class="m-stat-lbl">Menus</div></div>
+              </div>
+              <div class="m-card">
+                <div class="m-h3" style="margin-bottom:4px;">Recipes below target GP</div>
+                <div style="font-size:10px;color:#ef4444;">3 recipes need attention</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/chef</div><div class="name">Chef Home</div></div>
+    </div>
+
+    <!-- Ingredients -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Ingredients</div></div>
+            <div class="m-content">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div class="m-h2">Ingredients</div>
+                <div class="m-btn m-btn-green" style="font-size:9px;padding:4px 8px;">+ Add</div>
+              </div>
+              <div class="m-input" style="margin-bottom:8px;color:#aaa;">🔍 Search ingredients…</div>
+              <table class="m-table">
+                <thead><tr><th>Name</th><th>Cost/kg</th><th>Allergens</th></tr></thead>
+                <tbody>
+                  <tr><td>Hake fillet</td><td>£12.50</td><td>Fish</td></tr>
+                  <tr><td>Butter</td><td>£4.20</td><td>Milk</td></tr>
+                  <tr><td>Plain flour</td><td>£0.80</td><td>Gluten</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/chef/ingredients</div><div class="name">Ingredients List</div></div>
+    </div>
+
+    <!-- Recipes -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Recipes</div></div>
+            <div class="m-content">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div class="m-h2">Recipes</div>
+                <div class="m-btn m-btn-green" style="font-size:9px;padding:4px 8px;">+ New</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><div><div class="m-h3">Pan-roasted hake</div><div class="m-sm">Fish · Milk</div></div><span style="font-size:14px;font-weight:700;color:#1C3A2E;">71%</span></div>
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><div><div class="m-h3">Beef tartare</div><div class="m-sm">Eggs · Gluten</div></div><span style="font-size:14px;font-weight:700;color:#C8971A;">64%</span></div>
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><div><div class="m-h3">Lemon tart</div><div class="m-sm">Milk · Eggs · Nuts</div></div><span style="font-size:14px;font-weight:700;color:#ef4444;">58%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/chef/recipes</div><div class="name">Recipes</div></div>
+    </div>
+
+    <!-- Recipe Edit -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Recipes</div></div>
+            <div class="m-content">
+              <div class="m-h2" style="margin-bottom:8px;">Edit Recipe</div>
+              <div class="m-card" style="margin-bottom:6px;">
+                <div class="m-label">Recipe name</div>
+                <div class="m-input" style="margin-bottom:6px;">Pan-roasted hake</div>
+                <div class="m-label">Portion size</div>
+                <div class="m-input">200g</div>
+              </div>
+              <div class="m-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><div class="m-h3">Ingredients</div><div class="m-tag m-tag-green">GP 71%</div></div>
+                <div style="display:flex;flex-direction:column;gap:3px;">
+                  <div style="display:flex;justify-content:space-between;font-size:9px;"><span>Hake fillet 180g</span><span>£2.25</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:9px;"><span>Butter 20g</span><span>£0.08</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/chef/recipes/[id]/edit</div><div class="name">Edit Recipe</div></div>
+    </div>
+
+    <!-- Menus -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Menus</div></div>
+            <div class="m-content">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div class="m-h2">Menus</div>
+                <div class="m-btn m-btn-green" style="font-size:9px;padding:4px 8px;">+ New</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><div><div class="m-h3">Spring Dinner</div><div class="m-sm">8 dishes · Active</div></div><span class="m-tag m-tag-green">Live</span></div>
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><div><div class="m-h3">Lunch Set</div><div class="m-sm">5 dishes</div></div><span class="m-tag m-tag-blue">Draft</span></div>
+                <div class="m-card" style="display:flex;justify-content:space-between;align-items:center;"><div><div class="m-h3">Tasting Menu</div><div class="m-sm">7 dishes</div></div><span class="m-tag m-tag-green">Live</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/chef/menus</div><div class="name">Menus</div></div>
+    </div>
+
+    <!-- Invoice Scanner -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner">
+          <div class="m-nav"><div class="m-nav-logo"><div></div><div></div><div></div><div></div></div><span>mise</span></div>
+          <div class="m-layout">
+            <div class="m-sidebar"><div class="m-sidebar-item active">Invoice Scan</div></div>
+            <div class="m-content" style="text-align:center;padding-top:16px;">
+              <div class="m-h2" style="margin-bottom:6px;">Invoice AI Scanner</div>
+              <div class="m-p" style="margin-bottom:10px;">Upload a supplier invoice to auto-import ingredient prices</div>
+              <div style="border:2px dashed #ddd;border-radius:10px;padding:20px;margin-bottom:10px;">
+                <div style="font-size:20px;margin-bottom:4px;">📄</div>
+                <div style="font-size:10px;color:#aaa;">Drop PDF or image here</div>
+              </div>
+              <div class="m-btn m-btn-gold">Upload invoice</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/chef/ingredients/scan</div><div class="name">Invoice AI Scanner</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ KITCHEN PORTAL -->
+<div class="section" style="background:#fff;">
+  <div class="section-label">Kitchen Staff Portal</div>
+  <div class="grid">
+
+    <!-- PIN Login -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;width:24px;height:24px;margin-bottom:8px;opacity:0.8;">
+            <div style="border-radius:2px;background:white;"></div><div style="border-radius:2px;background:white;"></div>
+            <div style="border-radius:2px;background:white;"></div><div style="border-radius:2px;background:#C8971A;"></div>
+          </div>
+          <div style="color:white;font-size:13px;font-weight:700;margin-bottom:2px;">The Harbour Kitchen</div>
+          <div style="color:rgba(255,255,255,0.5);font-size:9px;margin-bottom:16px;">Staff portal</div>
+          <div style="display:flex;gap:10px;margin-bottom:12px;">
+            <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:50%;border:2px solid rgba(255,255,255,0.3);"></div>
+            <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:50%;border:2px solid rgba(255,255,255,0.3);"></div>
+            <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:50%;border:2px solid rgba(255,255,255,0.3);"></div>
+            <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:50%;border:2px solid rgba(255,255,255,0.3);"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;max-width:120px;">
+            <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px;text-align:center;color:white;font-size:12px;font-weight:600;">1</div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px;text-align:center;color:white;font-size:12px;font-weight:600;">2</div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px;text-align:center;color:white;font-size:12px;font-weight:600;">3</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/kitchen/[slug]</div><div class="name">Staff PIN Login</div></div>
+    </div>
+
+    <!-- Temp Log -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;padding:16px;">
+          <div style="color:rgba(255,255,255,0.5);font-size:9px;margin-bottom:8px;">THE HARBOUR KITCHEN</div>
+          <div style="color:white;font-size:14px;font-weight:700;margin-bottom:12px;">🌡 Log Temperature</div>
+          <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:12px;">
+            <div class="m-label" style="color:#aaa;">Location</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:8px;">Fridge 1</div>
+            <div class="m-label" style="color:#aaa;">Temperature (°C)</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:8px;">3.2°C</div>
+            <div class="m-btn m-btn-gold" style="width:100%;text-align:center;display:block;">Log reading</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/kitchen/[slug]/temperature</div><div class="name">Log Temperature</div></div>
+    </div>
+
+    <!-- Cleaning Sign-off -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;padding:16px;">
+          <div style="color:white;font-size:13px;font-weight:700;margin-bottom:12px;">🧹 Cleaning Sign-off</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:white;font-size:10px;">Grill surfaces</span>
+              <div style="width:18px;height:18px;border-radius:4px;background:#C8971A;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;">✓</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:white;font-size:10px;">Cold room</span>
+              <div style="width:18px;height:18px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);"></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:white;font-size:10px;">Fryer drain</span>
+              <div style="width:18px;height:18px;border-radius:4px;background:#C8971A;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;">✓</div>
+            </div>
+          </div>
+          <div class="m-btn m-btn-gold" style="margin-top:10px;display:block;text-align:center;">Submit</div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/kitchen/[slug]/cleaning</div><div class="name">Cleaning Sign-off</div></div>
+    </div>
+
+    <!-- Delivery -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;padding:16px;">
+          <div style="color:white;font-size:13px;font-weight:700;margin-bottom:12px;">🚚 Log Delivery</div>
+          <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:12px;">
+            <div class="m-label" style="color:#aaa;">Supplier</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:6px;">Bidfood</div>
+            <div class="m-label" style="color:#aaa;">Condition</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;">
+              <div style="background:#C8971A;border-radius:6px;padding:5px;text-align:center;color:white;font-size:9px;font-weight:600;">✓ Accepted</div>
+              <div style="background:rgba(255,255,255,0.1);border-radius:6px;padding:5px;text-align:center;color:rgba(255,255,255,0.5);font-size:9px;">✗ Rejected</div>
+            </div>
+            <div class="m-btn m-btn-gold" style="width:100%;text-align:center;display:block;">Log delivery</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/kitchen/[slug]/delivery</div><div class="name">Log Delivery</div></div>
+    </div>
+
+    <!-- Incident -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;padding:16px;">
+          <div style="color:white;font-size:13px;font-weight:700;margin-bottom:12px;">⚠️ Report Incident</div>
+          <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:12px;">
+            <div class="m-label" style="color:#aaa;">Type</div>
+            <div class="m-input" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#555;margin-bottom:6px;">Allergen near-miss</div>
+            <div class="m-label" style="color:#aaa;">Description</div>
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:8px;font-size:10px;color:#555;height:40px;margin-bottom:8px;"></div>
+            <div class="m-btn m-btn-gold" style="width:100%;text-align:center;display:block;">Submit report</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/kitchen/[slug]/incident</div><div class="name">Report Incident</div></div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;padding:16px;">
+          <div style="color:white;font-size:13px;font-weight:700;margin-bottom:12px;">✅ Daily Tasks</div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="background:#C8971A22;border:1px solid #C8971A55;border-radius:8px;padding:8px 10px;display:flex;gap:6px;align-items:center;">
+              <div style="width:14px;height:14px;border-radius:3px;background:#C8971A;flex-shrink:0;"></div>
+              <span style="color:white;font-size:10px;">Morning temp checks</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 10px;display:flex;gap:6px;align-items:center;">
+              <div style="width:14px;height:14px;border-radius:3px;border:1px solid rgba(255,255,255,0.3);flex-shrink:0;"></div>
+              <span style="color:rgba(255,255,255,0.7);font-size:10px;">Prep station clean</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 10px;display:flex;gap:6px;align-items:center;">
+              <div style="width:14px;height:14px;border-radius:3px;border:1px solid rgba(255,255,255,0.3);flex-shrink:0;"></div>
+              <span style="color:rgba(255,255,255,0.7);font-size:10px;">Fryer oil check</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/kitchen/[slug]/tasks</div><div class="name">Daily Task List</div></div>
+    </div>
+
+    <!-- Staff Learn -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#1C3A2E;padding:16px;">
+          <div style="color:white;font-size:13px;font-weight:700;margin-bottom:10px;">📚 Allergen Training</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:16px;">🐟</div><div style="color:white;font-size:9px;margin-top:3px;">Fish</div></div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:16px;">🥛</div><div style="color:white;font-size:9px;margin-top:3px;">Milk</div></div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:16px;">🌾</div><div style="color:white;font-size:9px;margin-top:3px;">Gluten</div></div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:16px;">🥜</div><div style="color:white;font-size:9px;margin-top:3px;">Peanuts</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/kitchen/[slug]/learn</div><div class="name">Staff Allergen Learning</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ ADMIN -->
+<div class="section">
+  <div class="section-label">Admin (Internal)</div>
+  <div class="grid">
+
+    <!-- Admin Login -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#111;display:flex;align-items:center;justify-content:center;padding:24px;">
+          <div style="width:100%;max-width:200px;">
+            <div style="color:white;font-size:12px;font-weight:700;margin-bottom:12px;text-align:center;">mise Admin</div>
+            <div class="m-label" style="color:#aaa;">Password</div>
+            <div class="m-input" style="background:#222;border-color:#333;color:#555;margin-bottom:8px;">••••••••••••</div>
+            <div class="m-btn m-btn-gold" style="width:100%;text-align:center;display:block;">Sign in</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/admin/login</div><div class="name">Admin Login</div></div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-inner" style="background:#111;">
+          <div style="background:#1a1a1a;padding:8px 14px;display:flex;gap:16px;border-bottom:1px solid #333;">
+            <span style="color:#C8971A;font-size:10px;font-weight:600;">mise admin</span>
+            <span style="color:#666;font-size:9px;">Overview</span>
+            <span style="color:#666;font-size:9px;">Restaurants</span>
+            <span style="color:#666;font-size:9px;">AI Costs</span>
+          </div>
+          <div style="padding:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px;">
+              <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px;"><div style="color:#C8971A;font-size:14px;font-weight:700;">47</div><div style="color:#666;font-size:8px;">Restaurants</div></div>
+              <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px;"><div style="color:#C8971A;font-size:14px;font-weight:700;">£2.4k</div><div style="color:#666;font-size:8px;">MRR</div></div>
+              <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px;"><div style="color:#C8971A;font-size:14px;font-weight:700;">£3.20</div><div style="color:#666;font-size:8px;">AI/30d</div></div>
+            </div>
+            <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px;">
+              <div style="color:#aaa;font-size:9px;font-weight:600;margin-bottom:5px;">AI COSTS BY ENDPOINT</div>
+              <div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:3px;"><span style="color:#666;">invoice</span><span style="color:#C8971A;">£1.80</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:3px;"><span style="color:#666;">ai-describe</span><span style="color:#C8971A;">£0.90</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:9px;"><span style="color:#666;">menu-import</span><span style="color:#C8971A;">£0.50</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label"><div class="route">/admin</div><div class="name">Admin Dashboard</div></div>
+    </div>
+
+  </div>
+</div>
+
+<div style="text-align:center;padding:24px;color:#999;font-size:11px;border-top:1px solid #e8e4de;">
+  mise page map · 53 pages · generated from source code
+</div>
+
+</body>
+</html>
