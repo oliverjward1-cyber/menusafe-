@@ -27,3 +27,20 @@
 ## Vercel Env Vars
 
 - [ ] Add `NEXT_PUBLIC_SITE_URL` — your production domain (e.g. `https://mise.kitchen`) — required for remind endpoint URL validation
+
+## Supabase Migrations (continued)
+
+- [ ] Run migration `023_waitlist.sql` — waitlist signups table
+
+## Offline / EHO Backup (build tasks)
+
+These protect restaurants when the app is down during an EHO inspection.
+
+- [ ] **Printable compliance sheets** — add proper `@media print` CSS to EHO mode so every section (allergen matrix, temp logs, cleaning, staff training, audit, incidents) prints cleanly as A4. Owner can print a full compliance pack at any time.
+
+- [ ] **Printable sheets for individual pages** — add print buttons/stylesheets to: Allergen Matrix, Temperature Logs, Cleaning Schedule, Delivery Log, Incident Log, Staff Training records.
+
+- [ ] **Weekly automated PDF backup email** — every Monday, auto-email the owner a PDF snapshot of all compliance records (allergen matrix, last 4 weeks temp logs, cleaning sign-offs, staff training, last audit, incidents). Owner always has last week's records in their inbox even if the app is unreachable.
+  - Requires: PDF generation library (e.g. `@react-pdf/renderer` or `puppeteer`), a scheduled Supabase Edge Function or Vercel cron job, and `RESEND_API_KEY` env var already in use.
+
+- [ ] **Consider**: PWA offline mode — cache the last-known allergen matrix and compliance records in the browser so the app works without internet. More complex but means the app itself works during an outage.
