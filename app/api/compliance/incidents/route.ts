@@ -35,6 +35,27 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+  // Auto-create corrective action for medium/high/critical incidents
+  if (severity !== 'low') {
+    try {
+      const dueDays = severity === 'critical' ? 1 : severity === 'high' ? 3 : 7
+      const dueDate = new Date()
+      dueDate.setDate(dueDate.getDate() + dueDays)
+
+      await adminSupabase.from('corrective_actions').insert({
+        restaurant_id: restaurantId,
+        title: `Investigate & resolve: ${title}`,
+        description: `Auto-created from ${severity} incident. ${description ?? ''}`.trim(),
+        due_date: dueDate.toISOString().split('T')[0],
+        source_type: 'incident',
+        source_id: incident.id,
+        status: 'open',
+      })
+    } catch {
+      // Non-blocking
+    }
+  }
+
   // Notify owner by email for medium/high/critical incidents
   if (severity !== 'low') {
     try {

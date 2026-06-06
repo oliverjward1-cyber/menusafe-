@@ -2,6 +2,14 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
+function isTemperatureBreach(location: string, temp: number): boolean {
+  const loc = location.toLowerCase()
+  if (loc.includes('freezer')) return temp > -15
+  if (loc.includes('hot') || loc.includes('hold')) return temp < 60
+  // Default fridge/chilled
+  return temp > 8
+}
+
 export async function POST(request: Request) {
   const body = await request.json()
   const { restaurantId, location, temperature, checkType, recordedBy, notes, correctiveAction, source } = body
@@ -32,5 +40,25 @@ export async function POST(request: Request) {
   })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Auto-create corrective action if temperature is out of safe range
+  const isBreach = isTemperatureBreach(location, temperature)
+  if (isBreach) {
+    try {
+      const due = new Date()
+      due.setDate(due.getDate() + 1)
+      await adminSupabase.from('corrective_actions').insert({
+        restaurant_id: restaurantId,
+        title: `Temperature breach — ${location}`,
+        description: `${temperature}°C recorded at ${location} by ${recordedBy}. Investigate cause and take corrective action.${correctiveAction ? ` Initial action: ${correctiveAction}` : ''}`,
+        due_date: due.toISOString().split('T')[0],
+        source_type: 'temperature',
+        status: 'open',
+      })
+    } catch {
+      // Non-blocking
+    }
+  }
+
   return NextResponse.json({ ok: true })
 }

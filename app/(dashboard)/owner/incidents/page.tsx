@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft, AlertOctagon, Plus, CheckCircle2 } from 'lucide-react'
 import IncidentForm from './IncidentForm'
 import ResolveButton from './ResolveButton'
+import CorrectiveActions from './CorrectiveActions'
 
 const TYPE_LABELS: Record<string, { label: string; emoji: string }> = {
   allergen_reaction: { label: 'Allergen reaction', emoji: '⚠️' },
@@ -37,6 +38,12 @@ export default async function IncidentsPage() {
     .eq('restaurant_id', rid)
     .order('occurred_at', { ascending: false })
 
+  const { data: correctiveActions } = await supabase
+    .from('corrective_actions')
+    .select('*')
+    .eq('restaurant_id', rid)
+    .order('created_at', { ascending: false })
+
   const allIncidents = incidents ?? []
   const open = allIncidents.filter(i => !i.resolved)
   const resolved = allIncidents.filter(i => i.resolved)
@@ -59,6 +66,9 @@ export default async function IncidentsPage() {
           </div>
         </div>
       </div>
+
+      {/* Corrective Actions */}
+      <CorrectiveActions initial={correctiveActions ?? []} />
 
       {/* Report new incident */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
