@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { ArrowLeft, Thermometer, Plus } from 'lucide-react'
 import TempLogForm from './TempLogForm'
+import PrintButton from '@/components/ui/PrintButton'
 
 export default async function TemperatureLogsPage() {
   const supabase = createClient()
@@ -57,10 +58,11 @@ export default async function TemperatureLogsPage() {
             <p className="text-sm text-mise-ink/50 mt-0.5">Record fridge, freezer and hot-hold temperatures</p>
           </div>
         </div>
+        <PrintButton label="Print log" />
       </div>
 
       {/* Log new reading */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
         <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
           <Plus className="h-4 w-4 text-mise-mid" /> Record temperature check
         </h2>

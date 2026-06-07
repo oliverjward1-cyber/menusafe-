@@ -5,6 +5,7 @@ import { ArrowLeft, AlertOctagon, Plus, CheckCircle2 } from 'lucide-react'
 import IncidentForm from './IncidentForm'
 import ResolveButton from './ResolveButton'
 import CorrectiveActions from './CorrectiveActions'
+import PrintButton from '@/components/ui/PrintButton'
 
 const TYPE_LABELS: Record<string, { label: string; emoji: string }> = {
   allergen_reaction: { label: 'Allergen reaction', emoji: '⚠️' },
@@ -65,13 +66,14 @@ export default async function IncidentsPage() {
             </p>
           </div>
         </div>
+        <PrintButton label="Print log" />
       </div>
 
       {/* Corrective Actions */}
-      <CorrectiveActions initial={correctiveActions ?? []} />
+      <div className="no-print"><CorrectiveActions initial={correctiveActions ?? []} /></div>
 
       {/* Report new incident */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
         <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
           <Plus className="h-4 w-4 text-red-500" /> Report an incident
         </h2>

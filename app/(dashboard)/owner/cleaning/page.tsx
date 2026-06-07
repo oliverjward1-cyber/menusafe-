@@ -5,6 +5,7 @@ import { ArrowLeft, Sparkles, Plus, ClipboardList } from 'lucide-react'
 import CleaningTaskList from './CleaningTaskList'
 import AddTaskForm from './AddTaskForm'
 import AdHocTaskForm from './AdHocTaskForm'
+import PrintButton from '@/components/ui/PrintButton'
 
 export default async function CleaningPage() {
   const supabase = createClient()
@@ -69,6 +70,7 @@ export default async function CleaningPage() {
             </p>
           </div>
         </div>
+        <PrintButton label="Print schedule" />
       </div>
 
       {tasks.length === 0 && (
@@ -97,7 +99,7 @@ export default async function CleaningPage() {
       ))}
 
       {/* Log a one-off job */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
         <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
           <ClipboardList className="h-4 w-4 text-mise-mid" /> Log a one-off job
         </h2>
@@ -108,7 +110,7 @@ export default async function CleaningPage() {
       </div>
 
       {/* Add task */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
         <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
           <Plus className="h-4 w-4 text-mise-mid" /> Add cleaning task
         </h2>
