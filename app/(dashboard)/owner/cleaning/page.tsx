@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { ArrowLeft, Sparkles, Plus } from 'lucide-react'
+import { ArrowLeft, Sparkles, Plus, ClipboardList } from 'lucide-react'
 import CleaningTaskList from './CleaningTaskList'
 import AddTaskForm from './AddTaskForm'
+import AdHocTaskForm from './AdHocTaskForm'
 
 export default async function CleaningPage() {
   const supabase = createClient()
@@ -94,6 +95,17 @@ export default async function CleaningPage() {
           />
         </div>
       ))}
+
+      {/* Log a one-off job */}
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
+        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
+          <ClipboardList className="h-4 w-4 text-mise-mid" /> Log a one-off job
+        </h2>
+        <p className="text-sm text-mise-ink/50 -mt-2 mb-4">
+          For unscheduled jobs — a one-off clean, an unexpected delivery, a maintenance issue — that don't belong on the recurring schedule.
+        </p>
+        <AdHocTaskForm restaurantId={rid} staffName={user.email?.split('@')[0] ?? ''} />
+      </div>
 
       {/* Add task */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">

@@ -757,9 +757,13 @@ export default async function EHOInspectionPage() {
 
       <style>{`
         @media print {
+          @page { size: A4; margin: 14mm; }
           .print\\:hidden { display: none !important; }
-          body { font-size: 11px; }
-          section { page-break-inside: avoid; }
+          body { font-size: 11px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          section { page-break-inside: avoid; break-inside: avoid; }
+          table { page-break-inside: auto; }
+          tr { page-break-inside: avoid; break-inside: avoid; }
+          thead { display: table-header-group; }
         }
       `}</style>
     </div>
