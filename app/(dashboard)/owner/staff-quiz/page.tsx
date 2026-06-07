@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/Badge'
 import { CheckCircle, XCircle, AlertTriangle, Clock } from 'lucide-react'
 import QrCodeDisplay from './QrCodeDisplay'
 import { RemindButton } from './RemindButton'
+import PrintButton from '@/components/ui/PrintButton'
 
 function addMonths(date: Date, months: number): Date {
   const d = new Date(date)
@@ -95,13 +96,16 @@ export default async function StaffQuizPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">Staff Allergen Quiz</h1>
-        <p className="text-mise-ink/50 mt-1">Manage quizzes and track staff compliance</p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">Staff Allergen Quiz</h1>
+          <p className="text-mise-ink/50 mt-1">Manage quizzes and track staff compliance</p>
+        </div>
+        <PrintButton label="Print compliance records" />
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-gray-200">
+      <div className="flex gap-1 border-b border-gray-200 no-print">
         <a
           href="?tab=setup"
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${

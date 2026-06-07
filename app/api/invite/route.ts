@@ -5,11 +5,14 @@ import { Resend } from 'resend'
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json()
+    const { email, role } = await request.json()
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
+
+    const allowedRoles = ['manager', 'head_chef', 'chef', 'foh']
+    const inviteRole = allowedRoles.includes(role) ? role : 'chef'
 
     const supabase = createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -36,7 +39,7 @@ export async function POST(request: Request) {
 
     const { data: invite, error: insertError } = await adminClient
       .from('invites')
-      .insert({ restaurant_id: profile.restaurant_id, email, role: 'chef' })
+      .insert({ restaurant_id: profile.restaurant_id, email, role: inviteRole })
       .select('token')
       .single()
 

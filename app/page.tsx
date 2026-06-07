@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import LandingPage from '@/components/marketing/LandingPage'
 
 export default async function Home() {
   // Check for bypass-mode restaurant cookie first
@@ -20,6 +21,6 @@ export default async function Home() {
     redirect(profile?.role === 'owner' ? '/owner' : '/chef')
   }
 
-  // No cookie, no user — go to onboarding
-  redirect('/onboarding')
+  // No cookie, no user — show the marketing landing page
+  return <LandingPage />
 }

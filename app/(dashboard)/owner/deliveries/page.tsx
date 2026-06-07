@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { ArrowLeft, Truck, Plus } from 'lucide-react'
 import DeliveryForm from './DeliveryForm'
+import PrintButton from '@/components/ui/PrintButton'
 
 const CONDITION_LABELS: Record<string, { label: string; className: string }> = {
   acceptable: { label: 'Accepted', className: 'bg-green-100 text-green-800' },
@@ -30,21 +31,24 @@ export default async function DeliveriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link href="/owner" className="text-mise-ink/40 hover:text-mise-ink transition-colors">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink flex items-center gap-2">
-            <Truck className="h-6 w-6 text-mise-mid" />
-            Delivery Records
-          </h1>
-          <p className="text-sm text-mise-ink/50 mt-0.5">Log deliveries with temperature, condition and supplier</p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Link href="/owner" className="text-mise-ink/40 hover:text-mise-ink transition-colors">
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-display font-semibold text-mise-ink flex items-center gap-2">
+              <Truck className="h-6 w-6 text-mise-mid" />
+              Delivery Records
+            </h1>
+            <p className="text-sm text-mise-ink/50 mt-0.5">Log deliveries with temperature, condition and supplier</p>
+          </div>
         </div>
+        <PrintButton label="Print log" />
       </div>
 
       {/* New delivery */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
         <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
           <Plus className="h-4 w-4 text-mise-mid" /> Log a delivery
         </h2>

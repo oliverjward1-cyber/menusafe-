@@ -32,7 +32,7 @@ export default async function DashboardLayout({
     redirect('/onboarding')
   }
 
-  const nav = profile?.role === 'chef'
+  const nav = profile?.role !== 'owner'
     ? <ChefNav restaurantName={restaurant?.name ?? ''} />
     : <OwnerNav restaurantName={restaurant?.name ?? ''} restaurantSlug={restaurant?.slug ?? ''} />
 

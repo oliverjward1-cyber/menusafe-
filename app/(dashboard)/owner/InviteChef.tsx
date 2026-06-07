@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import { UserPlus, CheckCircle2, Loader2 } from 'lucide-react'
+import { STAFF_ROLES } from '@/types/database'
 
 export function InviteChef() {
   const [email, setEmail] = useState('')
+  const [role, setRole] = useState('chef')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
@@ -16,7 +18,7 @@ export function InviteChef() {
     const res = await fetch('/api/invite', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, role }),
     })
     const data = await res.json()
     if (!res.ok) {
@@ -40,7 +42,7 @@ export function InviteChef() {
   return (
     <form onSubmit={handleInvite} className="flex items-end gap-3 flex-wrap">
       <div className="flex-1 min-w-[200px]">
-        <label className="block text-xs font-medium text-mise-ink/60 mb-1">Head chef email</label>
+        <label className="block text-xs font-medium text-mise-ink/60 mb-1">Staff email</label>
         <input
           type="email"
           value={email}
@@ -49,6 +51,18 @@ export function InviteChef() {
           required
           className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-mise-gold focus:ring-1 focus:ring-mise-gold"
         />
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-mise-ink/60 mb-1">Role</label>
+        <select
+          value={role}
+          onChange={e => setRole(e.target.value)}
+          className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-mise-gold focus:ring-1 focus:ring-mise-gold bg-white"
+        >
+          {STAFF_ROLES.map(r => (
+            <option key={r.value} value={r.value}>{r.label}</option>
+          ))}
+        </select>
       </div>
       <button
         type="submit"

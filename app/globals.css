@@ -20,6 +20,10 @@
 }
 
 @media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
   .no-print {
     display: none !important;
   }
@@ -28,5 +32,17 @@
   }
   body {
     background: white;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  table {
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  thead {
+    display: table-header-group;
   }
 }
