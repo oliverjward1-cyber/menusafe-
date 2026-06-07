@@ -11,10 +11,16 @@ function RoleBadge({ role }: { role: string | null }) {
       </span>
     )
   }
-  if (role === 'chef') {
+  const labels: Record<string, string> = {
+    manager: 'Manager',
+    head_chef: 'Head Chef',
+    chef: 'Kitchen Staff',
+    foh: 'Front of House',
+  }
+  if (role && labels[role]) {
     return (
       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-        Chef
+        {labels[role]}
       </span>
     )
   }

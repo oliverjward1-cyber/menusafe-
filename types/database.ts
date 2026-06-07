@@ -1,4 +1,11 @@
-export type Role = 'chef' | 'owner'
+export type Role = 'owner' | 'manager' | 'head_chef' | 'chef' | 'foh'
+
+export const STAFF_ROLES: { value: Role; label: string }[] = [
+  { value: 'manager', label: 'Manager' },
+  { value: 'head_chef', label: 'Head Chef' },
+  { value: 'chef', label: 'Kitchen Staff' },
+  { value: 'foh', label: 'Front of House' },
+]
 
 export interface Restaurant {
   id: string
