@@ -24,6 +24,7 @@ import {
   Tablet,
   FlaskConical,
   CreditCard,
+  History,
 } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
 
@@ -101,6 +102,7 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
           { href: '/owner/haccp', label: 'HACCP & Calibration', icon: FlaskConical },
           { href: '/owner/eho', label: 'EHO Mode', icon: ShieldCheck },
           { href: '/owner/kitchen-settings', label: 'Kitchen Portal', icon: Tablet },
+          { href: '/owner/history', label: 'History', icon: History },
         ]} />
       </nav>
 
