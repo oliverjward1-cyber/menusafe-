@@ -23,6 +23,7 @@ import {
   AlertOctagon,
   Tablet,
   FlaskConical,
+  CreditCard,
 } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
 
@@ -74,6 +75,7 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
 
         <NavSection label="People" pathname={pathname} items={[
           { href: '/owner/team', label: 'Team', icon: Users2 },
+          { href: '/owner/billing', label: 'Billing', icon: CreditCard },
         ]} />
 
         <NavSection label="Food" pathname={pathname} items={[
