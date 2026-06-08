@@ -488,6 +488,5 @@ export async function POST() {
     deliveries: deliveries.length,
     incidents: incidents.length,
     audits: 3,
-    staffErrors: staffErrors.length ? staffErrors : undefined,
   })
 }
