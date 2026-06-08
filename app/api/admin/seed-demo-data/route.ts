@@ -290,10 +290,13 @@ export async function POST() {
   const staffNames = names.length ? names : STAFF.map(s => s.name)
   const quizAttempts: any[] = []
   for (let i = 0; i < 20; i++) {
+    const score = Math.floor(Math.random() * 3) + 7
     quizAttempts.push({
       restaurant_id: rid,
       staff_name: pick(staffNames, i),
-      score: Math.floor(Math.random() * 3) + 7,
+      score,
+      total_questions: 10,
+      passed: score >= 7,
       assessment_type: i % 2 === 0 ? 'Allergen Knowledge' : 'Food Safety',
       created_at: daysAgo(Math.floor(i * 1.5), 10 + (i % 3)),
     })
