@@ -13,10 +13,10 @@ export default function LandingPage() {
               <rect x="0" y="12" width="10" height="10" rx="2.5" fill="#1B4332" />
               <rect x="12" y="12" width="10" height="10" rx="2.5" fill="#D4A017" />
             </svg>
-            <span className="font-display text-xl font-semibold text-mise-deep">mise</span>
+            <span className="font-display text-xl font-semibold text-mise-deep">HospoPilot</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-mise-ink/60">
-            <a href="#why" className="hover:text-mise-ink transition-colors">Why mise</a>
+            <a href="#why" className="hover:text-mise-ink transition-colors">Why HospoPilot</a>
             <a href="#features" className="hover:text-mise-ink transition-colors">Features</a>
             <a href="#pricing" className="hover:text-mise-ink transition-colors">Pricing</a>
           </div>

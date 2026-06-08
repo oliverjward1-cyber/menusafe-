@@ -17,7 +17,7 @@ const hanken = Hanken_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'mise — Allergen & Recipe Management for UK Restaurants',
+  title: 'HospoPilot — Allergen & Recipe Management for UK Restaurants',
   description:
     'Manage recipes, allergens, and GP performance. UK Food Information Regulations 2014 compliant.',
 }
@@ -29,6 +29,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en-GB" className={`${cormorant.variable} ${hanken.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body>{children}</body>
     </html>
   )

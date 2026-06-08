@@ -13,7 +13,7 @@ export function MiseLogo({ className }: { className?: string }) {
         className="font-sans font-semibold tracking-[0.16em] text-white"
         style={{ fontSize: '1.05rem', letterSpacing: '0.16em' }}
       >
-        mise
+        HospoPilot
       </span>
     </span>
   )

@@ -148,7 +148,7 @@ export default async function PublicMenuPage({ params }: Props) {
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center gap-2 mb-2">
             <UtensilsCrossed className="h-5 w-5 text-green-400" />
-            <span className="text-sm font-medium text-green-400">mise</span>
+            <span className="text-sm font-medium text-green-400">HospoPilot</span>
           </div>
           <h1 className="text-3xl font-bold">{restaurant.name}</h1>
           <p className="text-gray-400 mt-1 text-sm">
@@ -245,7 +245,7 @@ export default async function PublicMenuPage({ params }: Props) {
             ))}
           </div>
           <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-            This allergen information is provided by {restaurant.name} in good faith. mise is a
+            This allergen information is provided by {restaurant.name} in good faith. HospoPilot is a
             management tool — the accuracy of allergen data is the sole responsibility of the
             restaurant operator. Always speak to staff before ordering if you have an allergy.
           </p>

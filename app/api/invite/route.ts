@@ -72,7 +72,7 @@ export async function POST(request: Request) {
           <!-- Header -->
           <tr>
             <td style="background-color:#1a3d2b;padding:32px 40px;text-align:center;">
-              <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">mise</h1>
+              <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">HospoPilot</h1>
             </td>
           </tr>
           <!-- Body -->
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
             <td style="padding:40px 40px 32px;">
               <h2 style="margin:0 0 16px;color:#1a1a1a;font-size:22px;font-weight:600;">You've been invited!</h2>
               <p style="margin:0 0 16px;color:#444444;font-size:16px;line-height:1.6;">
-                You've been invited to join a restaurant team on <strong>mise</strong> — the platform that keeps your kitchen team aligned on menu knowledge and allergen safety.
+                You've been invited to join a restaurant team on <strong>HospoPilot</strong> — the platform that keeps your kitchen team aligned on menu knowledge and allergen safety.
               </p>
               <p style="margin:0 0 32px;color:#444444;font-size:16px;line-height:1.6;">
                 Click the button below to set up your account and get started. This invite link expires in 7 days.

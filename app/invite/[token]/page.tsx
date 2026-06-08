@@ -98,7 +98,7 @@ export default function InviteAcceptPage() {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
           <MiseLogo className="mb-3 scale-125" />
-          <p className="text-mise-fresh/70 text-sm mt-1 font-sans">You&apos;ve been invited to join mise as head chef</p>
+          <p className="text-mise-fresh/70 text-sm mt-1 font-sans">You&apos;ve been invited to join HospoPilot as head chef</p>
         </div>
 
         <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">

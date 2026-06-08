@@ -129,7 +129,7 @@ function App() {
     <div className={"app" + (navOpen ? " nav-open" : "")} data-nav={t.nav === "top" ? "top" : "side"} data-density={t.density}>
       {/* sidebar */}
       <aside className="sidebar">
-        <div className="brand">{MiseMark}<span className="brand-name">mise</span><span className="brand-tag">Admin</span></div>
+        <div className="brand">{MiseMark}<span className="brand-name">HospoPilot</span><span className="brand-tag">Admin</span></div>
         <div className="nav-group-label">Manage</div>
         <NavItems />
         <div className="sidebar-foot">
@@ -141,7 +141,7 @@ function App() {
       <div className="main">
         {/* top nav variant */}
         <div className="topnav">
-          <div className="brand">{MiseMark}<span className="brand-name">mise</span></div>
+          <div className="brand">{MiseMark}<span className="brand-name">HospoPilot</span></div>
           <div className="topnav-tabs"><NavItems /></div>
           <div className="topnav-right"><span className="avatar">AW</span></div>
         </div>

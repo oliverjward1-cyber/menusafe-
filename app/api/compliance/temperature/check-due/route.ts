@@ -80,7 +80,7 @@ export async function GET(request: Request) {
             Log temperature now →
           </a>
           <p style="color: #aaa; font-size: 12px; margin-top: 24px;">
-            mise food safety · You're receiving this because you're an owner on mise.
+            HospoPilot food safety · You're receiving this because you're an owner on HospoPilot.
           </p>
         </div>
       `,

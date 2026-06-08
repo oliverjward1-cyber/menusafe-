@@ -158,7 +158,7 @@ export async function GET() {
   const miseData = JSON.stringify({
     PLANS: {
       core:  { id: 'core',  name: 'mise Core',       price: 49,  blurb: 'Allergens, menus & QR for a single site.' },
-      plus:  { id: 'plus',  name: 'mise Plus',       price: 79,  blurb: 'Adds recipe costing, GP% and staff training.' },
+      plus:  { id: 'plus',  name: 'HospoPilot Plus',       price: 79,  blurb: 'Adds recipe costing, GP% and staff training.' },
       multi: { id: 'multi', name: 'mise Multi-site', price: 129, blurb: 'Everything in Plus across up to 5 venues.' },
     },
     CUSTOMERS: allCustomers,
@@ -190,7 +190,7 @@ export async function GET() {
     ACTIVITY: allCustomers.slice(0, 8).map(c => ({
       t: 'recently',
       who: c.name,
-      what: `joined mise with ${c.dishes} dish${c.dishes !== 1 ? 'es' : ''}`,
+      what: `joined HospoPilot with ${c.dishes} dish${c.dishes !== 1 ? 'es' : ''}`,
       kind: 'good',
     })),
   })
@@ -200,7 +200,7 @@ export async function GET() {
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>mise — Admin</title>
+<title>HospoPilot — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
