@@ -48,22 +48,33 @@ export async function POST() {
   const names: string[] = []
 
   // --- Staff ---
-  const staffErrors: string[] = []
+  // Fetch all existing auth users once so we can match by email if already registered
+  const { data: { users: existingUsers } } = await admin.auth.admin.listUsers({ perPage: 1000 })
+  const existingByEmail = new Map(existingUsers.map(u => [u.email, u.id]))
+
   for (let i = 0; i < STAFF.length; i++) {
     const staff = STAFF[i]
     const email = `demo${i + 1}.${rid.slice(0, 8)}@example.com`
-    const { data: created, error: createErr } = await admin.auth.admin.createUser({
-      email,
-      email_confirm: true,
-      password: `Demo${i + 1}Pass!${rid.slice(0, 4)}`,
-      user_metadata: { full_name: staff.name, demo: true },
-    })
-    if (createErr || !created?.user) {
-      staffErrors.push(`${staff.name}: ${createErr?.message ?? 'unknown error'}`)
-      continue
+
+    let userId: string | undefined
+
+    const existing = existingByEmail.get(email)
+    if (existing) {
+      userId = existing
+    } else {
+      const { data: created } = await admin.auth.admin.createUser({
+        email,
+        email_confirm: true,
+        password: `Demo${i + 1}Pass!${rid.slice(0, 4)}`,
+        user_metadata: { full_name: staff.name, demo: true },
+      })
+      userId = created?.user?.id
     }
+
+    if (!userId) continue
+
     await admin.from('profiles').upsert({
-      id: created.user.id,
+      id: userId,
       restaurant_id: rid,
       role: staff.role,
       full_name: staff.name,
