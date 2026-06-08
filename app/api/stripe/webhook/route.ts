@@ -18,7 +18,7 @@ async function syncSubscription(sub: Stripe.Subscription) {
 
   const admin = createAdminClient()
   const plan = planFromSubscription(sub)
-  const currentPeriodEnd = sub.items.data[0]?.current_period_end ?? sub.start_date
+  const currentPeriodEnd = (sub.items.data[0] as unknown as { current_period_end?: number })?.current_period_end ?? sub.start_date
 
   await admin.from('restaurants').update({
     stripe_subscription_id: sub.id,
