@@ -48,16 +48,20 @@ export async function POST() {
   const names: string[] = []
 
   // --- Staff ---
+  const staffErrors: string[] = []
   for (let i = 0; i < STAFF.length; i++) {
     const staff = STAFF[i]
-    const email = `demo.staff${i + 1}.${rid.slice(0, 8)}@mise-demo.app`
-    const { data: created } = await admin.auth.admin.createUser({
+    const email = `demo${i + 1}.${rid.slice(0, 8)}@example.com`
+    const { data: created, error: createErr } = await admin.auth.admin.createUser({
       email,
       email_confirm: true,
-      password: crypto.randomUUID(),
+      password: `Demo${i + 1}Pass!${rid.slice(0, 4)}`,
       user_metadata: { full_name: staff.name, demo: true },
     })
-    if (!created?.user) continue
+    if (createErr || !created?.user) {
+      staffErrors.push(`${staff.name}: ${createErr?.message ?? 'unknown error'}`)
+      continue
+    }
     await admin.from('profiles').upsert({
       id: created.user.id,
       restaurant_id: rid,
@@ -473,5 +477,6 @@ export async function POST() {
     deliveries: deliveries.length,
     incidents: incidents.length,
     audits: 3,
+    staffErrors: staffErrors.length ? staffErrors : undefined,
   })
 }

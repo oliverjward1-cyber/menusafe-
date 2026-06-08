@@ -18,7 +18,9 @@ export default function SeedDemoDataButton() {
       if (!res.ok) {
         setResult(data.error ?? 'Failed to seed demo data')
       } else {
-        setResult(`Done — created ${data.staffCreated} staff, ${data.tempLogs} temp checks, ${data.cleaningLogs} cleaning logs, ${data.deliveries} deliveries, ${data.incidents} incidents and ${data.audits} audits.`)
+        let msg = `Done — created ${data.staffCreated} staff, ${data.tempLogs} temp checks, ${data.cleaningLogs} cleaning logs, ${data.deliveries} deliveries, ${data.incidents} incidents and ${data.audits} audits.`
+        if (data.staffErrors?.length) msg += ` Staff errors: ${data.staffErrors.join('; ')}`
+        setResult(msg)
       }
     } catch {
       setResult('Failed to seed demo data')
