@@ -17,7 +17,7 @@ export default async function MenuEditPage({ params }: Props) {
 
   const { data: menu } = await supabase
     .from('menus')
-    .select('id, name, description, daypart, is_published')
+    .select('id, name, description, daypart, is_published, service_start, service_end')
     .eq('id', params.id)
     .single()
 
@@ -90,6 +90,8 @@ export default async function MenuEditPage({ params }: Props) {
         menuName={menu.name}
         menuDescription={menu.description}
         menuDaypart={menu.daypart}
+        menuServiceStart={menu.service_start ?? null}
+        menuServiceEnd={menu.service_end ?? null}
         isPublished={menu.is_published}
         allRecipes={(allRecipes ?? []) as any}
         initialSelectedIds={selectedIds}

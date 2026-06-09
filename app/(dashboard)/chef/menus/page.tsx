@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
-import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye } from 'lucide-react'
+import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye, Clock } from 'lucide-react'
 import { PublishToggle } from './PublishToggle'
 import { DuplicateMenuButton } from './DuplicateMenuButton'
 import { DeleteMenuButton } from './DeleteMenuButton'
@@ -32,7 +32,7 @@ export default async function MenusPage() {
   const { data: menus } = rid
     ? await supabase
         .from('menus')
-        .select('id, name, description, daypart, is_published, created_at, menu_recipes(count)')
+        .select('id, name, description, daypart, is_published, service_start, service_end, created_at, menu_recipes(count)')
         .eq('restaurant_id', rid)
         .order('created_at', { ascending: false })
     : { data: [] }
@@ -115,7 +115,15 @@ export default async function MenusPage() {
                       {menu.description && (
                         <p className="text-sm text-mise-ink/50 mt-0.5">{menu.description}</p>
                       )}
-                      <p className="text-xs text-gray-400 mt-1">{count} dish{count !== 1 ? 'es' : ''}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <p className="text-xs text-gray-400">{count} dish{count !== 1 ? 'es' : ''}</p>
+                        {(menu.service_start || menu.service_end) && (
+                          <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                            <Clock className="h-3 w-3" />
+                            {menu.service_start ?? '—'} – {menu.service_end ?? '—'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <Link
                       href={`/chef/menus/${menu.id}`}

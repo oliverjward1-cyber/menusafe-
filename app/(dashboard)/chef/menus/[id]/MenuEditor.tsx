@@ -55,6 +55,8 @@ interface Props {
   menuName: string
   menuDescription: string | null
   menuDaypart: string
+  menuServiceStart: string | null
+  menuServiceEnd: string | null
   isPublished: boolean
   allRecipes: Recipe[]
   initialSelectedIds: string[]
@@ -62,7 +64,7 @@ interface Props {
 }
 
 export function MenuEditor({
-  menuId, menuName, menuDescription, menuDaypart, isPublished,
+  menuId, menuName, menuDescription, menuDaypart, menuServiceStart, menuServiceEnd, isPublished,
   allRecipes, initialSelectedIds, menuUrl,
 }: Props) {
   const router = useRouter()
@@ -72,6 +74,8 @@ export function MenuEditor({
   const [name, setName] = useState(menuName)
   const [description, setDescription] = useState(menuDescription ?? '')
   const [daypart, setDaypart] = useState(menuDaypart)
+  const [serviceStart, setServiceStart] = useState(menuServiceStart ?? '')
+  const [serviceEnd, setServiceEnd] = useState(menuServiceEnd ?? '')
   const [published, setPublished] = useState(isPublished)
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
@@ -164,6 +168,8 @@ export function MenuEditor({
       name: name.trim(),
       description: description.trim() || null,
       daypart,
+      service_start: serviceStart || null,
+      service_end: serviceEnd || null,
       updated_at: new Date().toISOString(),
     }).eq('id', menuId)
 
@@ -225,6 +231,43 @@ export function MenuEditor({
           <input value={description} onChange={e => { setDescription(e.target.value); setSaved(false) }}
             placeholder="Optional — shown on the customer menu"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent" />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">Service times <span className="font-normal text-gray-400">(optional)</span></label>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-1">
+              <span className="text-xs text-gray-400 shrink-0">From</span>
+              <input
+                type="time"
+                value={serviceStart}
+                onChange={e => { setServiceStart(e.target.value); setSaved(false) }}
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent"
+              />
+            </div>
+            <div className="flex items-center gap-2 flex-1">
+              <span className="text-xs text-gray-400 shrink-0">Until</span>
+              <input
+                type="time"
+                value={serviceEnd}
+                onChange={e => { setServiceEnd(e.target.value); setSaved(false) }}
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent"
+              />
+            </div>
+            {(serviceStart || serviceEnd) && (
+              <button
+                type="button"
+                onClick={() => { setServiceStart(''); setServiceEnd(''); setSaved(false) }}
+                className="text-xs text-gray-400 hover:text-red-500 transition-colors shrink-0"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          {serviceStart && serviceEnd && (
+            <p className="text-xs text-gray-400 mt-1.5">
+              This menu runs from <span className="font-medium text-mise-ink">{serviceStart}</span> to <span className="font-medium text-mise-ink">{serviceEnd}</span>
+            </p>
+          )}
         </div>
       </div>
 
