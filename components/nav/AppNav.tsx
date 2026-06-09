@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useState, Suspense } from 'react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -115,14 +115,22 @@ function CollapsibleNavSection({ label, icon: SectionIcon, items, pathname }: {
   )
 }
 
-export function AppNav({ restaurantName, restaurantSlug, role }: {
+function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
   restaurantName: string
   restaurantSlug: string
   role: Role
 }) {
   const pathname = usePathname()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  const validRoles: Role[] = ['owner', 'manager', 'head_chef', 'chef', 'foh']
+  const viewParam = searchParams.get('view') as Role | null
+  // Owners/managers can preview any role; others always see their own role
+  const canPreview = dbRole === 'owner' || dbRole === 'manager'
+  const role: Role = canPreview && viewParam && validRoles.includes(viewParam) ? viewParam : dbRole
+  const isPreviewing = canPreview && viewParam && viewParam !== dbRole
 
   const isOwner = role === 'owner'
   const isManager = role === 'manager'
@@ -146,7 +154,7 @@ export function AppNav({ restaurantName, restaurantSlug, role }: {
         <Link href="/owner"><MiseLogo className="mb-2" /></Link>
         <p className="text-xs text-gray-400 truncate">{restaurantName}</p>
         <span className={cn('inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs', ROLE_BADGE[role])}>
-          {ROLE_LABELS[role]}
+          {isPreviewing ? `Preview: ${ROLE_LABELS[role]}` : ROLE_LABELS[role]}
         </span>
       </div>
 
@@ -256,5 +264,13 @@ export function AppNav({ restaurantName, restaurantSlug, role }: {
         </button>
       </div>
     </aside>
+  )
+}
+
+export function AppNav(props: { restaurantName: string; restaurantSlug: string; role: Role }) {
+  return (
+    <Suspense fallback={<aside className="w-64 min-h-screen bg-gray-900" />}>
+      <AppNavInner {...props} />
+    </Suspense>
   )
 }
