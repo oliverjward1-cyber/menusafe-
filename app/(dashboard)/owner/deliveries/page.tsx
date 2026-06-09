@@ -33,15 +33,15 @@ export default async function DeliveriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/owner" className="text-mise-ink/40 hover:text-mise-ink transition-colors">
+          <Link href="/owner" className="text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-display font-semibold text-mise-ink flex items-center gap-2">
-              <Truck className="h-6 w-6 text-mise-mid" />
+            <h1 className="text-2xl font-display font-semibold text-hospopilot-ink flex items-center gap-2">
+              <Truck className="h-6 w-6 text-hospopilot-mid" />
               Delivery Records
             </h1>
-            <p className="text-sm text-mise-ink/50 mt-0.5">Log deliveries with temperature, condition and supplier</p>
+            <p className="text-sm text-hospopilot-ink/50 mt-0.5">Log deliveries with temperature, condition and supplier</p>
           </div>
         </div>
         <PrintButton label="Print log" />
@@ -49,41 +49,41 @@ export default async function DeliveriesPage() {
 
       {/* New delivery */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
-          <Plus className="h-4 w-4 text-mise-mid" /> Log a delivery
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
+          <Plus className="h-4 w-4 text-hospopilot-mid" /> Log a delivery
         </h2>
         <DeliveryForm restaurantId={rid} staffName={user.email?.split('@')[0] ?? ''} />
       </div>
 
       {/* History */}
       {allRecords.length === 0 ? (
-        <div className="text-center py-12 text-mise-ink/40 text-sm">
+        <div className="text-center py-12 text-hospopilot-ink/40 text-sm">
           No deliveries logged yet.
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
           <div className="px-5 py-3 border-b border-black/[0.04]">
-            <p className="text-sm font-semibold text-mise-ink">Delivery log</p>
+            <p className="text-sm font-semibold text-hospopilot-ink">Delivery log</p>
           </div>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-black/[0.04]">
-                <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Supplier</th>
-                <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Items</th>
-                <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Temp</th>
-                <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Condition</th>
-                <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">By</th>
-                <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Date</th>
+                <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Supplier</th>
+                <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Items</th>
+                <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Temp</th>
+                <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Condition</th>
+                <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">By</th>
+                <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Date</th>
               </tr>
             </thead>
             <tbody>
               {allRecords.map(rec => {
                 const cond = CONDITION_LABELS[rec.condition] ?? CONDITION_LABELS.acceptable
                 return (
-                  <tr key={rec.id} className="border-b border-black/[0.04] last:border-0 hover:bg-mise-cream/20">
-                    <td className="px-5 py-3 font-medium text-mise-ink">{rec.supplier}</td>
-                    <td className="px-5 py-3 text-mise-ink/70 max-w-xs truncate">{rec.items}</td>
-                    <td className="px-5 py-3 font-mono text-mise-ink/70">
+                  <tr key={rec.id} className="border-b border-black/[0.04] last:border-0 hover:bg-hospopilot-cream/20">
+                    <td className="px-5 py-3 font-medium text-hospopilot-ink">{rec.supplier}</td>
+                    <td className="px-5 py-3 text-hospopilot-ink/70 max-w-xs truncate">{rec.items}</td>
+                    <td className="px-5 py-3 font-mono text-hospopilot-ink/70">
                       {rec.temperature != null ? `${rec.temperature}°C` : '—'}
                     </td>
                     <td className="px-5 py-3">
@@ -91,8 +91,8 @@ export default async function DeliveriesPage() {
                         {cond.label}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-mise-ink/60">{rec.received_by}</td>
-                    <td className="px-5 py-3 text-mise-ink/40">
+                    <td className="px-5 py-3 text-hospopilot-ink/60">{rec.received_by}</td>
+                    <td className="px-5 py-3 text-hospopilot-ink/40">
                       {new Date(rec.delivered_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                   </tr>

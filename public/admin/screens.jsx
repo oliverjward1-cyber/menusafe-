@@ -1,4 +1,4 @@
-/* mise admin — screens + customer drawer (exported to window) */
+/* HospoPilot admin — screens + customer drawer (exported to window) */
 
 var PLAN_COLORS = { core: "#52B788", plus: "#2D6A4F", multi: "#D4A017" };
 

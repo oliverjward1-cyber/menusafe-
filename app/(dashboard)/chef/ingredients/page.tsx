@@ -35,8 +35,8 @@ export default async function IngredientsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">Ingredients</h1>
-          <p className="text-mise-ink/50 mt-1">
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Ingredients</h1>
+          <p className="text-hospopilot-ink/50 mt-1">
             {ingredients?.length ?? 0} ingredient{ingredients?.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -87,7 +87,7 @@ export default async function IngredientsPage() {
                   <span className="ml-auto text-xs text-gray-400">{items.length} item{items.length !== 1 ? 's' : ''}</span>
                 </div>
                 {items.length === 0 ? (
-                  <p className="px-5 py-4 text-sm text-mise-ink/30 italic">No {label.toLowerCase()} ingredients</p>
+                  <p className="px-5 py-4 text-sm text-hospopilot-ink/30 italic">No {label.toLowerCase()} ingredients</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">

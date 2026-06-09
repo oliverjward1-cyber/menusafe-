@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -45,18 +45,18 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mise-ink flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
-          <MiseLogo className="mb-3 scale-125" />
+          <HospoPilotLogo className="mb-3 scale-125" />
         </div>
         <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
           {!ready ? (
-            <p className="text-mise-fresh/70 text-sm text-center">Loading…</p>
+            <p className="text-hospopilot-fresh/70 text-sm text-center">Loading…</p>
           ) : (
             <>
               <h1 className="text-xl font-semibold text-white mb-1">Set a new password</h1>
-              <p className="text-mise-fresh/60 text-sm mb-6">
+              <p className="text-hospopilot-fresh/60 text-sm mb-6">
                 Choose a strong password for your account.
               </p>
               <form onSubmit={handleReset} className="space-y-4">
@@ -70,7 +70,7 @@ export default function ResetPasswordPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     placeholder="Min. 8 characters"
-                    className="w-full rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-500 px-4 py-2.5 text-sm focus:border-mise-fresh focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-500 px-4 py-2.5 text-sm focus:border-hospopilot-fresh focus:outline-none"
                   />
                 </div>
                 <div>
@@ -83,14 +83,14 @@ export default function ResetPasswordPage() {
                     onChange={(e) => setConfirm(e.target.value)}
                     required
                     placeholder="Repeat your password"
-                    className="w-full rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-500 px-4 py-2.5 text-sm focus:border-mise-fresh focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-500 px-4 py-2.5 text-sm focus:border-hospopilot-fresh focus:outline-none"
                   />
                 </div>
                 {error && <p className="text-sm text-red-400">{error}</p>}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-2.5 bg-mise-mid hover:bg-mise-deep text-white font-medium rounded-xl disabled:opacity-40 transition-colors"
+                  className="w-full py-2.5 bg-hospopilot-mid hover:bg-hospopilot-deep text-white font-medium rounded-xl disabled:opacity-40 transition-colors"
                 >
                   {loading ? 'Saving…' : 'Set new password'}
                 </button>

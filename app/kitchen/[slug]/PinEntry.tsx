@@ -68,7 +68,7 @@ export default function PinEntry({ slug, restaurantName }: { slug: string; resta
           <button
             onClick={() => setStep('pin')}
             disabled={!name.trim()}
-            className="w-full bg-mise-fresh text-mise-ink font-bold rounded-xl py-3.5 text-base disabled:opacity-30 transition-opacity"
+            className="w-full bg-hospopilot-fresh text-hospopilot-ink font-bold rounded-xl py-3.5 text-base disabled:opacity-30 transition-opacity"
           >
             Continue →
           </button>
@@ -83,7 +83,7 @@ export default function PinEntry({ slug, restaurantName }: { slug: string; resta
           {/* PIN dots */}
           <div className="flex justify-center gap-4 py-2">
             {[0,1,2,3].map(i => (
-              <div key={i} className={`w-4 h-4 rounded-full transition-all ${i < pin.length ? 'bg-mise-fresh scale-110' : 'bg-white/20'}`} />
+              <div key={i} className={`w-4 h-4 rounded-full transition-all ${i < pin.length ? 'bg-hospopilot-fresh scale-110' : 'bg-white/20'}`} />
             ))}
           </div>
 

@@ -420,15 +420,15 @@ export default function NewRecipePage() {
       style={{ position: 'fixed', top: dropRect.top, left: dropRect.left, width: dropRect.width, zIndex: 9999 }}
       className="bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-y-auto"
     >
-      {searching && <div className="px-3 py-2 text-xs text-mise-ink/40">Searching…</div>}
+      {searching && <div className="px-3 py-2 text-xs text-hospopilot-ink/40">Searching…</div>}
       {!searching && results.length === 0 && (
-        <div className="px-3 py-2 text-xs text-mise-ink/40">No results found</div>
+        <div className="px-3 py-2 text-xs text-hospopilot-ink/40">No results found</div>
       )}
       {results.map((r, i) => (
         <button key={i} onMouseDown={() => selectResult(r)}
           className="w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-50 last:border-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-mise-ink">{r.name}</span>
+            <span className="text-sm font-medium text-hospopilot-ink">{r.name}</span>
             {r.type === 'library' && (
               <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">Library</span>
             )}
@@ -457,31 +457,31 @@ export default function NewRecipePage() {
         <Link href="/chef/recipes" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">Add recipe</h1>
+        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Add recipe</h1>
       </div>
 
       {/* AI assist panel */}
-      <div className="bg-mise-deep/5 border border-mise-deep/20 rounded-2xl p-4">
+      <div className="bg-hospopilot-deep/5 border border-hospopilot-deep/20 rounded-2xl p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-mise-mid" />
-            <span className="text-sm font-semibold text-mise-ink">AI recipe assist</span>
+            <Sparkles className="h-4 w-4 text-hospopilot-mid" />
+            <span className="text-sm font-semibold text-hospopilot-ink">AI recipe assist</span>
             {aiDone && <span className="text-xs text-green-600 font-medium">Fields filled ✓</span>}
           </div>
-          <button onClick={() => setAiMode(v => !v)} className="text-xs text-mise-mid hover:text-mise-deep font-medium">
+          <button onClick={() => setAiMode(v => !v)} className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">
             {aiMode ? 'Hide' : 'Describe dish'}
           </button>
         </div>
         {aiMode && (
           <div className="space-y-3">
-            <p className="text-xs text-mise-ink/50">Describe your dish in plain English — the AI will fill in the name, description, category, portion size and price.</p>
+            <p className="text-xs text-hospopilot-ink/50">Describe your dish in plain English — the AI will fill in the name, description, category, portion size and price.</p>
             <div className="flex gap-2">
               <textarea
                 value={aiInput}
                 onChange={e => setAiInput(e.target.value)}
                 placeholder="e.g. Pan-seared salmon fillet served with a lemon butter sauce, wilted spinach and new potatoes. A main course, priced at £18.50."
                 rows={3}
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold resize-none"
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-hospopilot-gold resize-none"
               />
             </div>
             <div className="flex gap-2">
@@ -496,7 +496,7 @@ export default function NewRecipePage() {
               <button
                 onClick={handleAiFill}
                 disabled={aiLoading || !aiInput.trim()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-mise-mid text-white rounded-lg text-sm font-medium hover:bg-mise-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-hospopilot-mid text-white rounded-lg text-sm font-medium hover:bg-hospopilot-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 {aiLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</> : <><Sparkles className="h-4 w-4" /> Fill in fields</>}
               </button>
@@ -512,14 +512,14 @@ export default function NewRecipePage() {
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Recipe name</label>
+            <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Recipe name</label>
             <input type="text" value={recipeName} onChange={(e) => setRecipeName(e.target.value)}
               placeholder="e.g. Grilled Chicken Caesar"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-mise-gold/10" />
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-hospopilot-gold/10" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Category</label>
+              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Category</label>
               <select value={category} onChange={(e) => setCategory(e.target.value)}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none">
                 <option value="">Select category</option>
@@ -527,24 +527,24 @@ export default function NewRecipePage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Portion size</label>
+              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Portion size</label>
               <input type="text" value={portionSize} onChange={(e) => setPortionSize(e.target.value)}
                 placeholder="e.g. 280g"
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Description</label>
+            <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Description</label>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)}
               rows={2} placeholder="Brief description for the menu..."
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none resize-none" />
           </div>
           <div>
-            <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Sell price (£)</label>
+            <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Sell price (£)</label>
             <input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)}
               placeholder="0.00" step="0.01" min="0"
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
-            <p className="mt-1 text-xs text-mise-ink/40">Used to calculate gross profit % in the summary below.</p>
+            <p className="mt-1 text-xs text-hospopilot-ink/40">Used to calculate gross profit % in the summary below.</p>
           </div>
         </div>
       </div>
@@ -560,7 +560,7 @@ export default function NewRecipePage() {
         </div>
 
         {lines.length === 0 ? (
-          <div className="py-10 text-center text-sm text-mise-ink/40">
+          <div className="py-10 text-center text-sm text-hospopilot-ink/40">
             No ingredients yet — search below to add one.
           </div>
         ) : (
@@ -584,7 +584,7 @@ export default function NewRecipePage() {
                     <tr key={l.uid} className="hover:bg-gray-50/50">
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">{l.name}</div>
-                        {l.brand && <div className="text-xs text-mise-ink/40">{l.brand}</div>}
+                        {l.brand && <div className="text-xs text-hospopilot-ink/40">{l.brand}</div>}
                         {l.source === 'library'
                           ? <div className="text-xs text-green-600 mt-0.5">From your library</div>
                           : l.kcalPer100 && <div className="text-xs text-gray-400 mt-0.5">{l.kcalPer100} kcal/100g</div>}
@@ -615,7 +615,7 @@ export default function NewRecipePage() {
                                   {allergenLabel(k)}
                                 </span>
                               ))
-                            : <span className="text-xs text-mise-ink/40">None detected</span>}
+                            : <span className="text-xs text-hospopilot-ink/40">None detected</span>}
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -636,7 +636,7 @@ export default function NewRecipePage() {
         <div className="p-4 border-t border-gray-100 bg-gray-50 space-y-3 rounded-b-xl">
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_110px_130px_auto] gap-3 items-end">
             <div>
-              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Search ingredient</label>
+              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Search ingredient</label>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
                 <input ref={searchInputRef} type="text" value={query}
@@ -648,14 +648,14 @@ export default function NewRecipePage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Qty (g)</label>
+              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Qty (g)</label>
               <input type="number" value={qtyInput} onChange={(e) => setQtyInput(e.target.value)}
                 placeholder="0" min="0" step="1"
                 onKeyDown={(e) => e.key === 'Enter' && addLine()}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
             </div>
             <div>
-              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">
+              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">
                 Cost (£/kg)
                 {pending?.type === 'library' && <span className="ml-1 text-green-600 normal-case font-normal">auto</span>}
               </label>
@@ -676,7 +676,7 @@ export default function NewRecipePage() {
             </button>
           </div>
           {pending?.type === 'off' && (
-            <p className="text-xs text-mise-ink/40">
+            <p className="text-xs text-hospopilot-ink/40">
               Enter cost price per kg so food cost and GP can be calculated accurately.
             </p>
           )}

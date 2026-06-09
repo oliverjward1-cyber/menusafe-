@@ -24,7 +24,7 @@ import {
   Tablet,
   FlaskConical,
 } from 'lucide-react'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 function NavSection({ label, items, pathname }: { label: string; items: { href: string; label: string; icon: any }[]; pathname: string }) {
   return (
@@ -33,7 +33,7 @@ function NavSection({ label, items, pathname }: { label: string; items: { href: 
       {items.map(({ href, label, icon: Icon }) => {
         const active = pathname.startsWith(href)
         return (
-          <Link key={href} href={href} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', active ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
+          <Link key={href} href={href} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', active ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
             <Icon className="h-4 w-4" />{label}
           </Link>
         )
@@ -57,9 +57,9 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
   return (
     <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
       <div className="p-4 border-b border-gray-700">
-        <Link href="/owner"><MiseLogo className="mb-2" /></Link>
+        <Link href="/owner"><HospoPilotLogo className="mb-2" /></Link>
         <p className="text-xs text-gray-400 truncate">{restaurantName}</p>
-        <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs bg-mise-gold/20 text-mise-gold">
+        <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs bg-hospopilot-gold/20 text-hospopilot-gold">
           Owner
         </span>
       </div>
@@ -67,7 +67,7 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
       <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
         {/* Dashboard */}
         <div>
-          <Link href="/owner" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', dashboardActive ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
+          <Link href="/owner" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', dashboardActive ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
             <LayoutDashboard className="h-4 w-4" /> Dashboard
           </Link>
         </div>

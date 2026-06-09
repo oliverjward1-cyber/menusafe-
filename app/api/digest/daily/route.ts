@@ -173,7 +173,7 @@ export async function GET(request: Request) {
       : ''
 
     await getResend().emails.send({
-      from: 'mise <digest@mise.kitchen>',
+      from: 'HospoPilot <support@hospopilot.co.uk>',
       to: ownerEmail,
       subject: `${emoji} ${restaurant.name} — ${dayLabel} compliance digest`,
       html: `
@@ -238,7 +238,7 @@ export async function GET(request: Request) {
 
           <!-- CTA -->
           <div style="margin-top: 28px; text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mise.kitchen'}/owner"
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.hospopilot.co.uk'}/owner"
                style="display: inline-block; background: #2D6A4F; color: white; padding: 12px 28px;
                       border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
               Open HospoPilot dashboard →

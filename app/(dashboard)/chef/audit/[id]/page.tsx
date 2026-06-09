@@ -44,7 +44,7 @@ export default async function AuditDetailPage({ params }: Props) {
           <div>
             <div className="flex items-center gap-2">
               <ClipboardCheck className={`h-5 w-5 ${audit.status === 'green' ? 'text-green-700' : audit.status === 'amber' ? 'text-amber-700' : 'text-red-600'}`} />
-              <h1 className="text-xl font-display font-semibold text-mise-ink">Kitchen Audit</h1>
+              <h1 className="text-xl font-display font-semibold text-hospopilot-ink">Kitchen Audit</h1>
             </div>
             <p className="text-sm text-gray-600 mt-1">
               Completed by <strong>{audit.completed_by}</strong> on{' '}
@@ -55,7 +55,7 @@ export default async function AuditDetailPage({ params }: Props) {
             <p className={`text-4xl font-black ${audit.status === 'green' ? 'text-green-700' : audit.status === 'amber' ? 'text-amber-700' : 'text-red-600'}`}>
               {pct}%
             </p>
-            <p className="text-xs text-mise-ink/50 mt-0.5">{audit.score}/{audit.total} passed</p>
+            <p className="text-xs text-hospopilot-ink/50 mt-0.5">{audit.score}/{audit.total} passed</p>
           </div>
         </div>
         {audit.status !== 'green' && (
@@ -78,7 +78,7 @@ export default async function AuditDetailPage({ params }: Props) {
               const q = AUDIT_QUESTIONS.find(q => q.key === f.question_key)
               return (
                 <div key={f.question_key} className="px-5 py-4">
-                  <p className="text-sm font-medium text-mise-ink">{q?.label}</p>
+                  <p className="text-sm font-medium text-hospopilot-ink">{q?.label}</p>
                   <p className="text-xs text-gray-400 mt-0.5">{q?.category}</p>
                   {f.notes && <p className="text-sm text-red-600 mt-2 bg-red-50 rounded-lg px-3 py-2">{f.notes}</p>}
                   {f.photo_url && (
@@ -109,11 +109,11 @@ export default async function AuditDetailPage({ params }: Props) {
                     <div className="shrink-0 mt-0.5">
                       {a?.answer === 'pass' ? <CheckCircle2 className="h-4 w-4 text-green-600" /> :
                        a?.answer === 'fail' ? <XCircle className="h-4 w-4 text-red-500" /> :
-                       <MinusCircle className="h-4 w-4 text-mise-ink/20" />}
+                       <MinusCircle className="h-4 w-4 text-hospopilot-ink/20" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-800">{q.label}</p>
-                      {a?.notes && <p className="text-xs text-mise-ink/50 mt-1">{a.notes}</p>}
+                      {a?.notes && <p className="text-xs text-hospopilot-ink/50 mt-1">{a.notes}</p>}
                       {a?.photo_url && (
                         <a href={a.photo_url} target="_blank" rel="noopener noreferrer">
                           <img src={a.photo_url} alt="evidence" className="mt-2 h-20 w-auto rounded-lg object-cover border border-gray-200" />

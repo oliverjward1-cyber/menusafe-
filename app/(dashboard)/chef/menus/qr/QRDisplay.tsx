@@ -15,7 +15,7 @@ export function QRDisplay({ menuUrl, restaurantName }: Props) {
 
   if (!menuUrl) {
     return (
-      <div className="bg-white rounded-2xl border border-black/[0.06] p-8 text-center text-mise-ink/50">
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-8 text-center text-hospopilot-ink/50">
         <p>No menu URL found. Complete onboarding first.</p>
       </div>
     )
@@ -70,7 +70,7 @@ export function QRDisplay({ menuUrl, restaurantName }: Props) {
         </div>
         <div>
           <p className="text-lg font-bold text-gray-900">{restaurantName}</p>
-          <p className="text-sm text-mise-ink/50 mt-1">Scan to view our menu &amp; allergen information</p>
+          <p className="text-sm text-hospopilot-ink/50 mt-1">Scan to view our menu &amp; allergen information</p>
           <p className="text-xs text-gray-400 font-mono mt-2 break-all">{menuUrl}</p>
         </div>
       </div>
@@ -81,21 +81,21 @@ export function QRDisplay({ menuUrl, restaurantName }: Props) {
           onClick={copyUrl}
           className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
         >
-          {copied ? <CheckCircle2 className="h-6 w-6 text-green-600" /> : <Copy className="h-6 w-6 text-mise-ink/40" />}
+          {copied ? <CheckCircle2 className="h-6 w-6 text-green-600" /> : <Copy className="h-6 w-6 text-hospopilot-ink/40" />}
           {copied ? 'Copied!' : 'Copy URL'}
         </button>
         <button
           onClick={handlePrint}
           className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
         >
-          <Printer className="h-6 w-6 text-mise-ink/40" />
+          <Printer className="h-6 w-6 text-hospopilot-ink/40" />
           Print
         </button>
         <button
           onClick={handleDownload}
           className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
         >
-          <Download className="h-6 w-6 text-mise-ink/40" />
+          <Download className="h-6 w-6 text-hospopilot-ink/40" />
           Download PNG
         </button>
       </div>

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -65,11 +65,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mise-ink flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
-          <MiseLogo className="mb-3 scale-125" />
-          <p className="text-mise-fresh/70 text-sm mt-1 font-sans">Sign in to your account</p>
+          <HospoPilotLogo className="mb-3 scale-125" />
+          <p className="text-hospopilot-fresh/70 text-sm mt-1 font-sans">Sign in to your account</p>
         </div>
 
         <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
@@ -104,7 +104,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <Button type="submit" loading={loading} size="lg" className="w-full !bg-mise-mid hover:!bg-mise-deep">
+            <Button type="submit" loading={loading} size="lg" className="w-full !bg-hospopilot-mid hover:!bg-hospopilot-deep">
               Sign in
             </Button>
           </form>
@@ -112,7 +112,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-400 mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-mise-fresh hover:text-mise-gold font-medium">
+          <Link href="/signup" className="text-hospopilot-fresh hover:text-hospopilot-gold font-medium">
             Create one
           </Link>
         </p>

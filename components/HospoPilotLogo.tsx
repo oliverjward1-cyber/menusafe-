@@ -1,4 +1,4 @@
-export function MiseLogo({ className }: { className?: string }) {
+export function HospoPilotLogo({ className }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className ?? ''}`}>
       {/* 2×2 grid mark */}

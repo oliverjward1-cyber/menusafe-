@@ -165,12 +165,12 @@ export default async function OwnerDashboard() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">{restaurant?.name}</h1>
-          <p className="text-sm text-mise-ink/50 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">{restaurant?.name}</h1>
+          <p className="text-sm text-hospopilot-ink/50 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
         </div>
         <Link
           href="/owner/eho"
-          className="flex-shrink-0 inline-flex items-center gap-2 bg-mise-deep text-white rounded-xl px-4 py-2.5 text-sm font-semibold shadow hover:bg-mise-deep/90 transition-colors"
+          className="flex-shrink-0 inline-flex items-center gap-2 bg-hospopilot-deep text-white rounded-xl px-4 py-2.5 text-sm font-semibold shadow hover:bg-hospopilot-deep/90 transition-colors"
         >
           <ShieldCheck className="h-4 w-4" />
           EHO Inspection Mode
@@ -180,32 +180,32 @@ export default async function OwnerDashboard() {
       {/* Top stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Total dishes</p>
-          <p className="text-3xl font-display font-semibold text-mise-ink mt-1">{recipeStats.length}</p>
-          <Link href="/chef/recipes" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+          <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Total dishes</p>
+          <p className="text-3xl font-display font-semibold text-hospopilot-ink mt-1">{recipeStats.length}</p>
+          <Link href="/chef/recipes" className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
             View all <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Avg menu GP</p>
+          <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Avg menu GP</p>
           <p className={`text-3xl font-bold mt-1 ${avgGp === null ? 'text-gray-400' : avgGp >= targetGp ? 'text-green-700' : 'text-red-600'}`}>
             {avgGp !== null ? formatPercent(avgGp) : '—'}
           </p>
-          <p className="text-xs text-mise-ink/40 mt-2">Target: {targetGp}%</p>
+          <p className="text-xs text-hospopilot-ink/40 mt-2">Target: {targetGp}%</p>
         </div>
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Below target GP</p>
+          <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Below target GP</p>
           <p className={`text-3xl font-bold mt-1 ${belowTargetCount > 0 ? 'text-red-600' : 'text-green-700'}`}>
             {belowTargetCount}
           </p>
-          <p className="text-xs text-mise-ink/40 mt-2">{belowTargetCount === 0 ? 'All dishes on target' : `dish${belowTargetCount !== 1 ? 'es' : ''} need pricing review`}</p>
+          <p className="text-xs text-hospopilot-ink/40 mt-2">{belowTargetCount === 0 ? 'All dishes on target' : `dish${belowTargetCount !== 1 ? 'es' : ''} need pricing review`}</p>
         </div>
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Pending approval</p>
+          <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Pending approval</p>
           <p className={`text-3xl font-bold mt-1 ${pendingCount > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
             {pendingCount}
           </p>
-          <p className="text-xs text-mise-ink/40 mt-2">{pendingCount === 0 ? 'All up to date' : `recipe${pendingCount !== 1 ? 's' : ''} awaiting review`}</p>
+          <p className="text-xs text-hospopilot-ink/40 mt-2">{pendingCount === 0 ? 'All up to date' : `recipe${pendingCount !== 1 ? 's' : ''} awaiting review`}</p>
         </div>
       </div>
 
@@ -221,32 +221,32 @@ export default async function OwnerDashboard() {
           <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <ClipboardCheck className="h-4 w-4 text-mise-mid" />
-                <h2 className="text-sm font-semibold text-mise-ink">Kitchen Audit</h2>
+                <ClipboardCheck className="h-4 w-4 text-hospopilot-mid" />
+                <h2 className="text-sm font-semibold text-hospopilot-ink">Kitchen Audit</h2>
               </div>
-              <Link href="/chef/audit" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Run audit →</Link>
+              <Link href="/chef/audit" className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">Run audit →</Link>
             </div>
             {!lastAudit ? (
               <div className="text-center py-4">
-                <p className="text-sm text-mise-ink/40">No audits completed yet</p>
-                <Link href="/chef/audit/new" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+                <p className="text-sm text-hospopilot-ink/40">No audits completed yet</p>
+                <Link href="/chef/audit/new" className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
                   Start first audit <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Last score</p>
+                  <p className="text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1">Last score</p>
                   <p className={`text-2xl font-bold ${statusColour}`}>{auditScore}%</p>
-                  <p className="text-xs text-mise-ink/40 mt-0.5">by {lastAudit.completed_by}</p>
+                  <p className="text-xs text-hospopilot-ink/40 mt-0.5">by {lastAudit.completed_by}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Completed</p>
-                  <p className="text-sm font-semibold text-mise-ink">{auditDate!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                  <p className="text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1">Completed</p>
+                  <p className="text-sm font-semibold text-hospopilot-ink">{auditDate!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Next due</p>
-                  <p className={`text-sm font-semibold ${isOverdue ? 'text-red-600' : isDueSoon ? 'text-amber-600' : 'text-mise-ink'}`}>
+                  <p className="text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1">Next due</p>
+                  <p className={`text-sm font-semibold ${isOverdue ? 'text-red-600' : isDueSoon ? 'text-amber-600' : 'text-hospopilot-ink'}`}>
                     {nextDue!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </p>
                   {isOverdue && <p className="text-xs text-red-500 mt-0.5">Overdue</p>}
@@ -266,16 +266,16 @@ export default async function OwnerDashboard() {
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MenuSquare className="h-4 w-4 text-green-700" />
-              <h2 className="text-sm font-semibold text-mise-ink">Live menus</h2>
+              <h2 className="text-sm font-semibold text-hospopilot-ink">Live menus</h2>
             </div>
-            <Link href="/chef/menus" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Manage →</Link>
+            <Link href="/chef/menus" className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">Manage →</Link>
           </div>
           <div className="divide-y divide-gray-50">
             {allMenus.length === 0 ? (
               <div className="px-5 py-8 text-center">
                 <GlobeLock className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-mise-ink/40">No menus created yet</p>
-                <Link href="/chef/menus/new" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+                <p className="text-sm text-hospopilot-ink/40">No menus created yet</p>
+                <Link href="/chef/menus/new" className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
                   Create first menu <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -287,8 +287,8 @@ export default async function OwnerDashboard() {
                       ? <Globe className="h-4 w-4 text-green-600 shrink-0" />
                       : <GlobeLock className="h-4 w-4 text-gray-300 shrink-0" />}
                     <div>
-                      <p className="text-sm font-medium text-mise-ink">{menu.name}</p>
-                      <p className="text-xs text-mise-ink/40">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</p>
+                      <p className="text-sm font-medium text-hospopilot-ink">{menu.name}</p>
+                      <p className="text-xs text-hospopilot-ink/40">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</p>
                     </div>
                   </div>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${menu.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
@@ -313,16 +313,16 @@ export default async function OwnerDashboard() {
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-blue-600" />
-              <h2 className="text-sm font-semibold text-mise-ink">Staff Quiz</h2>
+              <h2 className="text-sm font-semibold text-hospopilot-ink">Staff Quiz</h2>
             </div>
-            <Link href="/owner/staff-quiz" className="text-xs text-mise-mid hover:text-mise-deep font-medium">View all →</Link>
+            <Link href="/owner/staff-quiz" className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">View all →</Link>
           </div>
 
           {trainedStaff.length === 0 ? (
             <div className="px-5 py-8 text-center">
               <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-mise-ink/40">No staff trained yet</p>
-              <Link href="/owner/staff-quiz" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+              <p className="text-sm text-hospopilot-ink/40">No staff trained yet</p>
+              <Link href="/owner/staff-quiz" className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
                 Set up staff quiz <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -359,7 +359,7 @@ export default async function OwnerDashboard() {
                     <div key={s.id} className="flex items-center justify-between px-4 py-2.5 bg-amber-50/50">
                       <div className="flex items-center gap-2">
                         <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                        <p className="text-sm font-medium text-mise-ink">{s.staff_name}</p>
+                        <p className="text-sm font-medium text-hospopilot-ink">{s.staff_name}</p>
                       </div>
                       <p className="text-xs text-amber-600 font-medium">{daysLeft}d left</p>
                     </div>
@@ -374,7 +374,7 @@ export default async function OwnerDashboard() {
                   <div key={s.id} className="flex items-center justify-between px-4 py-2.5 bg-red-50/40">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
-                      <p className="text-sm font-medium text-mise-ink">{s.staff_name}</p>
+                      <p className="text-sm font-medium text-hospopilot-ink">{s.staff_name}</p>
                     </div>
                     <p className="text-xs text-red-500 font-medium">Needs retraining</p>
                   </div>
@@ -387,7 +387,7 @@ export default async function OwnerDashboard() {
                         <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
                         <p className="text-sm text-gray-700">{s.staff_name}</p>
                       </div>
-                      <p className="text-xs text-mise-ink/40">Expires {expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                      <p className="text-xs text-hospopilot-ink/40">Expires {expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
                     </div>
                   )
                 })}

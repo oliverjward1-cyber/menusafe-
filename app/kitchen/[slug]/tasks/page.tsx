@@ -108,7 +108,7 @@ export default function StaffTaskBoard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-mise-ink px-5 py-4 flex items-center justify-between">
+      <div className="bg-hospopilot-ink px-5 py-4 flex items-center justify-between">
         <div>
           <p className="text-white font-semibold">{restaurantName}</p>
           <p className="text-white/50 text-sm">Hi {staffName.split(' ')[0]} 👋</p>
@@ -127,16 +127,16 @@ export default function StaffTaskBoard() {
         {tasks.map(task => (
           <Link key={task.id} href={task.href}
             className={`flex items-center gap-4 p-4 rounded-2xl border shadow-sm active:scale-[0.98] transition-transform ${task.colour}`}>
-            <div className={`flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center ${task.urgent ? 'bg-red-100' : 'bg-mise-ink/5'}`}>
-              <task.icon className={`h-5 w-5 ${task.urgent ? 'text-red-600' : 'text-mise-ink/60'}`} />
+            <div className={`flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center ${task.urgent ? 'bg-red-100' : 'bg-hospopilot-ink/5'}`}>
+              <task.icon className={`h-5 w-5 ${task.urgent ? 'text-red-600' : 'text-hospopilot-ink/60'}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-mise-ink text-sm">{task.label}</p>
-              <p className={`text-xs mt-0.5 ${task.urgent ? 'text-red-600 font-medium' : 'text-mise-ink/50'}`}>
+              <p className="font-semibold text-hospopilot-ink text-sm">{task.label}</p>
+              <p className={`text-xs mt-0.5 ${task.urgent ? 'text-red-600 font-medium' : 'text-hospopilot-ink/50'}`}>
                 {task.description}
               </p>
             </div>
-            <ArrowRight className="h-4 w-4 text-mise-ink/20 flex-shrink-0" />
+            <ArrowRight className="h-4 w-4 text-hospopilot-ink/20 flex-shrink-0" />
           </Link>
         ))}
       </div>

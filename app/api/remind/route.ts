@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   const resend = new Resend(process.env.RESEND_API_KEY)
 
   await resend.emails.send({
-    from: 'mise <noreply@mise.app>',
+    from: 'HospoPilot <support@hospopilot.co.uk>',
     to: staffEmail,
     subject: `${restaurantName} — Your allergen training is due for renewal`,
     html: buildReminderEmail(staffName, restaurantName, quizUrl),

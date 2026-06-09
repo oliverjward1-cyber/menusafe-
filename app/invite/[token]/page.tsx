@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 export default function InviteAcceptPage() {
   const params = useParams()
@@ -73,18 +73,18 @@ export default function InviteAcceptPage() {
 
   if (expired) {
     return (
-      <div className="min-h-screen bg-mise-ink flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-md">
           <div className="flex flex-col items-center mb-10">
-            <MiseLogo className="mb-3 scale-125" />
+            <HospoPilotLogo className="mb-3 scale-125" />
           </div>
           <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8 text-center">
             <p className="text-2xl mb-3">🔗</p>
             <h1 className="text-xl font-display font-semibold text-white mb-2">Link expired</h1>
-            <p className="text-mise-fresh/70 text-sm">
+            <p className="text-hospopilot-fresh/70 text-sm">
               This invite link has expired or already been used. Ask your restaurant owner to send a new invite.
             </p>
-            <Link href="/login" className="mt-4 inline-block text-sm text-mise-fresh hover:text-white transition-colors">
+            <Link href="/login" className="mt-4 inline-block text-sm text-hospopilot-fresh hover:text-white transition-colors">
               Go to login
             </Link>
           </div>
@@ -94,11 +94,11 @@ export default function InviteAcceptPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mise-ink flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
-          <MiseLogo className="mb-3 scale-125" />
-          <p className="text-mise-fresh/70 text-sm mt-1 font-sans">You&apos;ve been invited to join HospoPilot as head chef</p>
+          <HospoPilotLogo className="mb-3 scale-125" />
+          <p className="text-hospopilot-fresh/70 text-sm mt-1 font-sans">You&apos;ve been invited to join HospoPilot as head chef</p>
         </div>
 
         <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
@@ -146,7 +146,7 @@ export default function InviteAcceptPage() {
               </div>
             )}
 
-            <Button type="submit" loading={loading} size="lg" className="w-full !bg-mise-mid hover:!bg-mise-deep">
+            <Button type="submit" loading={loading} size="lg" className="w-full !bg-hospopilot-mid hover:!bg-hospopilot-deep">
               Create my account
             </Button>
           </form>

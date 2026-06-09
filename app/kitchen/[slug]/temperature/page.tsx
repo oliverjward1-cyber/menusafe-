@@ -49,15 +49,15 @@ export default function StaffTempLog() {
   if (done) return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 text-center">
       <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
-      <h2 className="text-xl font-semibold text-mise-ink">Temperature logged!</h2>
-      <p className="text-mise-ink/50 text-sm mt-1">{rows.filter(r => r.temperature).length} reading{rows.filter(r => r.temperature).length !== 1 ? 's' : ''} saved</p>
-      <button onClick={() => router.push(`/kitchen/${slug}/tasks`)} className="mt-6 bg-mise-deep text-white rounded-xl px-6 py-3 font-semibold text-sm">Back to tasks</button>
+      <h2 className="text-xl font-semibold text-hospopilot-ink">Temperature logged!</h2>
+      <p className="text-hospopilot-ink/50 text-sm mt-1">{rows.filter(r => r.temperature).length} reading{rows.filter(r => r.temperature).length !== 1 ? 's' : ''} saved</p>
+      <button onClick={() => router.push(`/kitchen/${slug}/tasks`)} className="mt-6 bg-hospopilot-deep text-white rounded-xl px-6 py-3 font-semibold text-sm">Back to tasks</button>
     </div>
   )
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-mise-ink px-5 py-4 flex items-center gap-3">
+      <div className="bg-hospopilot-ink px-5 py-4 flex items-center gap-3">
         <button onClick={() => router.back()} className="text-white/50 hover:text-white"><ArrowLeft className="h-5 w-5" /></button>
         <div>
           <p className="text-white font-semibold flex items-center gap-2"><Thermometer className="h-4 w-4" /> Temperature check</p>
@@ -70,7 +70,7 @@ export default function StaffTempLog() {
         <div className="flex gap-2">
           {(['am','pm','spot'] as const).map(t => (
             <button key={t} onClick={() => setCheckType(t)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${checkType === t ? 'bg-mise-deep text-white' : 'bg-white border border-black/[0.08] text-mise-ink/60'}`}>
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${checkType === t ? 'bg-hospopilot-deep text-white' : 'bg-white border border-black/[0.08] text-hospopilot-ink/60'}`}>
               {t === 'am' ? 'AM check' : t === 'pm' ? 'PM check' : 'Spot check'}
             </button>
           ))}
@@ -80,24 +80,24 @@ export default function StaffTempLog() {
         {rows.map((row, i) => (
           <div key={i} className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm space-y-3">
             <select value={row.location} onChange={e => updateRow(i, 'location', e.target.value)}
-              className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30">
+              className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30">
               {LOCATIONS.map(l => <option key={l}>{l}</option>)}
             </select>
             <div className="flex items-center gap-2">
               <input type="number" step="0.1" value={row.temperature} onChange={e => updateRow(i, 'temperature', e.target.value)}
                 placeholder="Temperature"
-                className="flex-1 border border-black/[0.08] rounded-xl px-3 py-3 text-lg font-mono text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
-              <span className="text-mise-ink/40 text-lg font-medium">°C</span>
+                className="flex-1 border border-black/[0.08] rounded-xl px-3 py-3 text-lg font-mono text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
+              <span className="text-hospopilot-ink/40 text-lg font-medium">°C</span>
             </div>
           </div>
         ))}
 
-        <button onClick={addRow} className="w-full border-2 border-dashed border-black/[0.08] rounded-2xl py-3 text-sm text-mise-ink/40 hover:text-mise-ink/60 hover:border-mise-mid/30 transition-colors">
+        <button onClick={addRow} className="w-full border-2 border-dashed border-black/[0.08] rounded-2xl py-3 text-sm text-hospopilot-ink/40 hover:text-hospopilot-ink/60 hover:border-hospopilot-mid/30 transition-colors">
           + Add another location
         </button>
 
         <button onClick={submit} disabled={saving || !rows.some(r => r.temperature)}
-          className="w-full bg-mise-deep text-white rounded-2xl py-4 font-bold text-base disabled:opacity-40 transition-opacity shadow-lg">
+          className="w-full bg-hospopilot-deep text-white rounded-2xl py-4 font-bold text-base disabled:opacity-40 transition-opacity shadow-lg">
           {saving ? 'Saving…' : 'Submit readings'}
         </button>
       </div>

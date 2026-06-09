@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, Upload, BookOpen, Package, CheckCircle2, ChefHat } from 'lucide-react'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 import { MenuPhotoImport } from './MenuPhotoImport'
 
 function slugify(text: string) {
@@ -63,12 +63,12 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mise-ink flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg">
 
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
-          <MiseLogo className="scale-125" />
+          <HospoPilotLogo className="scale-125" />
         </div>
 
         {/* Step progress bar */}
@@ -80,17 +80,17 @@ export default function OnboardingPage() {
               const active = step === num
               return (
                 <div key={s} className="flex flex-col items-center gap-1 flex-1">
-                  <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${done ? 'bg-mise-fresh text-white' : active ? 'bg-mise-gold text-white ring-2 ring-mise-gold/30' : 'bg-white/10 text-gray-500'}`}>
+                  <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${done ? 'bg-hospopilot-fresh text-white' : active ? 'bg-hospopilot-gold text-white ring-2 ring-hospopilot-gold/30' : 'bg-white/10 text-gray-500'}`}>
                     {done ? '✓' : num}
                   </div>
-                  <span className={`text-xs hidden sm:block transition-colors ${active ? 'text-white font-medium' : done ? 'text-mise-fresh/70' : 'text-gray-600'}`}>{s}</span>
+                  <span className={`text-xs hidden sm:block transition-colors ${active ? 'text-white font-medium' : done ? 'text-hospopilot-fresh/70' : 'text-gray-600'}`}>{s}</span>
                 </div>
               )
             })}
           </div>
           <div className="relative h-1.5 bg-white/10 rounded-full mt-1">
             <div
-              className="absolute left-0 top-0 h-1.5 bg-mise-fresh rounded-full transition-all duration-500"
+              className="absolute left-0 top-0 h-1.5 bg-hospopilot-fresh rounded-full transition-all duration-500"
               style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
             />
           </div>
@@ -100,10 +100,10 @@ export default function OnboardingPage() {
         {/* Step 1 — Welcome */}
         {step === 1 && (
           <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8 text-center">
-            <div className="h-16 w-16 bg-mise-mid/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <ChefHat className="h-8 w-8 text-mise-fresh" />
+            <div className="h-16 w-16 bg-hospopilot-mid/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <ChefHat className="h-8 w-8 text-hospopilot-fresh" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-3 font-display">Welcome to mise</h1>
+            <h1 className="text-2xl font-bold text-white mb-3 font-display">Welcome to HospoPilot</h1>
             <p className="text-gray-300 mb-2">
               The all-in-one kitchen management platform for UK independent restaurants.
             </p>
@@ -129,7 +129,7 @@ export default function OnboardingPage() {
             </div>
 
             <button onClick={() => setStep(2)}
-              className="w-full py-3 bg-mise-mid hover:bg-mise-deep text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2">
+              className="w-full py-3 bg-hospopilot-mid hover:bg-hospopilot-deep text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2">
               Let&apos;s get started <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -147,7 +147,7 @@ export default function OnboardingPage() {
                 <input
                   type="text" value={restaurantName} onChange={(e) => handleNameChange(e.target.value)}
                   placeholder="e.g. The Crown Kitchen"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-500 px-4 py-2.5 text-sm focus:border-mise-fresh focus:outline-none focus:ring-2 focus:ring-mise-fresh/20"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-500 px-4 py-2.5 text-sm focus:border-hospopilot-fresh focus:outline-none focus:ring-2 focus:ring-hospopilot-fresh/20"
                 />
               </div>
 
@@ -156,8 +156,8 @@ export default function OnboardingPage() {
                   Menu URL
                   <span className="ml-2 text-xs text-gray-500 font-normal">Used for your public QR menu</span>
                 </label>
-                <div className="flex items-center rounded-xl border border-white/10 overflow-hidden focus-within:border-mise-fresh focus-within:ring-2 focus-within:ring-mise-fresh/20">
-                  <span className="px-3 py-2.5 bg-white/5 text-xs text-gray-500 border-r border-white/10 whitespace-nowrap">getmise.app/menu/</span>
+                <div className="flex items-center rounded-xl border border-white/10 overflow-hidden focus-within:border-hospopilot-fresh focus-within:ring-2 focus-within:ring-hospopilot-fresh/20">
+                  <span className="px-3 py-2.5 bg-white/5 text-xs text-gray-500 border-r border-white/10 whitespace-nowrap">hospopilot.co.uk/menu/</span>
                   <input
                     type="text" value={slug}
                     onChange={(e) => { setSlug(slugify(e.target.value)); setSlugEdited(true) }}
@@ -175,13 +175,13 @@ export default function OnboardingPage() {
                 <div className="grid grid-cols-5 gap-2">
                   {GP_PRESETS.map((p) => (
                     <button key={p.value} type="button" onClick={() => setTargetGp(p.value)}
-                      className={`py-3 rounded-xl border text-center transition-colors ${targetGp === p.value ? 'border-mise-fresh bg-mise-mid/30' : 'border-white/10 hover:border-white/20'}`}>
+                      className={`py-3 rounded-xl border text-center transition-colors ${targetGp === p.value ? 'border-hospopilot-fresh bg-hospopilot-mid/30' : 'border-white/10 hover:border-white/20'}`}>
                       <p className={`text-base font-bold ${targetGp === p.value ? 'text-white' : 'text-gray-300'}`}>{p.label}</p>
                       <p className="text-xs text-gray-500 mt-0.5">{p.note}</p>
                     </button>
                   ))}
                   <button type="button" onClick={() => { if (PRESET_VALUES.includes(targetGp)) setTargetGp(0) }}
-                    className={`py-3 rounded-xl border text-center transition-colors ${!PRESET_VALUES.includes(targetGp) ? 'border-mise-fresh bg-mise-mid/30' : 'border-white/10 hover:border-white/20'}`}>
+                    className={`py-3 rounded-xl border text-center transition-colors ${!PRESET_VALUES.includes(targetGp) ? 'border-hospopilot-fresh bg-hospopilot-mid/30' : 'border-white/10 hover:border-white/20'}`}>
                     <p className={`text-base font-bold ${!PRESET_VALUES.includes(targetGp) ? 'text-white' : 'text-gray-300'}`}>Custom</p>
                     <p className="text-xs text-gray-500 mt-0.5">Set your own</p>
                   </button>
@@ -194,7 +194,7 @@ export default function OnboardingPage() {
                         value={targetGp || ''}
                         onChange={e => setTargetGp(Math.min(99, Math.max(1, parseInt(e.target.value) || 0)))}
                         placeholder="e.g. 68"
-                        className="w-28 border border-mise-fresh/40 rounded-lg px-3 py-2 text-sm bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-mise-fresh/30"
+                        className="w-28 border border-hospopilot-fresh/40 rounded-lg px-3 py-2 text-sm bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-hospopilot-fresh/30"
                         autoFocus
                       />
                       <span className="text-sm text-gray-400">% target GP</span>
@@ -215,7 +215,7 @@ export default function OnboardingPage() {
                 Back
               </button>
               <button onClick={handleCreate} disabled={saving || !restaurantName.trim() || !slug.trim()}
-                className="flex-1 py-2.5 bg-mise-mid hover:bg-mise-deep text-white font-medium rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+                className="flex-1 py-2.5 bg-hospopilot-mid hover:bg-hospopilot-deep text-white font-medium rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
                 {saving ? 'Setting up…' : <><CheckCircle2 className="h-4 w-4" /> Create my restaurant</>}
               </button>
             </div>
@@ -226,8 +226,8 @@ export default function OnboardingPage() {
         {step === 3 && (
           <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
             <div className="text-center mb-6">
-              <div className="h-14 w-14 bg-mise-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="h-7 w-7 text-mise-gold" />
+              <div className="h-14 w-14 bg-hospopilot-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="h-7 w-7 text-hospopilot-gold" />
               </div>
               <h2 className="text-xl font-display font-semibold text-white mb-1">
                 {restaurantName} is ready

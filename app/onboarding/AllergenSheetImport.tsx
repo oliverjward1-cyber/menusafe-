@@ -113,11 +113,11 @@ export function AllergenSheetImport({ recipes, onDone }: Props) {
       <div className="space-y-3">
         <div
           onClick={() => fileRef.current?.click()}
-          className="border-2 border-dashed border-mise-ink/20 rounded-2xl p-8 text-center cursor-pointer hover:border-mise-gold hover:bg-mise-gold/5 transition-colors group"
+          className="border-2 border-dashed border-hospopilot-ink/20 rounded-2xl p-8 text-center cursor-pointer hover:border-hospopilot-gold hover:bg-hospopilot-gold/5 transition-colors group"
         >
-          <ShieldCheck className="h-8 w-8 text-mise-ink/20 group-hover:text-mise-gold mx-auto mb-3 transition-colors" />
-          <p className="text-sm font-semibold text-mise-ink mb-1">Upload your allergen sheet</p>
-          <p className="text-xs text-mise-ink/40">Photo of your printed allergen matrix or information sheet</p>
+          <ShieldCheck className="h-8 w-8 text-hospopilot-ink/20 group-hover:text-hospopilot-gold mx-auto mb-3 transition-colors" />
+          <p className="text-sm font-semibold text-hospopilot-ink mb-1">Upload your allergen sheet</p>
+          <p className="text-xs text-hospopilot-ink/40">Photo of your printed allergen matrix or information sheet</p>
           <input
             ref={fileRef}
             type="file"
@@ -132,7 +132,7 @@ export function AllergenSheetImport({ recipes, onDone }: Props) {
             <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
           </div>
         )}
-        <button onClick={onDone} className="w-full py-2 text-xs text-mise-ink/40 hover:text-mise-ink/60 transition-colors">
+        <button onClick={onDone} className="w-full py-2 text-xs text-hospopilot-ink/40 hover:text-hospopilot-ink/60 transition-colors">
           Skip this step
         </button>
       </div>
@@ -142,9 +142,9 @@ export function AllergenSheetImport({ recipes, onDone }: Props) {
   if (stage === 'scanning') {
     return (
       <div className="text-center py-10">
-        <Loader2 className="h-8 w-8 animate-spin text-mise-gold mx-auto mb-3" />
-        <p className="text-sm font-semibold text-mise-ink">Reading allergen sheet…</p>
-        <p className="text-xs text-mise-ink/40 mt-1">Matching dishes to your recipes</p>
+        <Loader2 className="h-8 w-8 animate-spin text-hospopilot-gold mx-auto mb-3" />
+        <p className="text-sm font-semibold text-hospopilot-ink">Reading allergen sheet…</p>
+        <p className="text-xs text-hospopilot-ink/40 mt-1">Matching dishes to your recipes</p>
       </div>
     )
   }
@@ -152,14 +152,14 @@ export function AllergenSheetImport({ recipes, onDone }: Props) {
   if (stage === 'done') {
     return (
       <div className="text-center py-8">
-        <CheckCircle2 className="h-10 w-10 text-mise-fresh mx-auto mb-3" />
-        <p className="text-lg font-display font-semibold text-mise-ink mb-1">Allergens saved</p>
-        <p className="text-sm text-mise-ink/50 mb-5">
+        <CheckCircle2 className="h-10 w-10 text-hospopilot-fresh mx-auto mb-3" />
+        <p className="text-lg font-display font-semibold text-hospopilot-ink mb-1">Allergens saved</p>
+        <p className="text-sm text-hospopilot-ink/50 mb-5">
           {matches.length} dish{matches.length !== 1 ? 'es' : ''} updated. These will show on your public menu straight away.
         </p>
         <button
           onClick={onDone}
-          className="px-5 py-2.5 bg-mise-gold hover:bg-yellow-600 text-white font-semibold rounded-xl transition-colors"
+          className="px-5 py-2.5 bg-hospopilot-gold hover:bg-yellow-600 text-white font-semibold rounded-xl transition-colors"
         >
           Continue to dashboard
         </button>
@@ -170,16 +170,16 @@ export function AllergenSheetImport({ recipes, onDone }: Props) {
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-sm font-semibold text-mise-ink">
+        <p className="text-sm font-semibold text-hospopilot-ink">
           {matches.length} of {matches.length + unmatched.length} dishes matched
         </p>
-        <p className="text-xs text-mise-ink/40 mt-0.5">Review and adjust allergens before saving</p>
+        <p className="text-xs text-hospopilot-ink/40 mt-0.5">Review and adjust allergens before saving</p>
       </div>
 
       <div className="space-y-3 max-h-[45vh] overflow-y-auto pr-1">
         {matches.map(m => (
           <div key={m.recipeId} className="bg-white rounded-xl border border-black/[0.06] p-4">
-            <p className="text-sm font-semibold text-mise-ink mb-3">{m.recipeName}</p>
+            <p className="text-sm font-semibold text-hospopilot-ink mb-3">{m.recipeName}</p>
             <div className="flex flex-wrap gap-1.5">
               {Object.entries(ALLERGEN_LABELS).map(([key, label]) => {
                 const active = m.allergens.includes(key)
@@ -189,8 +189,8 @@ export function AllergenSheetImport({ recipes, onDone }: Props) {
                     onClick={() => toggleAllergen(m.recipeId, key)}
                     className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                       active
-                        ? 'bg-mise-deep text-white'
-                        : 'bg-black/5 text-mise-ink/40 hover:bg-black/10'
+                        ? 'bg-hospopilot-deep text-white'
+                        : 'bg-black/5 text-hospopilot-ink/40 hover:bg-black/10'
                     }`}
                   >
                     {label}
@@ -220,7 +220,7 @@ export function AllergenSheetImport({ recipes, onDone }: Props) {
       <button
         onClick={handleSave}
         disabled={stage === 'saving' || matches.length === 0}
-        className="w-full py-3 bg-mise-gold hover:bg-yellow-600 text-white font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        className="w-full py-3 bg-hospopilot-gold hover:bg-yellow-600 text-white font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
       >
         {stage === 'saving'
           ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>

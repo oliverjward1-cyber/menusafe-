@@ -55,15 +55,15 @@ export default async function CleaningPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/owner" className="text-mise-ink/40 hover:text-mise-ink transition-colors">
+          <Link href="/owner" className="text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-display font-semibold text-mise-ink flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-mise-mid" />
+            <h1 className="text-2xl font-display font-semibold text-hospopilot-ink flex items-center gap-2">
+              <Sparkles className="h-6 w-6 text-hospopilot-mid" />
               Cleaning Schedule
             </h1>
-            <p className="text-sm text-mise-ink/50 mt-0.5">
+            <p className="text-sm text-hospopilot-ink/50 mt-0.5">
               {dueTodayCount > 0
                 ? `${dueTodayCount} task${dueTodayCount !== 1 ? 's' : ''} outstanding`
                 : 'All tasks signed off'}
@@ -86,8 +86,8 @@ export default async function CleaningPage() {
         { label: 'Monthly', tasks: monthlyTasks },
       ].filter(g => g.tasks.length > 0).map(group => (
         <div key={group.label} className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
-          <div className="px-5 py-3 border-b border-black/[0.04] bg-mise-cream/30">
-            <p className="text-sm font-semibold text-mise-ink/60">{group.label} tasks</p>
+          <div className="px-5 py-3 border-b border-black/[0.04] bg-hospopilot-cream/30">
+            <p className="text-sm font-semibold text-hospopilot-ink/60">{group.label} tasks</p>
           </div>
           <CleaningTaskList
             tasks={group.tasks}
@@ -100,10 +100,10 @@ export default async function CleaningPage() {
 
       {/* Log a one-off job */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
-          <ClipboardList className="h-4 w-4 text-mise-mid" /> Log a one-off job
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
+          <ClipboardList className="h-4 w-4 text-hospopilot-mid" /> Log a one-off job
         </h2>
-        <p className="text-sm text-mise-ink/50 -mt-2 mb-4">
+        <p className="text-sm text-hospopilot-ink/50 -mt-2 mb-4">
           For unscheduled jobs — a one-off clean, an unexpected delivery, a maintenance issue — that don't belong on the recurring schedule.
         </p>
         <AdHocTaskForm restaurantId={rid} staffName={user.email?.split('@')[0] ?? ''} />
@@ -111,8 +111,8 @@ export default async function CleaningPage() {
 
       {/* Add task */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
-          <Plus className="h-4 w-4 text-mise-mid" /> Add cleaning task
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
+          <Plus className="h-4 w-4 text-hospopilot-mid" /> Add cleaning task
         </h2>
         <AddTaskForm restaurantId={rid} />
       </div>
@@ -121,22 +121,22 @@ export default async function CleaningPage() {
       {logs.length > 0 && (
         <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
           <div className="px-5 py-3 border-b border-black/[0.04]">
-            <p className="text-sm font-semibold text-mise-ink">Recent sign-offs</p>
+            <p className="text-sm font-semibold text-hospopilot-ink">Recent sign-offs</p>
           </div>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-black/[0.04]">
-                <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Task</th>
-                <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Signed by</th>
-                <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">When</th>
+                <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Task</th>
+                <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Signed by</th>
+                <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">When</th>
               </tr>
             </thead>
             <tbody>
               {logs.slice(0, 20).map(log => (
                 <tr key={log.id} className="border-b border-black/[0.04] last:border-0">
-                  <td className="px-5 py-3 font-medium text-mise-ink">{log.task_name}</td>
-                  <td className="px-5 py-3 text-mise-ink/60">{log.signed_by}</td>
-                  <td className="px-5 py-3 text-mise-ink/40">
+                  <td className="px-5 py-3 font-medium text-hospopilot-ink">{log.task_name}</td>
+                  <td className="px-5 py-3 text-hospopilot-ink/60">{log.signed_by}</td>
+                  <td className="px-5 py-3 text-hospopilot-ink/40">
                     {new Date(log.completed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </td>
                 </tr>

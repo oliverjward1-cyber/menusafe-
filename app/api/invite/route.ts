@@ -54,15 +54,15 @@ export async function POST(request: Request) {
     const resend = new Resend(process.env.RESEND_API_KEY)
 
     const { error: emailError } = await resend.emails.send({
-      from: 'mise <noreply@mise.app>',
+      from: 'HospoPilot <support@hospopilot.co.uk>',
       to: email,
-      subject: "You've been invited to mise",
+      subject: "You've been invited to HospoPilot",
       html: `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>You've been invited to mise</title>
+  <title>You've been invited to HospoPilot</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:40px 0;">

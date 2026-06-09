@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { slugify } from '@/lib/utils'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 type Role = 'owner' | 'chef'
 
@@ -116,11 +116,11 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mise-ink flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
-          <MiseLogo className="mb-3 scale-125" />
-          <p className="text-mise-fresh/70 text-sm mt-1 font-sans">Create your account</p>
+          <HospoPilotLogo className="mb-3 scale-125" />
+          <p className="text-hospopilot-fresh/70 text-sm mt-1 font-sans">Create your account</p>
         </div>
 
         <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
@@ -135,7 +135,7 @@ export default function SignupPage() {
                   onClick={() => setRole(r)}
                   className={`rounded-lg border-2 p-3 text-sm font-medium transition-colors ${
                     role === r
-                      ? 'border-mise-fresh bg-mise-mid/30 text-white'
+                      ? 'border-hospopilot-fresh bg-hospopilot-mid/30 text-white'
                       : 'border-white/10 text-gray-400 hover:border-white/20'
                   }`}
                 >
@@ -200,7 +200,7 @@ export default function SignupPage() {
               <select
                 value={hearAbout}
                 onChange={(e) => setHearAbout(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-mise-fresh"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-hospopilot-fresh"
               >
                 <option value="">Select an option</option>
                 <option value="Google search">Google search</option>
@@ -227,7 +227,7 @@ export default function SignupPage() {
 
         <p className="text-center text-sm text-gray-400 mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-mise-fresh hover:text-mise-gold font-medium">
+          <Link href="/login" className="text-hospopilot-fresh hover:text-hospopilot-gold font-medium">
             Sign in
           </Link>
         </p>

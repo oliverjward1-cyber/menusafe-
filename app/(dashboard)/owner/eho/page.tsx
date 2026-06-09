@@ -183,10 +183,10 @@ export default async function EHOInspectionPage() {
     <div className="min-h-screen bg-white print:bg-white">
 
       {/* Screen-only header bar */}
-      <div className="print:hidden sticky top-0 z-10 bg-mise-ink px-4 py-3">
+      <div className="print:hidden sticky top-0 z-10 bg-hospopilot-ink px-4 py-3">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <ShieldCheck className="h-4 w-4 text-mise-fresh flex-shrink-0" />
+            <ShieldCheck className="h-4 w-4 text-hospopilot-fresh flex-shrink-0" />
             <span className="text-white font-semibold text-sm truncate">EHO Inspection Mode</span>
             <span className="text-xs text-gray-400 hidden sm:inline flex-shrink-0">· {inspectionTime}</span>
           </div>
@@ -204,9 +204,9 @@ export default async function EHOInspectionPage() {
         <div className="border-b border-gray-200 pb-6">
           <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-display font-bold text-mise-ink">{restaurant?.name}</h1>
-              <p className="text-mise-ink/50 mt-1 text-sm">Food Safety & Allergen Compliance Record</p>
-              <p className="text-sm text-mise-ink/40 mt-0.5">Inspection date: {inspectionDate}</p>
+              <h1 className="text-2xl sm:text-3xl font-display font-bold text-hospopilot-ink">{restaurant?.name}</h1>
+              <p className="text-hospopilot-ink/50 mt-1 text-sm">Food Safety & Allergen Compliance Record</p>
+              <p className="text-sm text-hospopilot-ink/40 mt-0.5">Inspection date: {inspectionDate}</p>
             </div>
             {/* Status badge — full width on mobile */}
             <div className={`flex items-start gap-3 p-4 rounded-xl ${badgeConfig[badgeStatus].cls}`}>
@@ -240,8 +240,8 @@ export default async function EHOInspectionPage() {
               { label: 'Last audit', value: lastAudit ? `${Math.round((lastAudit.score / lastAudit.total) * 100)}%` : 'None', ok: !!lastAudit && lastAudit.status !== 'red' },
             ].map(item => (
               <div key={item.label} className="bg-gray-50 rounded-xl p-4">
-                <p className="text-xs text-mise-ink/40 font-medium uppercase tracking-wide">{item.label}</p>
-                <p className={`text-2xl font-bold mt-1 ${item.ok ? 'text-mise-ink' : 'text-red-500'}`}>{item.value}</p>
+                <p className="text-xs text-hospopilot-ink/40 font-medium uppercase tracking-wide">{item.label}</p>
+                <p className={`text-2xl font-bold mt-1 ${item.ok ? 'text-hospopilot-ink' : 'text-red-500'}`}>{item.value}</p>
               </div>
             ))}
           </div>
@@ -249,8 +249,8 @@ export default async function EHOInspectionPage() {
 
         {/* ── 1. Kitchen Audit ── */}
         <section>
-          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
-            <ClipboardCheck className="h-5 w-5 text-mise-mid" /> Kitchen Audit Records
+          <h2 className="text-lg font-semibold text-hospopilot-ink flex items-center gap-2 mb-4">
+            <ClipboardCheck className="h-5 w-5 text-hospopilot-mid" /> Kitchen Audit Records
           </h2>
           {audits.length === 0 ? (
             <div className="flex items-center gap-2 p-4 bg-red-50 rounded-xl text-sm text-red-600">
@@ -266,17 +266,17 @@ export default async function EHOInspectionPage() {
                     <div className="flex items-center gap-3">
                       <StatusDot status={audit.status as 'green' | 'amber' | 'red'} />
                       <div>
-                        <p className="text-sm font-medium text-mise-ink">
+                        <p className="text-sm font-medium text-hospopilot-ink">
                           {date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-                          {i === 0 && <span className="ml-2 text-xs bg-mise-mid/10 text-mise-mid px-2 py-0.5 rounded-full">Most recent</span>}
+                          {i === 0 && <span className="ml-2 text-xs bg-hospopilot-mid/10 text-hospopilot-mid px-2 py-0.5 rounded-full">Most recent</span>}
                         </p>
-                        <p className="text-xs text-mise-ink/40">Completed by {audit.completed_by}</p>
-                        {audit.notes && <p className="text-xs text-mise-ink/50 mt-0.5 italic">"{audit.notes}"</p>}
+                        <p className="text-xs text-hospopilot-ink/40">Completed by {audit.completed_by}</p>
+                        {audit.notes && <p className="text-xs text-hospopilot-ink/50 mt-0.5 italic">"{audit.notes}"</p>}
                       </div>
                     </div>
                     <div className="text-right">
                       <p className={`text-lg font-bold ${audit.status === 'green' ? 'text-green-600' : audit.status === 'amber' ? 'text-amber-600' : 'text-red-600'}`}>{pct}%</p>
-                      <p className="text-xs text-mise-ink/40">{audit.score}/{audit.total} passed</p>
+                      <p className="text-xs text-hospopilot-ink/40">{audit.score}/{audit.total} passed</p>
                     </div>
                   </div>
                 )
@@ -293,7 +293,7 @@ export default async function EHOInspectionPage() {
 
         {/* ── 2. HACCP Plan ── */}
         <section>
-          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
+          <h2 className="text-lg font-semibold text-hospopilot-ink flex items-center gap-2 mb-4">
             <ShieldCheck className="h-5 w-5 text-indigo-600" /> HACCP Plan
           </h2>
           {!haccpPlan ? (
@@ -308,12 +308,12 @@ export default async function EHOInspectionPage() {
             <div className="rounded-xl border border-gray-200 overflow-hidden">
               <div className="p-4 flex items-start justify-between gap-4">
                 <div>
-                  <p className="font-semibold text-mise-ink">{haccpPlan.title}</p>
-                  <p className="text-sm text-mise-ink/60 mt-1">
+                  <p className="font-semibold text-hospopilot-ink">{haccpPlan.title}</p>
+                  <p className="text-sm text-hospopilot-ink/60 mt-1">
                     Last reviewed: <span className="font-medium">{new Date(haccpPlan.last_reviewed_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     {' '}by <span className="font-medium">{haccpPlan.reviewed_by}</span>
                   </p>
-                  {haccpPlan.notes && <p className="text-xs text-mise-ink/40 mt-1 italic">"{haccpPlan.notes}"</p>}
+                  {haccpPlan.notes && <p className="text-xs text-hospopilot-ink/40 mt-1 italic">"{haccpPlan.notes}"</p>}
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
                   {haccpOverdue
@@ -321,7 +321,7 @@ export default async function EHOInspectionPage() {
                     : <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-700 bg-green-100 px-3 py-1 rounded-full"><CheckCircle2 className="h-3 w-3" /> Current</span>}
                   {haccpPlan.document_url && (
                     <a href={haccpPlan.document_url} target="_blank" rel="noreferrer"
-                      className="text-xs text-mise-mid font-semibold hover:underline">
+                      className="text-xs text-hospopilot-mid font-semibold hover:underline">
                       View document →
                     </a>
                   )}
@@ -338,7 +338,7 @@ export default async function EHOInspectionPage() {
 
         {/* ── 3. Staff Allergen Training ── */}
         <section>
-          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
+          <h2 className="text-lg font-semibold text-hospopilot-ink flex items-center gap-2 mb-4">
             <Users className="h-5 w-5 text-blue-600" /> Staff Allergen Training Records
           </h2>
           {trainedStaff.length === 0 ? (
@@ -366,13 +366,13 @@ export default async function EHOInspectionPage() {
                     const assessmentLabel = s.assessment_type ?? (s.quiz_type === 'kitchen' ? 'Kitchen Allergen Knowledge' : 'Front of House Allergen Knowledge')
                     return (
                       <tr key={s.id} className={expired ? 'bg-red-50' : ''}>
-                        <td className="px-4 py-3 font-medium text-mise-ink">{s.staff_name}</td>
-                        <td className="px-4 py-3 text-mise-ink/70">
+                        <td className="px-4 py-3 font-medium text-hospopilot-ink">{s.staff_name}</td>
+                        <td className="px-4 py-3 text-hospopilot-ink/70">
                           <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">{assessmentLabel}</span>
                         </td>
-                        <td className="px-4 py-3 text-mise-ink">{pct}% ({s.score}/{s.total_questions})</td>
-                        <td className="px-4 py-3 text-mise-ink/60">{new Date(s.completed_at).toLocaleDateString('en-GB')}</td>
-                        <td className="px-4 py-3 text-mise-ink/60">{expiry.toLocaleDateString('en-GB')}</td>
+                        <td className="px-4 py-3 text-hospopilot-ink">{pct}% ({s.score}/{s.total_questions})</td>
+                        <td className="px-4 py-3 text-hospopilot-ink/60">{new Date(s.completed_at).toLocaleDateString('en-GB')}</td>
+                        <td className="px-4 py-3 text-hospopilot-ink/60">{expiry.toLocaleDateString('en-GB')}</td>
                         <td className="px-4 py-3">
                           {expired
                             ? <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600"><XCircle className="h-3.5 w-3.5" /> Expired</span>
@@ -389,8 +389,8 @@ export default async function EHOInspectionPage() {
 
         {/* ── 4. Kitchen Team (all roles) ── */}
         <section>
-          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
-            <ChefHat className="h-5 w-5 text-mise-gold" /> Full Team — Allergen Training Status
+          <h2 className="text-lg font-semibold text-hospopilot-ink flex items-center gap-2 mb-4">
+            <ChefHat className="h-5 w-5 text-hospopilot-gold" /> Full Team — Allergen Training Status
           </h2>
           <div className="overflow-hidden rounded-xl border border-gray-200">
             <table className="w-full text-sm">
@@ -404,15 +404,15 @@ export default async function EHOInspectionPage() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {profiles.length === 0 ? (
-                  <tr><td colSpan={4} className="px-4 py-4 text-mise-ink/40 text-sm text-center">No team members found</td></tr>
+                  <tr><td colSpan={4} className="px-4 py-4 text-hospopilot-ink/40 text-sm text-center">No team members found</td></tr>
                 ) : profiles.map((p, i) => {
                   const trained = trainedStaff.find(s => s.staff_name.toLowerCase() === (p.full_name ?? '').toLowerCase())
                   const expired = trained ? addM(new Date(trained.completed_at), 6) < now : false
                   const expiry = trained ? addM(new Date(trained.completed_at), 6) : null
                   return (
                     <tr key={i} className={expired ? 'bg-red-50' : ''}>
-                      <td className="px-4 py-3 font-medium text-mise-ink">{p.full_name ?? '—'}</td>
-                      <td className="px-4 py-3 capitalize text-mise-ink/60">{p.role?.replace(/_/g, ' ')}</td>
+                      <td className="px-4 py-3 font-medium text-hospopilot-ink">{p.full_name ?? '—'}</td>
+                      <td className="px-4 py-3 capitalize text-hospopilot-ink/60">{p.role?.replace(/_/g, ' ')}</td>
                       <td className="px-4 py-3">
                         {trained
                           ? expired
@@ -420,7 +420,7 @@ export default async function EHOInspectionPage() {
                             : <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600"><CheckCircle2 className="h-3.5 w-3.5" /> Valid</span>
                           : <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600"><AlertTriangle className="h-3.5 w-3.5" /> Not recorded</span>}
                       </td>
-                      <td className="px-4 py-3 text-mise-ink/50 text-xs">{expiry ? expiry.toLocaleDateString('en-GB') : '—'}</td>
+                      <td className="px-4 py-3 text-hospopilot-ink/50 text-xs">{expiry ? expiry.toLocaleDateString('en-GB') : '—'}</td>
                     </tr>
                   )
                 })}
@@ -431,7 +431,7 @@ export default async function EHOInspectionPage() {
 
         {/* ── 5. Allergen Matrix ── */}
         <section>
-          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
+          <h2 className="text-lg font-semibold text-hospopilot-ink flex items-center gap-2 mb-4">
             <BookOpen className="h-5 w-5 text-purple-600" /> Allergen Matrix — {approvedRecipes.length} approved dishes
           </h2>
           {approvedRecipes.length === 0 ? (
@@ -460,7 +460,7 @@ export default async function EHOInspectionPage() {
                     )
                     return (
                       <tr key={recipe.id} className="hover:bg-gray-50">
-                        <td className="px-3 py-2 font-medium text-mise-ink">{recipe.name}</td>
+                        <td className="px-3 py-2 font-medium text-hospopilot-ink">{recipe.name}</td>
                         {ALLERGENS.map(a => (
                           <td key={a.key} className="px-1.5 py-2 text-center">
                             {allergenSet.has(a.key)
@@ -479,7 +479,7 @@ export default async function EHOInspectionPage() {
 
         {/* ── 6. Temperature Monitoring ── */}
         <section>
-          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
+          <h2 className="text-lg font-semibold text-hospopilot-ink flex items-center gap-2 mb-4">
             <span className="text-blue-400 text-xl">🌡</span> Temperature Monitoring
           </h2>
 
@@ -521,15 +521,15 @@ export default async function EHOInspectionPage() {
                     const noAction = isFail && !log.corrective_action
                     return (
                       <tr key={log.id} className={isFail ? 'bg-red-50' : ''}>
-                        <td className="px-4 py-2.5 font-medium text-mise-ink">{log.location}</td>
-                        <td className="px-4 py-2.5 font-mono font-bold text-mise-ink">{log.temperature}°{log.unit ?? 'C'}</td>
-                        <td className="px-4 py-2.5 text-mise-ink/50 text-xs">{safeRange(log.location)}</td>
+                        <td className="px-4 py-2.5 font-medium text-hospopilot-ink">{log.location}</td>
+                        <td className="px-4 py-2.5 font-mono font-bold text-hospopilot-ink">{log.temperature}°{log.unit ?? 'C'}</td>
+                        <td className="px-4 py-2.5 text-hospopilot-ink/50 text-xs">{safeRange(log.location)}</td>
                         <td className="px-4 py-2.5">
                           {result === 'unknown'
                             ? <span className="text-xs text-gray-400">—</span>
                             : <PassBadge pass={result === 'pass'} />}
                         </td>
-                        <td className="px-4 py-2.5 text-mise-ink/60 capitalize text-xs">{log.check_type}</td>
+                        <td className="px-4 py-2.5 text-hospopilot-ink/60 capitalize text-xs">{log.check_type}</td>
                         <td className="px-4 py-2.5">
                           {log.corrective_action
                             ? <span className="text-xs text-green-700">{log.corrective_action}</span>
@@ -537,8 +537,8 @@ export default async function EHOInspectionPage() {
                               ? <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full"><AlertTriangle className="h-3 w-3" /> No action recorded</span>
                               : <span className="text-xs text-gray-300">—</span>}
                         </td>
-                        <td className="px-4 py-2.5 text-mise-ink/60 text-xs">{log.recorded_by}</td>
-                        <td className="px-4 py-2.5 text-mise-ink/40 text-xs whitespace-nowrap">
+                        <td className="px-4 py-2.5 text-hospopilot-ink/60 text-xs">{log.recorded_by}</td>
+                        <td className="px-4 py-2.5 text-hospopilot-ink/40 text-xs whitespace-nowrap">
                           {new Date(log.logged_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                         </td>
                       </tr>
@@ -551,7 +551,7 @@ export default async function EHOInspectionPage() {
 
           {/* ── Probe Calibration ── */}
           <div className="mt-6">
-            <h3 className="text-base font-semibold text-mise-ink mb-3">Probe calibration log</h3>
+            <h3 className="text-base font-semibold text-hospopilot-ink mb-3">Probe calibration log</h3>
 
             {calibrationOverdue && (
               <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 mb-3">
@@ -585,19 +585,19 @@ export default async function EHOInspectionPage() {
                       const overallPass = icePass && boilPass
                       return (
                         <tr key={cal.id} className={!overallPass ? 'bg-red-50' : ''}>
-                          <td className="px-4 py-2.5 text-mise-ink font-medium text-xs whitespace-nowrap">
+                          <td className="px-4 py-2.5 text-hospopilot-ink font-medium text-xs whitespace-nowrap">
                             {new Date(cal.calibrated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </td>
                           <td className="px-4 py-2.5">
-                            <span className={`font-mono text-sm ${icePass ? 'text-mise-ink' : 'text-red-600 font-bold'}`}>{cal.ice_point}°C</span>
+                            <span className={`font-mono text-sm ${icePass ? 'text-hospopilot-ink' : 'text-red-600 font-bold'}`}>{cal.ice_point}°C</span>
                             {' '}<PassBadge pass={icePass} />
                           </td>
                           <td className="px-4 py-2.5">
-                            <span className={`font-mono text-sm ${boilPass ? 'text-mise-ink' : 'text-red-600 font-bold'}`}>{cal.boiling_point}°C</span>
+                            <span className={`font-mono text-sm ${boilPass ? 'text-hospopilot-ink' : 'text-red-600 font-bold'}`}>{cal.boiling_point}°C</span>
                             {' '}<PassBadge pass={boilPass} />
                           </td>
                           <td className="px-4 py-2.5"><PassBadge pass={overallPass} /></td>
-                          <td className="px-4 py-2.5 text-mise-ink/60 text-xs">{cal.recorded_by}</td>
+                          <td className="px-4 py-2.5 text-hospopilot-ink/60 text-xs">{cal.recorded_by}</td>
                         </tr>
                       )
                     })}
@@ -610,7 +610,7 @@ export default async function EHOInspectionPage() {
 
         {/* ── 7. Cleaning Records ── */}
         <section>
-          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
+          <h2 className="text-lg font-semibold text-hospopilot-ink flex items-center gap-2 mb-4">
             <span className="text-green-500 text-xl">✓</span> Cleaning Schedule (recent sign-offs)
           </h2>
           {cleaningLogs.length === 0 ? (
@@ -630,9 +630,9 @@ export default async function EHOInspectionPage() {
                 <tbody className="divide-y divide-gray-100">
                   {cleaningLogs.slice(0, 15).map((log: any) => (
                     <tr key={log.id}>
-                      <td className="px-4 py-2.5 font-medium text-mise-ink">{log.task_name}</td>
-                      <td className="px-4 py-2.5 text-mise-ink/60">{log.signed_by}</td>
-                      <td className="px-4 py-2.5 text-mise-ink/40 text-xs">{new Date(log.completed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
+                      <td className="px-4 py-2.5 font-medium text-hospopilot-ink">{log.task_name}</td>
+                      <td className="px-4 py-2.5 text-hospopilot-ink/60">{log.signed_by}</td>
+                      <td className="px-4 py-2.5 text-hospopilot-ink/40 text-xs">{new Date(log.completed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -643,8 +643,8 @@ export default async function EHOInspectionPage() {
 
         {/* ── 8. Delivery Records ── */}
         <section>
-          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
-            <span className="text-mise-gold text-xl">📦</span> Delivery Records (recent)
+          <h2 className="text-lg font-semibold text-hospopilot-ink flex items-center gap-2 mb-4">
+            <span className="text-hospopilot-gold text-xl">📦</span> Delivery Records (recent)
           </h2>
           {deliveries.length === 0 ? (
             <div className="flex items-center gap-2 p-4 bg-amber-50 rounded-xl text-sm text-amber-700">
@@ -666,16 +666,16 @@ export default async function EHOInspectionPage() {
                 <tbody className="divide-y divide-gray-100">
                   {deliveries.map((rec: any) => (
                     <tr key={rec.id} className={rec.condition === 'rejected' ? 'bg-red-50' : rec.condition === 'borderline' ? 'bg-amber-50' : ''}>
-                      <td className="px-4 py-2.5 font-medium text-mise-ink">{rec.supplier}</td>
-                      <td className="px-4 py-2.5 text-mise-ink/70 max-w-xs truncate">{rec.items}</td>
-                      <td className="px-4 py-2.5 font-mono text-mise-ink/70 text-xs">{rec.temperature != null ? `${rec.temperature}°C` : '—'}</td>
+                      <td className="px-4 py-2.5 font-medium text-hospopilot-ink">{rec.supplier}</td>
+                      <td className="px-4 py-2.5 text-hospopilot-ink/70 max-w-xs truncate">{rec.items}</td>
+                      <td className="px-4 py-2.5 font-mono text-hospopilot-ink/70 text-xs">{rec.temperature != null ? `${rec.temperature}°C` : '—'}</td>
                       <td className="px-4 py-2.5 capitalize">
                         <span className={`text-xs font-semibold ${rec.condition === 'rejected' ? 'text-red-600' : rec.condition === 'borderline' ? 'text-amber-600' : 'text-green-700'}`}>
                           {rec.condition}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 text-mise-ink/60 text-xs">{rec.received_by}</td>
-                      <td className="px-4 py-2.5 text-mise-ink/40 text-xs">{new Date(rec.delivered_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                      <td className="px-4 py-2.5 text-hospopilot-ink/60 text-xs">{rec.received_by}</td>
+                      <td className="px-4 py-2.5 text-hospopilot-ink/40 text-xs">{new Date(rec.delivered_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -686,7 +686,7 @@ export default async function EHOInspectionPage() {
 
         {/* ── 9. Incident Log ── */}
         <section>
-          <h2 className="text-lg font-semibold text-mise-ink flex items-center gap-2 mb-4">
+          <h2 className="text-lg font-semibold text-hospopilot-ink flex items-center gap-2 mb-4">
             <span className="text-red-500 text-xl">⚠️</span> Incident Log
           </h2>
           {incidentsList.length === 0 ? (
@@ -711,11 +711,11 @@ export default async function EHOInspectionPage() {
                     const noAction = !inc.resolved && !inc.action_taken
                     return (
                       <tr key={inc.id} className={!inc.resolved && inc.severity === 'critical' ? 'bg-red-50' : ''}>
-                        <td className="px-4 py-2.5 text-mise-ink/60 text-xs capitalize">{typeLabels[inc.type] ?? inc.type}</td>
+                        <td className="px-4 py-2.5 text-hospopilot-ink/60 text-xs capitalize">{typeLabels[inc.type] ?? inc.type}</td>
                         <td className="px-4 py-2.5">
-                          <p className="font-medium text-mise-ink">{inc.title}</p>
-                          {inc.description && <p className="text-xs text-mise-ink/50 mt-0.5 line-clamp-2">{inc.description}</p>}
-                          {inc.affected_person && <p className="text-xs text-mise-ink/40 mt-0.5">Person: {inc.affected_person}</p>}
+                          <p className="font-medium text-hospopilot-ink">{inc.title}</p>
+                          {inc.description && <p className="text-xs text-hospopilot-ink/50 mt-0.5 line-clamp-2">{inc.description}</p>}
+                          {inc.affected_person && <p className="text-xs text-hospopilot-ink/40 mt-0.5">Person: {inc.affected_person}</p>}
                         </td>
                         <td className="px-4 py-2.5">
                           <span className={`text-xs font-semibold capitalize ${
@@ -736,7 +736,7 @@ export default async function EHOInspectionPage() {
                             ? <span className="text-green-600 text-xs font-medium">Resolved</span>
                             : <span className="text-red-600 text-xs font-semibold">Open</span>}
                         </td>
-                        <td className="px-4 py-2.5 text-mise-ink/40 text-xs whitespace-nowrap">
+                        <td className="px-4 py-2.5 text-hospopilot-ink/40 text-xs whitespace-nowrap">
                           {new Date(inc.occurred_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </td>
                       </tr>
@@ -749,7 +749,7 @@ export default async function EHOInspectionPage() {
         </section>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 pt-6 text-xs text-mise-ink/30 flex items-center justify-between">
+        <div className="border-t border-gray-200 pt-6 text-xs text-hospopilot-ink/30 flex items-center justify-between">
           <span>Generated by HospoPilot · {inspectionDate} at {inspectionTime}</span>
           <span>{restaurant?.name}</span>
         </div>

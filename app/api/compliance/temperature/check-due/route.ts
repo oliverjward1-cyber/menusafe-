@@ -60,7 +60,7 @@ export async function GET(request: Request) {
     const checkDeadline = checkType === 'am' ? '10:00 AM' : '6:00 PM'
 
     await getResend().emails.send({
-      from: 'mise <alerts@mise.kitchen>',
+      from: 'HospoPilot <support@hospopilot.co.uk>',
       to: ownerEmail,
       subject: `⚠️ ${restaurant.name} — temperature check overdue`,
       html: `
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
             Regular temperature monitoring is required for food safety compliance. Please log your
             fridge, freezer, and hot-hold readings as soon as possible.
           </p>
-          <a href="https://mise.kitchen/owner/temperature-logs"
+          <a href="https://www.hospopilot.co.uk/owner/temperature-logs"
              style="display: inline-block; background: #2D6A4F; color: white; padding: 12px 24px;
                     border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
             Log temperature now →

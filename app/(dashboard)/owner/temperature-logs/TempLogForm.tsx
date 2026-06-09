@@ -46,11 +46,11 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
   return (
     <form onSubmit={submit} className="grid grid-cols-2 md:grid-cols-3 gap-4">
       <div className="col-span-2 md:col-span-1">
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Location</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Location</label>
         <select
           value={location}
           onChange={e => setLocation(e.target.value)}
-          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
         >
           {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
         </select>
@@ -59,13 +59,13 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
             value={customLocation}
             onChange={e => setCustomLocation(e.target.value)}
             placeholder="Enter location name"
-            className="mt-2 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+            className="mt-2 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
           />
         )}
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Temperature (°C)</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Temperature (°C)</label>
         <input
           type="number"
           step="0.1"
@@ -73,16 +73,16 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
           onChange={e => setTemperature(e.target.value)}
           placeholder="e.g. 4.5"
           required
-          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Check</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Check</label>
         <select
           value={checkType}
           onChange={e => setCheckType(e.target.value)}
-          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
         >
           <option value="am">AM check</option>
           <option value="pm">PM check</option>
@@ -91,33 +91,33 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Recorded by</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Recorded by</label>
         <input
           value={recordedBy}
           onChange={e => setRecordedBy(e.target.value)}
           placeholder="Name"
           required
-          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Notes (optional)</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Notes (optional)</label>
         <input
           value={notes}
           onChange={e => setNotes(e.target.value)}
           placeholder="Any observations"
-          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Corrective action (if reading failed)</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Corrective action (if reading failed)</label>
         <input
           value={correctiveAction}
           onChange={e => setCorrectiveAction(e.target.value)}
           placeholder="e.g. moved stock, called engineer"
-          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
         />
       </div>
 
@@ -125,7 +125,7 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
         <button
           type="submit"
           disabled={saving || !temperature}
-          className="w-full bg-mise-deep text-white rounded-xl py-2.5 text-sm font-semibold hover:bg-mise-deep/90 disabled:opacity-50 transition-colors"
+          className="w-full bg-hospopilot-deep text-white rounded-xl py-2.5 text-sm font-semibold hover:bg-hospopilot-deep/90 disabled:opacity-50 transition-colors"
         >
           {saving ? 'Saving…' : 'Log temperature'}
         </button>

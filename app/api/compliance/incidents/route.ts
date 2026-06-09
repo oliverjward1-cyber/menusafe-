@@ -79,7 +79,7 @@ export async function POST(request: Request) {
           }
 
           await getResend().emails.send({
-            from: 'mise <alerts@mise.kitchen>',
+            from: 'HospoPilot <support@hospopilot.co.uk>',
             to: ownerEmail,
             subject: `${severityEmoji} Incident reported at ${restaurant?.name ?? 'your restaurant'}`,
             html: `
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
                   ${severity === 'critical' ? '<br/><strong style="color:#991b1b">This is a critical incident — please respond immediately.</strong>' : ''}
                 </p>
 
-                <a href="https://mise.kitchen/owner/incidents"
+                <a href="https://www.hospopilot.co.uk/owner/incidents"
                    style="display: inline-block; background: #991b1b; color: white; padding: 12px 24px;
                           border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
                   View incident log →

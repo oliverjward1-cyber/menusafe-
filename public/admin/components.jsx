@@ -1,4 +1,4 @@
-/* mise admin — shared UI components (exported to window) */
+/* HospoPilot admin — shared UI components (exported to window) */
 
 /* ---------- formatters ---------- */
 function gbp(n) { return "£" + Number(n).toLocaleString("en-GB"); }

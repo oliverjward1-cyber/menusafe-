@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
@@ -26,7 +26,7 @@ export function MobileNavWrapper({ nav, children }: Props) {
     <>
       {/* Mobile top bar — fixed so it always sits above content */}
       <div className="md:hidden fixed top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 bg-gray-900 text-white border-b border-gray-700">
-        <Link href="/chef"><MiseLogo /></Link>
+        <Link href="/chef"><HospoPilotLogo /></Link>
         <button
           onClick={() => setOpen(true)}
           className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors"
@@ -50,7 +50,7 @@ export function MobileNavWrapper({ nav, children }: Props) {
       {/* Slide-out drawer */}
       <div className={`md:hidden fixed top-0 left-0 h-full w-72 bg-gray-900 z-50 transform transition-transform duration-300 ease-in-out ${open ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-          <Link href="/chef"><MiseLogo /></Link>
+          <Link href="/chef"><HospoPilotLogo /></Link>
           <button
             onClick={() => setOpen(false)}
             className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors text-gray-400 hover:text-white"

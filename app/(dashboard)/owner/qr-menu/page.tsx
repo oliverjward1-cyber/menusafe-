@@ -26,8 +26,8 @@ export default async function QrMenuPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">QR Menu</h1>
-        <p className="text-mise-ink/50 mt-1">
+        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">QR Menu</h1>
+        <p className="text-hospopilot-ink/50 mt-1">
           Print this QR code for customers to scan — no login required
         </p>
       </div>

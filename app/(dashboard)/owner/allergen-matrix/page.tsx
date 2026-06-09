@@ -47,8 +47,8 @@ export default async function AllergenMatrixPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between no-print">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">Allergen Matrix</h1>
-          <p className="text-mise-ink/50 mt-1">
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Allergen Matrix</h1>
+          <p className="text-hospopilot-ink/50 mt-1">
             UK Food Information Regulations 2014 — approved dishes only
           </p>
         </div>

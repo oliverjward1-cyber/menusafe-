@@ -74,12 +74,12 @@ export default function NewIngredientPage() {
         >
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">Add ingredient</h1>
+        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Add ingredient</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
-          <h2 className="text-base font-semibold text-mise-ink mb-4">Basic details</h2>
+          <h2 className="text-base font-semibold text-hospopilot-ink mb-4">Basic details</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2">
               <Input

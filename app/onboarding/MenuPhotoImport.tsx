@@ -99,9 +99,9 @@ export function MenuPhotoImport({ restaurantId }: Props) {
       <div className="space-y-4">
         <div
           onClick={() => fileRef.current?.click()}
-          className="border-2 border-dashed border-white/20 rounded-2xl p-10 text-center cursor-pointer hover:border-mise-gold hover:bg-mise-gold/10 transition-colors group"
+          className="border-2 border-dashed border-white/20 rounded-2xl p-10 text-center cursor-pointer hover:border-hospopilot-gold hover:bg-hospopilot-gold/10 transition-colors group"
         >
-          <ImagePlus className="h-10 w-10 text-white/30 group-hover:text-mise-gold mx-auto mb-3 transition-colors" />
+          <ImagePlus className="h-10 w-10 text-white/30 group-hover:text-hospopilot-gold mx-auto mb-3 transition-colors" />
           <p className="text-sm font-semibold text-white mb-1">Upload a photo of your menu</p>
           <p className="text-xs text-white/40">JPG, PNG or WEBP · Works with printed menus, PDFs photographed, or digital screenshots</p>
           <input
@@ -128,7 +128,7 @@ export function MenuPhotoImport({ restaurantId }: Props) {
         {preview && (
           <img src={preview} alt="menu" className="h-32 w-32 object-cover rounded-xl mx-auto mb-6 opacity-50" />
         )}
-        <Loader2 className="h-8 w-8 animate-spin text-mise-gold mx-auto mb-3" />
+        <Loader2 className="h-8 w-8 animate-spin text-hospopilot-gold mx-auto mb-3" />
         <p className="text-sm font-semibold text-white">Reading your menu…</p>
         <p className="text-xs text-white/40 mt-1">This takes about 10 seconds</p>
       </div>
@@ -139,8 +139,8 @@ export function MenuPhotoImport({ restaurantId }: Props) {
     return (
       <div>
         <div className="text-center mb-6">
-          <p className="text-sm font-semibold text-mise-ink">Upload your allergen sheet</p>
-          <p className="text-xs text-mise-ink/40 mt-1">
+          <p className="text-sm font-semibold text-hospopilot-ink">Upload your allergen sheet</p>
+          <p className="text-xs text-hospopilot-ink/40 mt-1">
             We&apos;ll match the allergens to the {savedRecipes.length} dishes you just added
           </p>
         </div>
@@ -155,23 +155,23 @@ export function MenuPhotoImport({ restaurantId }: Props) {
   if (stage === 'done') {
     return (
       <div className="text-center py-6">
-        <CheckCircle2 className="h-12 w-12 text-mise-fresh mx-auto mb-4" />
-        <p className="text-xl font-display font-semibold text-mise-ink mb-1">
+        <CheckCircle2 className="h-12 w-12 text-hospopilot-fresh mx-auto mb-4" />
+        <p className="text-xl font-display font-semibold text-hospopilot-ink mb-1">
           {selectedCount} dish{selectedCount !== 1 ? 'es' : ''} added
         </p>
-        <p className="text-sm text-mise-ink/50 mb-6">
+        <p className="text-sm text-hospopilot-ink/50 mb-6">
           Do you have an existing allergen sheet? Upload it now and we&apos;ll pre-fill allergens for every dish.
         </p>
         <div className="space-y-3">
           <button
             onClick={() => setStage('allergens')}
-            className="w-full py-3 bg-mise-gold hover:bg-yellow-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 bg-hospopilot-gold hover:bg-yellow-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
           >
             Yes — upload my allergen sheet
           </button>
           <button
             onClick={() => router.push('/chef/recipes')}
-            className="w-full py-2.5 text-sm text-mise-ink/40 hover:text-mise-ink/60 transition-colors"
+            className="w-full py-2.5 text-sm text-hospopilot-ink/40 hover:text-hospopilot-ink/60 transition-colors"
           >
             Skip — go to my recipes <ArrowRight className="h-3.5 w-3.5 inline" />
           </button>
@@ -187,12 +187,12 @@ export function MenuPhotoImport({ restaurantId }: Props) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-semibold text-mise-ink">{dishes.length} dishes found</p>
-          <p className="text-xs text-mise-ink/40 mt-0.5">Deselect any you don&apos;t want, then save</p>
+          <p className="text-sm font-semibold text-hospopilot-ink">{dishes.length} dishes found</p>
+          <p className="text-xs text-hospopilot-ink/40 mt-0.5">Deselect any you don&apos;t want, then save</p>
         </div>
         <button
           onClick={() => { setStage('upload'); setPreview(null); setDishes([]) }}
-          className="text-xs text-mise-ink/40 hover:text-mise-ink underline"
+          className="text-xs text-hospopilot-ink/40 hover:text-hospopilot-ink underline"
         >
           Try another photo
         </button>
@@ -201,7 +201,7 @@ export function MenuPhotoImport({ restaurantId }: Props) {
       <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
         {categories.map(cat => (
           <div key={cat}>
-            <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-2 px-1">{cat}</p>
+            <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-2 px-1">{cat}</p>
             <div className="space-y-2">
               {dishes.filter(d => d.category === cat).map(dish => (
                 <div
@@ -213,34 +213,34 @@ export function MenuPhotoImport({ restaurantId }: Props) {
                       type="checkbox"
                       checked={dish.selected}
                       onChange={() => toggleDish(dish.id)}
-                      className="mt-0.5 h-4 w-4 rounded accent-mise-gold cursor-pointer"
+                      className="mt-0.5 h-4 w-4 rounded accent-hospopilot-gold cursor-pointer"
                     />
                     <div className="flex-1 min-w-0 space-y-1.5">
                       <input
                         value={dish.name}
                         onChange={e => updateDish(dish.id, 'name', e.target.value)}
-                        className="w-full text-sm font-semibold text-mise-ink bg-transparent border-b border-transparent hover:border-mise-ink/10 focus:border-mise-gold focus:outline-none pb-0.5"
+                        className="w-full text-sm font-semibold text-hospopilot-ink bg-transparent border-b border-transparent hover:border-hospopilot-ink/10 focus:border-hospopilot-gold focus:outline-none pb-0.5"
                       />
                       {dish.description && (
                         <input
                           value={dish.description ?? ''}
                           onChange={e => updateDish(dish.id, 'description', e.target.value)}
-                          className="w-full text-xs text-mise-ink/50 bg-transparent border-b border-transparent hover:border-mise-ink/10 focus:border-mise-gold focus:outline-none pb-0.5"
+                          className="w-full text-xs text-hospopilot-ink/50 bg-transparent border-b border-transparent hover:border-hospopilot-ink/10 focus:border-hospopilot-gold focus:outline-none pb-0.5"
                         />
                       )}
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                      <span className="text-xs text-mise-ink/40">£</span>
+                      <span className="text-xs text-hospopilot-ink/40">£</span>
                       <input
                         type="number"
                         step="0.01"
                         value={dish.price ?? ''}
                         onChange={e => updateDish(dish.id, 'price', e.target.value ? parseFloat(e.target.value) : null)}
                         placeholder="—"
-                        className="w-14 text-sm font-semibold text-right text-mise-ink bg-transparent border-b border-transparent hover:border-mise-ink/10 focus:border-mise-gold focus:outline-none pb-0.5"
+                        className="w-14 text-sm font-semibold text-right text-hospopilot-ink bg-transparent border-b border-transparent hover:border-hospopilot-ink/10 focus:border-hospopilot-gold focus:outline-none pb-0.5"
                       />
                     </div>
-                    <button onClick={() => removeDish(dish.id)} className="text-mise-ink/20 hover:text-red-400 transition-colors mt-0.5">
+                    <button onClick={() => removeDish(dish.id)} className="text-hospopilot-ink/20 hover:text-red-400 transition-colors mt-0.5">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -260,7 +260,7 @@ export function MenuPhotoImport({ restaurantId }: Props) {
       <button
         onClick={handleSave}
         disabled={stage === 'saving' || selectedCount === 0}
-        className="w-full py-3 bg-mise-gold hover:bg-yellow-600 text-white font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        className="w-full py-3 bg-hospopilot-gold hover:bg-yellow-600 text-white font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
       >
         {stage === 'saving'
           ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>

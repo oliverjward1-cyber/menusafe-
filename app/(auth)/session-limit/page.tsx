@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, Suspense } from 'react'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 function SessionLimitContent() {
   const searchParams = useSearchParams()
@@ -22,10 +22,10 @@ function SessionLimitContent() {
   }
 
   return (
-    <div className="min-h-screen bg-mise-ink flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
-          <MiseLogo className="mb-3 scale-125" />
+          <HospoPilotLogo className="mb-3 scale-125" />
         </div>
 
         <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8 text-center">
@@ -36,7 +36,7 @@ function SessionLimitContent() {
           </div>
 
           <h1 className="text-xl font-semibold text-white mb-2">Too many active devices</h1>
-          <p className="text-mise-fresh/70 text-sm mb-6 leading-relaxed">
+          <p className="text-hospopilot-fresh/70 text-sm mb-6 leading-relaxed">
             You&apos;ve reached the limit of{' '}
             <span className="text-white font-medium">{limit} active devices</span> on your current plan.
             You currently have{' '}
@@ -47,7 +47,7 @@ function SessionLimitContent() {
             <button
               onClick={handleClearSessions}
               disabled={clearing}
-              className="w-full py-2.5 px-4 rounded-lg bg-mise-mid hover:bg-mise-deep disabled:opacity-50 text-white text-sm font-medium transition-colors"
+              className="w-full py-2.5 px-4 rounded-lg bg-hospopilot-mid hover:bg-hospopilot-deep disabled:opacity-50 text-white text-sm font-medium transition-colors"
             >
               {clearing ? 'Signing out other devices…' : 'Sign out all other devices'}
             </button>

@@ -25,11 +25,11 @@ export default async function AllergenLearnPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink flex items-center gap-2">
-          <BookOpen className="h-6 w-6 text-mise-mid" />
+        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink flex items-center gap-2">
+          <BookOpen className="h-6 w-6 text-hospopilot-mid" />
           Allergen Learning Hub
         </h1>
-        <p className="text-sm text-mise-ink/50 mt-1">
+        <p className="text-sm text-hospopilot-ink/50 mt-1">
           14 modules covering every major allergen · Complete all 14 to earn your certification
         </p>
       </div>
@@ -37,7 +37,7 @@ export default async function AllergenLearnPage() {
       {/* Progress bar */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-mise-ink">{completedCount} of 14 modules completed</p>
+          <p className="text-sm font-semibold text-hospopilot-ink">{completedCount} of 14 modules completed</p>
           {completedCount === 14 && (
             <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full">
               <CheckCircle2 className="h-3.5 w-3.5" /> Certified
@@ -46,7 +46,7 @@ export default async function AllergenLearnPage() {
         </div>
         <div className="w-full bg-black/[0.06] rounded-full h-2.5">
           <div
-            className="bg-mise-mid h-2.5 rounded-full transition-all duration-500"
+            className="bg-hospopilot-mid h-2.5 rounded-full transition-all duration-500"
             style={{ width: `${(completedCount / 14) * 100}%` }}
           />
         </div>
@@ -60,7 +60,7 @@ export default async function AllergenLearnPage() {
             <Link
               key={module.slug}
               href={`/owner/learn/${module.slug}`}
-              className="group bg-white rounded-2xl border border-black/[0.06] shadow-sm hover:shadow-md hover:border-mise-mid/30 transition-all overflow-hidden"
+              className="group bg-white rounded-2xl border border-black/[0.06] shadow-sm hover:shadow-md hover:border-hospopilot-mid/30 transition-all overflow-hidden"
             >
               <div className={`${module.colour} px-5 py-4`}>
                 <div className="flex items-center justify-between">
@@ -70,16 +70,16 @@ export default async function AllergenLearnPage() {
                       <CheckCircle2 className="h-3 w-3" /> {done.score}%
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 bg-white/60 text-mise-ink/50 text-xs px-2 py-1 rounded-full">
+                    <span className="inline-flex items-center gap-1 bg-white/60 text-hospopilot-ink/50 text-xs px-2 py-1 rounded-full">
                       <Clock className="h-3 w-3" /> ~5 min
                     </span>
                   )}
                 </div>
               </div>
               <div className="px-5 py-4">
-                <p className="font-semibold text-mise-ink text-sm">{module.name}</p>
-                <p className="text-xs text-mise-ink/50 mt-0.5">{module.tagline}</p>
-                <p className="text-xs text-mise-mid font-medium mt-3 group-hover:underline">
+                <p className="font-semibold text-hospopilot-ink text-sm">{module.name}</p>
+                <p className="text-xs text-hospopilot-ink/50 mt-0.5">{module.tagline}</p>
+                <p className="text-xs text-hospopilot-mid font-medium mt-3 group-hover:underline">
                   {done ? 'Review module →' : 'Start module →'}
                 </p>
               </div>

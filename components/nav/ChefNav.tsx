@@ -12,7 +12,7 @@ import {
   MenuSquare,
   ClipboardCheck,
 } from 'lucide-react'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 const navItems = [
   { href: '/chef', label: 'Dashboard', icon: ChefHat, exact: true },
@@ -35,9 +35,9 @@ export function ChefNav({ restaurantName }: { restaurantName: string }) {
   return (
     <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
       <div className="p-4 border-b border-gray-700">
-        <Link href="/chef"><MiseLogo className="mb-2" /></Link>
+        <Link href="/chef"><HospoPilotLogo className="mb-2" /></Link>
         <p className="text-xs text-gray-400 truncate">{restaurantName}</p>
-        <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs bg-mise-mid/40 text-mise-fresh">
+        <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs bg-hospopilot-mid/40 text-hospopilot-fresh">
           Kitchen
         </span>
       </div>
@@ -48,7 +48,7 @@ export function ChefNav({ restaurantName }: { restaurantName: string }) {
           {[navItems[0]].map(({ href, label, icon: Icon, exact }) => {
             const active = exact ? pathname === href : pathname.startsWith(href)
             return (
-              <Link key={href} href={href} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', active ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
+              <Link key={href} href={href} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', active ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
                 <Icon className="h-4 w-4" />{label}
               </Link>
             )
@@ -61,7 +61,7 @@ export function ChefNav({ restaurantName }: { restaurantName: string }) {
           {navItems.slice(1).map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href)
             return (
-              <Link key={href} href={href} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', active ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
+              <Link key={href} href={href} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', active ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
                 <Icon className="h-4 w-4" />{label}
               </Link>
             )
