@@ -4,7 +4,7 @@ import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
   AlertTriangle, Globe, GlobeLock,
-  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck, AlertOctagon, Truck, ListChecks,
+  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck, AlertOctagon, Truck, ListChecks, History,
 } from 'lucide-react'
 
 function addMonths(date: Date, months: number): Date {
@@ -57,6 +57,26 @@ export default async function OwnerDashboard() {
       .eq('restaurant_id', rid)
       .eq('scheduled_date', todayStr)
       .order('sort_order'),
+  ])
+
+  // Week dates (Mon–today)
+  const weekDates: string[] = []
+  const weekStart = new Date(now)
+  weekStart.setDate(now.getDate() - ((now.getDay() + 6) % 7)) // Monday
+  weekStart.setHours(0, 0, 0, 0)
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart)
+    d.setDate(weekStart.getDate() + i)
+    weekDates.push(d.toISOString().split('T')[0])
+  }
+  const weekStartStr = weekDates[0]
+
+  const [weekTrailRes] = await Promise.all([
+    supabase.from('ops_task_logs')
+      .select('scheduled_date, status')
+      .eq('restaurant_id', rid)
+      .gte('scheduled_date', weekStartStr)
+      .lte('scheduled_date', todayStr),
   ])
 
   const restaurant = restaurantRes.data
@@ -124,6 +144,42 @@ export default async function OwnerDashboard() {
   const lastFohQuiz = allAttempts.filter(a => a.quiz_type === 'front_of_house')[0] ?? null
   const lastBohQuiz = allAttempts.filter(a => a.quiz_type === 'kitchen')[0] ?? null
 
+  // Weekly trail summary per day
+  const weekTasksByDate = new Map<string, { done: number; total: number }>()
+  for (const d of weekDates) weekTasksByDate.set(d, { done: 0, total: 0 })
+  for (const t of weekTrailRes.data ?? []) {
+    const entry = weekTasksByDate.get(t.scheduled_date)
+    if (!entry) continue
+    entry.total++
+    if (t.status === 'done' || t.status === 'flagged') entry.done++
+  }
+  const weekDays = weekDates.map(d => {
+    const { done, total } = weekTasksByDate.get(d)!
+    const pct = total > 0 ? Math.round((done / total) * 100) : null
+    const label = new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })
+    return { date: d, done, total, pct, label, isToday: d === todayStr, isFuture: d > todayStr }
+  })
+  const weekCompletedDays = weekDays.filter(d => !d.isFuture && d.pct === 100).length
+  const weekTotalDaysSoFar = weekDays.filter(d => !d.isFuture && d.total > 0).length
+
+  // Daily compliance score
+  type ComplianceIssue = { label: string; severity: 'critical' | 'warning' }
+  const complianceIssues: ComplianceIssue[] = []
+  if (criticalIncidents.length > 0)
+    complianceIssues.push({ label: `${criticalIncidents.length} critical incident${criticalIncidents.length !== 1 ? 's' : ''} unresolved`, severity: 'critical' })
+  if (amOverdue) complianceIssues.push({ label: 'AM temperature check overdue', severity: 'critical' })
+  if (pmOverdue) complianceIssues.push({ label: 'PM temperature check overdue', severity: 'critical' })
+  if (trailTotal > 0 && missedTasks.length > 0)
+    complianceIssues.push({ label: `${missedTasks.length} trail task${missedTasks.length !== 1 ? 's' : ''} past due time`, severity: 'warning' })
+  if (expiredStaff.length > 0)
+    complianceIssues.push({ label: `${expiredStaff.length} staff member${expiredStaff.length !== 1 ? 's' : ''} with expired training`, severity: 'warning' })
+  if (openIncidents.filter(i => i.severity !== 'critical' && i.severity !== 'high').length > 0)
+    complianceIssues.push({ label: `${openIncidents.length - criticalIncidents.length} open incident${openIncidents.length - criticalIncidents.length !== 1 ? 's' : ''} require resolution`, severity: 'warning' })
+  const criticalCount = complianceIssues.filter(i => i.severity === 'critical').length
+  const complianceScore = complianceIssues.length === 0 ? 100
+    : Math.max(0, 100 - criticalCount * 25 - (complianceIssues.length - criticalCount) * 10)
+  const complianceStatus = complianceScore === 100 ? 'compliant' : criticalCount > 0 ? 'critical' : 'needs-attention'
+
   // Legacy: combined for old code
   const trainedStaff = [...new Map([...fohCompliance, ...bohCompliance].map(s => [s.name, s])).values()]
   const expiringStaff = trainedStaff.filter(s => s.status === 'expiring')
@@ -165,6 +221,87 @@ export default async function OwnerDashboard() {
 
   return (
     <div className="space-y-6">
+
+      {/* Daily Compliance Bar */}
+      <div className={`rounded-2xl border p-5 ${
+        complianceStatus === 'compliant' ? 'bg-green-50 border-green-200' :
+        complianceStatus === 'critical' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'
+      }`}>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className={`h-4 w-4 ${complianceStatus === 'compliant' ? 'text-green-600' : complianceStatus === 'critical' ? 'text-red-600' : 'text-amber-600'}`} />
+            <p className={`text-sm font-semibold ${complianceStatus === 'compliant' ? 'text-green-700' : complianceStatus === 'critical' ? 'text-red-700' : 'text-amber-700'}`}>
+              {complianceStatus === 'compliant' ? 'Fully compliant today' : complianceStatus === 'critical' ? 'Compliance action required' : 'Areas need attention'}
+            </p>
+          </div>
+          <span className={`text-lg font-bold ${complianceStatus === 'compliant' ? 'text-green-700' : complianceStatus === 'critical' ? 'text-red-700' : 'text-amber-700'}`}>
+            {complianceScore}%
+          </span>
+        </div>
+        <div className="h-2.5 bg-white/60 rounded-full overflow-hidden mb-3">
+          <div
+            className={`h-full rounded-full transition-all ${complianceStatus === 'compliant' ? 'bg-green-500' : complianceStatus === 'critical' ? 'bg-red-500' : 'bg-amber-500'}`}
+            style={{ width: `${complianceScore}%` }}
+          />
+        </div>
+        {complianceIssues.length > 0 ? (
+          <ul className="space-y-1">
+            {complianceIssues.map((issue, i) => (
+              <li key={i} className={`flex items-center gap-2 text-xs font-medium ${issue.severity === 'critical' ? 'text-red-700' : 'text-amber-700'}`}>
+                {issue.severity === 'critical'
+                  ? <AlertOctagon className="h-3.5 w-3.5 shrink-0" />
+                  : <AlertTriangle className="h-3.5 w-3.5 shrink-0" />}
+                {issue.label}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-green-600">All compliance checks passed — great work!</p>
+        )}
+      </div>
+
+      {/* Weekly Trail Overview */}
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <History className="h-4 w-4 text-mise-mid" />
+            <h2 className="text-sm font-semibold text-mise-ink">This week&apos;s trail</h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-mise-ink/40">
+              {weekCompletedDays}/{weekTotalDaysSoFar} days fully complete
+            </span>
+            <Link href="/owner/trail-history" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Full history →</Link>
+          </div>
+        </div>
+        <div className="flex items-end gap-2">
+          {weekDays.map(day => (
+            <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5">
+              <div className="w-full relative">
+                {!day.isFuture && day.total > 0 ? (
+                  <div className="relative h-16 flex flex-col justify-end">
+                    <div className="w-full bg-gray-100 rounded-lg overflow-hidden h-full flex flex-col justify-end">
+                      <div
+                        className={`w-full rounded-lg transition-all ${day.pct === 100 ? 'bg-green-400' : (day.pct ?? 0) >= 50 ? 'bg-amber-400' : 'bg-red-400'}`}
+                        style={{ height: `${Math.max(day.pct ?? 0, 8)}%` }}
+                      />
+                    </div>
+                    <span className={`absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] font-bold whitespace-nowrap
+                      ${day.pct === 100 ? 'text-green-600' : (day.pct ?? 0) >= 50 ? 'text-amber-600' : 'text-red-500'}`}>
+                      {day.pct}%
+                    </span>
+                  </div>
+                ) : (
+                  <div className={`h-16 w-full rounded-lg ${day.isFuture ? 'bg-gray-50 border-2 border-dashed border-gray-200' : 'bg-gray-100'}`} />
+                )}
+              </div>
+              <span className={`text-[11px] font-medium ${day.isToday ? 'text-mise-mid' : 'text-mise-ink/40'}`}>{day.label}</span>
+              {day.isToday && <span className="w-1 h-1 rounded-full bg-mise-mid" />}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Open incidents alert */}
       {openIncidents.length > 0 && (
         <Link href="/owner/incidents" className="block">
