@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
-import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye, Clock } from 'lucide-react'
+import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye, Clock, ExternalLink } from 'lucide-react'
 import { PublishToggle } from './PublishToggle'
 import { DuplicateMenuButton } from './DuplicateMenuButton'
 import { DeleteMenuButton } from './DeleteMenuButton'
@@ -62,12 +62,22 @@ export default async function MenusPage() {
               <p className="text-sm font-mono text-green-800 break-all">{menuUrl}</p>
               <p className="text-xs text-gray-400 mt-1">Share this link or display the QR code on your tables. Customers see all published menus.</p>
             </div>
-            <Link
-              href={`/chef/menus/qr`}
-              className="shrink-0 inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-            >
-              <QrCode className="h-4 w-4" /> QR code
-            </Link>
+            <div className="flex items-center gap-2 shrink-0">
+              <a
+                href={menuUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-mise-mid text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" /> Preview live menu
+              </a>
+              <Link
+                href={`/chef/menus/qr`}
+                className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                <QrCode className="h-4 w-4" /> QR code
+              </Link>
+            </div>
           </div>
         </Card>
       )}

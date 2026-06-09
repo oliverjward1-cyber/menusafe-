@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { QRDisplay } from './QRDisplay'
 
 export default async function QRPage() {
@@ -21,11 +21,23 @@ export default async function QRPage() {
 
   return (
     <div className="space-y-5 max-w-lg">
-      <div className="flex items-center gap-3">
-        <Link href="/chef/menus" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
-          <ChevronLeft className="h-4 w-4" /> Back
-        </Link>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">QR code for tables</h1>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-3">
+          <Link href="/chef/menus" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+            <ChevronLeft className="h-4 w-4" /> Back
+          </Link>
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">QR code for tables</h1>
+        </div>
+        {menuUrl && (
+          <a
+            href={menuUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+          >
+            <ExternalLink className="h-4 w-4" /> Preview live menu
+          </a>
+        )}
       </div>
 
       <QRDisplay
