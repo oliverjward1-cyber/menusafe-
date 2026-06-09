@@ -69,12 +69,12 @@ export default function FOHLearningPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 px-4 py-6">
       <div className="flex items-center gap-3">
-        <Link href="/owner/learn" className="text-mise-ink/40 hover:text-mise-ink transition-colors">
+        <Link href="/owner/learn" className="text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-mise-ink">FOH Allergen Awareness</h1>
-          <p className="text-mise-ink/50 text-sm mt-0.5">Front of House — essential allergen knowledge</p>
+          <h1 className="text-2xl font-bold text-hospopilot-ink">FOH Allergen Awareness</h1>
+          <p className="text-hospopilot-ink/50 text-sm mt-0.5">Front of House — essential allergen knowledge</p>
         </div>
       </div>
 
@@ -92,19 +92,19 @@ export default function FOHLearningPage() {
 
       {/* FOH duties */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-mise-ink">Your responsibilities</h2>
+        <h2 className="text-lg font-bold text-hospopilot-ink">Your responsibilities</h2>
         {FOH_DUTIES.map(duty => (
           <div key={duty.title} className="bg-white border border-black/[0.06] rounded-2xl p-5 shadow-sm">
             <div className="flex items-center gap-3 mb-3">
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${duty.colour}`}>
                 <duty.icon className="h-5 w-5" />
               </div>
-              <h3 className="font-semibold text-mise-ink">{duty.title}</h3>
+              <h3 className="font-semibold text-hospopilot-ink">{duty.title}</h3>
             </div>
             <ul className="space-y-1.5">
               {duty.points.map(p => (
-                <li key={p} className="flex items-start gap-2 text-sm text-mise-ink/70">
-                  <span className="text-mise-mid font-bold mt-0.5">·</span> {p}
+                <li key={p} className="flex items-start gap-2 text-sm text-hospopilot-ink/70">
+                  <span className="text-hospopilot-mid font-bold mt-0.5">·</span> {p}
                 </li>
               ))}
             </ul>
@@ -115,8 +115,8 @@ export default function FOHLearningPage() {
       {/* 14 allergen modules */}
       <div className="space-y-4">
         <div>
-          <h2 className="text-lg font-bold text-mise-ink">The 14 major allergens</h2>
-          <p className="text-mise-ink/50 text-sm">Learn each allergen in detail — where it hides, symptoms, and how to handle requests.</p>
+          <h2 className="text-lg font-bold text-hospopilot-ink">The 14 major allergens</h2>
+          <p className="text-hospopilot-ink/50 text-sm">Learn each allergen in detail — where it hides, symptoms, and how to handle requests.</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {ALLERGENS.map(a => (
@@ -127,20 +127,20 @@ export default function FOHLearningPage() {
             >
               <span className="text-2xl">{a.emoji}</span>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-mise-ink text-sm">{a.name}</p>
+                <p className="font-semibold text-hospopilot-ink text-sm">{a.name}</p>
               </div>
-              <ChevronRight className="h-4 w-4 text-mise-ink/20 flex-shrink-0" />
+              <ChevronRight className="h-4 w-4 text-hospopilot-ink/20 flex-shrink-0" />
             </Link>
           ))}
         </div>
       </div>
 
       {/* Take the quiz */}
-      <div className="bg-mise-ink rounded-2xl p-6 text-center text-white">
+      <div className="bg-hospopilot-ink rounded-2xl p-6 text-center text-white">
         <h2 className="text-lg font-bold mb-1">Ready to test your knowledge?</h2>
         <p className="text-white/60 text-sm mb-4">Take the FOH allergen quiz — 80% needed to pass</p>
         <Link href="/owner/staff-quiz"
-          className="inline-flex items-center gap-2 bg-mise-mid text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-mise-deep transition-colors">
+          className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-hospopilot-deep transition-colors">
           Go to FOH Quiz <ChevronRight className="h-4 w-4" />
         </Link>
       </div>

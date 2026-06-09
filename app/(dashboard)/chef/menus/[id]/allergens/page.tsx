@@ -72,7 +72,7 @@ export default async function AllergenMatrixPage({ params }: Props) {
     .concat(Object.keys(grouped).filter(c => !CATEGORY_ORDER.includes(c) && grouped[c]?.length))
 
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-  const restaurantName = restaurant?.name ?? 'mise'
+  const restaurantName = restaurant?.name ?? 'HospoPilot'
 
   return (
     <>
@@ -82,7 +82,7 @@ export default async function AllergenMatrixPage({ params }: Props) {
           <Link href={`/chef/menus/${params.id}`} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
             <ChevronLeft className="h-4 w-4" /> Back
           </Link>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">Allergen matrix — {menu.name}</h1>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Allergen matrix — {menu.name}</h1>
         </div>
         <PrintButton />
       </div>
@@ -91,7 +91,7 @@ export default async function AllergenMatrixPage({ params }: Props) {
       <div className="bg-white print:bg-white" id="allergen-print">
 
         {/* Branded header */}
-        <div className="bg-mise-deep text-white px-8 py-6 print:px-6 print:py-5 rounded-t-2xl print:rounded-none">
+        <div className="bg-hospopilot-deep text-white px-8 py-6 print:px-6 print:py-5 rounded-t-2xl print:rounded-none">
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-xs font-semibold tracking-widest uppercase text-white/60 mb-1">{restaurantName}</p>
@@ -126,7 +126,7 @@ export default async function AllergenMatrixPage({ params }: Props) {
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b-2 border-mise-deep/20">
+              <tr className="bg-gray-50 border-b-2 border-hospopilot-deep/20">
                 <th className="sticky left-0 bg-gray-50 text-left px-6 py-4 print:px-4 font-semibold text-gray-700 border-r border-gray-200 min-w-[180px] w-[180px]">
                   Dish
                 </th>
@@ -152,10 +152,10 @@ export default async function AllergenMatrixPage({ params }: Props) {
               ) : cats.map(cat => (
                 <>
                   {/* Category header row */}
-                  <tr key={`${cat}-hdr`} className="bg-mise-deep/5 print:bg-gray-100">
+                  <tr key={`${cat}-hdr`} className="bg-hospopilot-deep/5 print:bg-gray-100">
                     <td
                       colSpan={ALLERGENS.length + 1}
-                      className="px-6 py-2 print:px-4 text-xs font-bold text-mise-deep uppercase tracking-widest border-b border-mise-deep/10"
+                      className="px-6 py-2 print:px-4 text-xs font-bold text-hospopilot-deep uppercase tracking-widest border-b border-hospopilot-deep/10"
                     >
                       {cat}
                     </td>

@@ -44,21 +44,21 @@ export default async function IngredientsPage() {
           {(ingredients?.length ?? 0) > 0 && <CategoriseButton />}
           <Link
             href="/chef/ingredients/scan"
-            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+            className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep transition-colors"
           >
             <Camera className="h-4 w-4" />
             Scan invoice
           </Link>
           <Link
             href="/chef/ingredients/upload"
-            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+            className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep transition-colors"
           >
             <Upload className="h-4 w-4" />
             Upload sheet
           </Link>
           <Link
             href="/chef/ingredients/new"
-            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+            className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add ingredient
@@ -105,7 +105,7 @@ export default async function IngredientsPage() {
                           return (
                             <tr key={ing.id} className="hover:bg-gray-50 transition-colors cursor-pointer group">
                               <td className="px-5 py-3 font-medium text-gray-900">
-                                <Link href={`/chef/ingredients/${ing.id}/edit`} className="hover:text-mise-mid transition-colors">{ing.name}</Link>
+                                <Link href={`/chef/ingredients/${ing.id}/edit`} className="hover:text-hospopilot-mid transition-colors">{ing.name}</Link>
                               </td>
                               <td className="px-4 py-3 text-gray-600">
                                 <Link href={`/chef/ingredients/${ing.id}/edit`} className="block">{formatCurrency(ing.cost_per_unit)}</Link>

@@ -71,44 +71,44 @@ export default function DeliveryForm({ restaurantId, staffName }: { restaurantId
     <form onSubmit={submit} className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Supplier</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Supplier</label>
           <input value={supplier} onChange={e => setSupplier(e.target.value)} placeholder="e.g. Brakes, Sysco" required
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
         </div>
         <div className="col-span-2 md:col-span-1">
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Items delivered</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Items delivered</label>
           <input value={items} onChange={e => setItems(e.target.value)} placeholder="e.g. Chicken breast, mixed salad" required
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Delivery temp (°C)</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Delivery temp (°C)</label>
           <input type="number" step="0.1" value={temperature} onChange={e => setTemperature(e.target.value)} placeholder="e.g. 4.2"
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Received by</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Received by</label>
           <input value={receivedBy} onChange={e => setReceivedBy(e.target.value)} required placeholder="Name"
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Batch/use-by codes</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Batch/use-by codes</label>
           <input value={batchCodes} onChange={e => setBatchCodes(e.target.value)} placeholder="Optional"
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
         </div>
       </div>
 
       {/* Happy / Issue */}
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Delivery condition</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Delivery condition</label>
         <div className="flex gap-2">
           <button type="button" onClick={() => setHappy(true)}
             className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors
-              ${happy === true ? 'bg-green-500 text-white border-green-500' : 'border-black/[0.08] text-mise-ink/60 hover:bg-green-50'}`}>
+              ${happy === true ? 'bg-green-500 text-white border-green-500' : 'border-black/[0.08] text-hospopilot-ink/60 hover:bg-green-50'}`}>
             ✓ Happy with delivery
           </button>
           <button type="button" onClick={() => setHappy(false)}
             className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors
-              ${happy === false ? 'bg-red-500 text-white border-red-500' : 'border-black/[0.08] text-mise-ink/60 hover:bg-red-50'}`}>
+              ${happy === false ? 'bg-red-500 text-white border-red-500' : 'border-black/[0.08] text-hospopilot-ink/60 hover:bg-red-50'}`}>
             ✗ Issue with delivery
           </button>
         </div>
@@ -116,14 +116,14 @@ export default function DeliveryForm({ restaurantId, staffName }: { restaurantId
 
       {/* Notes */}
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Notes</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Notes</label>
         <input value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any issues, corrective actions…"
-          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
       </div>
 
       {/* Invoice photo */}
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Invoice photo</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Invoice photo</label>
         <input ref={photoRef} type="file" accept="image/*" capture="environment" className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) handlePhoto(f) }} />
         {photoPreview ? (
@@ -136,14 +136,14 @@ export default function DeliveryForm({ restaurantId, staffName }: { restaurantId
           </div>
         ) : (
           <button type="button" onClick={() => photoRef.current?.click()}
-            className="flex items-center gap-2 border-2 border-dashed border-black/[0.08] rounded-xl px-4 py-3 text-sm text-mise-ink/40 hover:border-mise-mid/30 hover:text-mise-mid transition-colors">
+            className="flex items-center gap-2 border-2 border-dashed border-black/[0.08] rounded-xl px-4 py-3 text-sm text-hospopilot-ink/40 hover:border-hospopilot-mid/30 hover:text-hospopilot-mid transition-colors">
             <Camera className="h-4 w-4" /> Take photo of invoice
           </button>
         )}
       </div>
 
       <button type="submit" disabled={saving || !supplier.trim() || !items.trim()}
-        className="w-full bg-mise-deep text-white rounded-xl py-3 text-sm font-semibold hover:bg-mise-deep/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+        className="w-full bg-hospopilot-deep text-white rounded-xl py-3 text-sm font-semibold hover:bg-hospopilot-deep/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
         {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : 'Log delivery'}
       </button>
     </form>

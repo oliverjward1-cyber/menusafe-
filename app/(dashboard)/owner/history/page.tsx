@@ -17,7 +17,7 @@ const TYPE_META: Record<HistoryEntry['type'], { label: string; icon: any; color:
   cleaning: { label: 'Cleaning', icon: Sparkles, color: 'text-emerald-600 bg-emerald-50' },
   delivery: { label: 'Delivery', icon: Truck, color: 'text-amber-600 bg-amber-50' },
   incident: { label: 'Incident', icon: AlertOctagon, color: 'text-red-600 bg-red-50' },
-  audit: { label: 'Kitchen audit', icon: ClipboardCheck, color: 'text-mise-mid bg-mise-mid/10' },
+  audit: { label: 'Kitchen audit', icon: ClipboardCheck, color: 'text-hospopilot-mid bg-hospopilot-mid/10' },
   trail_flag: { label: 'Trail flag', icon: Flag, color: 'text-amber-600 bg-amber-50' },
 }
 
@@ -119,10 +119,10 @@ export default async function HistoryPage({
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <History className="h-5 w-5 text-mise-mid" />
-            <h1 className="text-2xl font-display font-semibold text-mise-ink">History</h1>
+            <History className="h-5 w-5 text-hospopilot-mid" />
+            <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">History</h1>
           </div>
-          <p className="text-sm text-mise-ink/50 mt-0.5">Full record of past audits, checks and logs across the kitchen</p>
+          <p className="text-sm text-hospopilot-ink/50 mt-0.5">Full record of past audits, checks and logs across the kitchen</p>
         </div>
         <PrintButton label="Print" />
       </div>
@@ -134,7 +134,7 @@ export default async function HistoryPage({
             href={f.key ? `/owner/history?type=${f.key}` : '/owner/history'}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
               (activeType ?? '') === f.key
-                ? 'bg-mise-mid text-white'
+                ? 'bg-hospopilot-mid text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
@@ -156,7 +156,7 @@ export default async function HistoryPage({
                 <Icon className="h-4 w-4" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-mise-ink truncate">{entry.title}</p>
+                <p className="text-sm font-medium text-hospopilot-ink truncate">{entry.title}</p>
                 <p className="text-xs text-gray-500 truncate">{meta.label} · {entry.detail}{entry.by ? ` · ${entry.by}` : ''}</p>
               </div>
               <p className="text-xs text-gray-400 shrink-0">

@@ -26,14 +26,14 @@ export default async function QRPage() {
           <Link href="/chef/menus" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
             <ChevronLeft className="h-4 w-4" /> Back
           </Link>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">QR code for tables</h1>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">QR code for tables</h1>
         </div>
         {menuUrl && (
           <a
             href={menuUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+            className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep transition-colors"
           >
             <ExternalLink className="h-4 w-4" /> Preview live menu
           </a>

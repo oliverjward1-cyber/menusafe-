@@ -64,7 +64,7 @@ export default function StaffDetailForm({ profile }: { profile: Profile }) {
     <div className="space-y-6">
       {/* Basic info */}
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-mise-ink">Details</h2>
+        <h2 className="text-sm font-semibold text-hospopilot-ink">Details</h2>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Full name</label>
@@ -112,7 +112,7 @@ export default function StaffDetailForm({ profile }: { profile: Profile }) {
 
       {/* Next of kin */}
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-mise-ink">Next of kin</h2>
+        <h2 className="text-sm font-semibold text-hospopilot-ink">Next of kin</h2>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Name</label>
@@ -138,7 +138,7 @@ export default function StaffDetailForm({ profile }: { profile: Profile }) {
 
       {/* Notes */}
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-mise-ink">Notes</h2>
+        <h2 className="text-sm font-semibold text-hospopilot-ink">Notes</h2>
         <textarea
           value={form.notes}
           onChange={e => set('notes', e.target.value)}

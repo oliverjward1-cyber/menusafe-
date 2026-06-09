@@ -195,15 +195,15 @@ function TaskCard({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className={`font-semibold text-sm ${isDone ? 'text-green-700' : isFlagged ? 'text-amber-700' : 'text-mise-ink'}`}>
+            <p className={`font-semibold text-sm ${isDone ? 'text-green-700' : isFlagged ? 'text-amber-700' : 'text-hospopilot-ink'}`}>
               {task.title}
             </p>
             {task.scheduled_time && (
-              <span className="text-[11px] text-mise-ink/30 font-medium">{fmt(task.scheduled_time)}</span>
+              <span className="text-[11px] text-hospopilot-ink/30 font-medium">{fmt(task.scheduled_time)}</span>
             )}
           </div>
           {task.description && !open && (
-            <p className="text-xs text-mise-ink/40 mt-0.5 truncate">{task.description}</p>
+            <p className="text-xs text-hospopilot-ink/40 mt-0.5 truncate">{task.description}</p>
           )}
           {isDone && <p className="text-xs text-green-600 mt-0.5">✓ Done by {task.completed_by}</p>}
           {isFlagged && <p className="text-xs text-amber-600 mt-0.5">⚑ Flagged · {task.flag_reason}</p>}
@@ -211,14 +211,14 @@ function TaskCard({
         <div className="flex-shrink-0">
           {isDone ? <CheckCircle2 className="h-6 w-6 text-green-500" />
             : isFlagged ? <Flag className="h-5 w-5 text-amber-500 fill-amber-500" />
-            : open ? <ChevronUp className="h-5 w-5 text-mise-ink/20" />
-            : <ChevronDown className="h-5 w-5 text-mise-ink/20" />}
+            : open ? <ChevronUp className="h-5 w-5 text-hospopilot-ink/20" />
+            : <ChevronDown className="h-5 w-5 text-hospopilot-ink/20" />}
         </div>
       </button>
 
       {open && !isComplete && (
         <div className="px-4 pb-4 space-y-4 border-t border-black/[0.04] pt-3">
-          {task.description && <p className="text-xs text-mise-ink/50">{task.description}</p>}
+          {task.description && <p className="text-xs text-hospopilot-ink/50">{task.description}</p>}
 
           {task.task_type === 'checklist' && task.checklist_items && (
             <div className="space-y-2">
@@ -231,8 +231,8 @@ function TaskCard({
                 >
                   {checks[item.id]
                     ? <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    : <Circle className="h-5 w-5 text-mise-ink/20 flex-shrink-0" />}
-                  <span className={`text-sm ${checks[item.id] ? 'text-green-700' : 'text-mise-ink'}`}>
+                    : <Circle className="h-5 w-5 text-hospopilot-ink/20 flex-shrink-0" />}
+                  <span className={`text-sm ${checks[item.id] ? 'text-green-700' : 'text-hospopilot-ink'}`}>
                     {item.label}
                     {item.required && <span className="text-red-400 ml-1">*</span>}
                   </span>
@@ -249,18 +249,18 @@ function TaskCard({
                     value={row.location}
                     onChange={e => setTemps(p => p.map((r, idx) => idx === i ? { ...r, location: e.target.value } : r))}
                     placeholder="Location"
-                    className="flex-1 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+                    className="flex-1 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
                   />
                   <div className="flex items-center gap-1">
                     <input
                       type="number" step="0.1" value={row.temperature}
                       onChange={e => setTemps(p => p.map((r, idx) => idx === i ? { ...r, temperature: e.target.value } : r))}
                       placeholder="°C"
-                      className="w-20 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+                      className="w-20 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
                     />
                     {i > 0 && (
                       <button onClick={() => setTemps(p => p.filter((_, idx) => idx !== i))}
-                        className="text-mise-ink/30 hover:text-red-500">
+                        className="text-hospopilot-ink/30 hover:text-red-500">
                         <Minus className="h-4 w-4" />
                       </button>
                     )}
@@ -269,7 +269,7 @@ function TaskCard({
               ))}
               <button
                 onClick={() => setTemps(p => [...p, { location: '', temperature: '' }])}
-                className="text-xs text-mise-ink/40 hover:text-mise-mid flex items-center gap-1 transition-colors"
+                className="text-xs text-hospopilot-ink/40 hover:text-hospopilot-mid flex items-center gap-1 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" /> Add location
               </button>
@@ -283,9 +283,9 @@ function TaskCard({
                 return (
                   <div key={d.id} className="border border-black/[0.08] rounded-xl p-3 space-y-2 bg-gray-50">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-semibold text-mise-ink/50 uppercase tracking-widest">Delivery {i + 1}</p>
+                      <p className="text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest">Delivery {i + 1}</p>
                       {deliveries.length > 1 && (
-                        <button onClick={() => removeDelivery(d.id)} className="text-mise-ink/20 hover:text-red-500 transition-colors">
+                        <button onClick={() => removeDelivery(d.id)} className="text-hospopilot-ink/20 hover:text-red-500 transition-colors">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       )}
@@ -293,34 +293,34 @@ function TaskCard({
                     <div className="grid grid-cols-2 gap-2">
                       <input value={d.supplier} onChange={e => updateDelivery(d.id, 'supplier', e.target.value)}
                         placeholder="Supplier name"
-                        className="col-span-2 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+                        className="col-span-2 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
                       <input value={d.items} onChange={e => updateDelivery(d.id, 'items', e.target.value)}
                         placeholder="Items delivered"
-                        className="border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+                        className="border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
                       <div className="flex items-center gap-1">
                         <input type="number" step="0.1" value={d.temperature}
                           onChange={e => updateDelivery(d.id, 'temperature', e.target.value)}
                           placeholder="Temp °C"
-                          className="flex-1 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+                          className="flex-1 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
                       </div>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-mise-ink/40 font-medium">£</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-hospopilot-ink/40 font-medium">£</span>
                         <input type="number" step="0.01" min="0" value={d.cost}
                           onChange={e => updateDelivery(d.id, 'cost', e.target.value)}
                           placeholder="Invoice total"
-                          className="w-full border border-black/[0.08] rounded-xl pl-7 pr-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+                          className="w-full border border-black/[0.08] rounded-xl pl-7 pr-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
                       </div>
                     </div>
                     {/* Happy / Issue toggle */}
                     <div className="flex gap-2">
                       <button onClick={() => updateDelivery(d.id, 'happy', true)}
                         className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors
-                          ${d.happy === true ? 'bg-green-500 text-white border-green-500' : 'border-black/[0.08] text-mise-ink/50 hover:bg-green-50'}`}>
+                          ${d.happy === true ? 'bg-green-500 text-white border-green-500' : 'border-black/[0.08] text-hospopilot-ink/50 hover:bg-green-50'}`}>
                         ✓ Happy with delivery
                       </button>
                       <button onClick={() => updateDelivery(d.id, 'happy', false)}
                         className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors
-                          ${d.happy === false ? 'bg-red-500 text-white border-red-500' : 'border-black/[0.08] text-mise-ink/50 hover:bg-red-50'}`}>
+                          ${d.happy === false ? 'bg-red-500 text-white border-red-500' : 'border-black/[0.08] text-hospopilot-ink/50 hover:bg-red-50'}`}>
                         ✗ Issue
                       </button>
                     </div>
@@ -338,7 +338,7 @@ function TaskCard({
                         </div>
                       ) : (
                         <label htmlFor={photoInputId}
-                          className="flex items-center gap-2 text-xs text-mise-ink/40 hover:text-mise-mid cursor-pointer transition-colors">
+                          className="flex items-center gap-2 text-xs text-hospopilot-ink/40 hover:text-hospopilot-mid cursor-pointer transition-colors">
                           <Camera className="h-4 w-4" /> Photo invoice
                         </label>
                       )}
@@ -347,7 +347,7 @@ function TaskCard({
                 )
               })}
               <button onClick={addDelivery}
-                className="w-full border-2 border-dashed border-black/[0.08] rounded-xl py-2.5 text-sm text-mise-ink/40 hover:border-mise-mid/30 hover:text-mise-mid transition-colors flex items-center justify-center gap-1.5">
+                className="w-full border-2 border-dashed border-black/[0.08] rounded-xl py-2.5 text-sm text-hospopilot-ink/40 hover:border-hospopilot-mid/30 hover:text-hospopilot-mid transition-colors flex items-center justify-center gap-1.5">
                 <Plus className="h-4 w-4" /> Add another delivery
               </button>
             </div>
@@ -361,13 +361,13 @@ function TaskCard({
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs text-mise-ink/50 mb-1 font-medium">Ice point reading (°C)</label>
+                  <label className="block text-xs text-hospopilot-ink/50 mb-1 font-medium">Ice point reading (°C)</label>
                   <input type="number" step="0.1" value={icePoint} onChange={e => setIcePoint(e.target.value)}
                     placeholder="e.g. 0.2"
                     className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40" />
                 </div>
                 <div>
-                  <label className="block text-xs text-mise-ink/50 mb-1 font-medium">Boiling point reading (°C)</label>
+                  <label className="block text-xs text-hospopilot-ink/50 mb-1 font-medium">Boiling point reading (°C)</label>
                   <input type="number" step="0.1" value={boilingPoint} onChange={e => setBoilingPoint(e.target.value)}
                     placeholder="e.g. 100.1"
                     className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40" />
@@ -388,7 +388,7 @@ function TaskCard({
             onChange={e => setNotes(e.target.value)}
             placeholder="Notes (optional)"
             rows={2}
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
           />
 
           {flagging && (
@@ -423,7 +423,7 @@ function TaskCard({
             <button
               onClick={() => complete('done')}
               disabled={saving || !checklistReady || !tempReady || !calibrationReady}
-              className="flex-1 bg-mise-deep text-white rounded-xl py-3 font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
+              className="flex-1 bg-hospopilot-deep text-white rounded-xl py-3 font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               Mark done
@@ -494,13 +494,13 @@ export default function TrailClient({ restaurantId, staffName }: { restaurantId:
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-mise-ink">Daily Trail</h1>
-          <p className="text-mise-ink/50 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-hospopilot-ink">Daily Trail</h1>
+          <p className="text-hospopilot-ink/50 text-sm mt-0.5">
             {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </div>
         <Link href="/owner/trail-history"
-          className="flex items-center gap-1.5 text-sm text-mise-ink/40 hover:text-mise-ink transition-colors">
+          className="flex items-center gap-1.5 text-sm text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors">
           <History className="h-4 w-4" /> History
         </Link>
       </div>
@@ -509,12 +509,12 @@ export default function TrailClient({ restaurantId, staffName }: { restaurantId:
       {!loading && total > 0 && (
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
           <div className="flex justify-between text-sm mb-2">
-            <span className="font-medium text-mise-ink">{done} of {total} tasks complete</span>
-            <span className={`font-bold ${pct === 100 ? 'text-green-600' : 'text-mise-mid'}`}>{pct}%</span>
+            <span className="font-medium text-hospopilot-ink">{done} of {total} tasks complete</span>
+            <span className={`font-bold ${pct === 100 ? 'text-green-600' : 'text-hospopilot-mid'}`}>{pct}%</span>
           </div>
           <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-mise-mid rounded-full transition-all duration-500"
+              className="h-full bg-hospopilot-mid rounded-full transition-all duration-500"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -523,12 +523,12 @@ export default function TrailClient({ restaurantId, staffName }: { restaurantId:
 
       {loading && (
         <div className="flex justify-center py-16">
-          <Loader2 className="h-7 w-7 text-mise-mid animate-spin" />
+          <Loader2 className="h-7 w-7 text-hospopilot-mid animate-spin" />
         </div>
       )}
 
       {!loading && tasks.length === 0 && (
-        <div className="text-center py-16 text-mise-ink/40">
+        <div className="text-center py-16 text-hospopilot-ink/40">
           <ClipboardList className="h-10 w-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">No tasks scheduled for today.</p>
         </div>
@@ -550,7 +550,7 @@ export default function TrailClient({ restaurantId, staffName }: { restaurantId:
             </div>
           )}
           {!allDone && (
-            <p className="text-sm text-mise-ink/50">
+            <p className="text-sm text-hospopilot-ink/50">
               {total - done} task{total - done !== 1 ? 's' : ''} still pending. You can submit now or complete them first.
             </p>
           )}
@@ -561,19 +561,19 @@ export default function TrailClient({ restaurantId, staffName }: { restaurantId:
                 onChange={e => setSubmitNotes(e.target.value)}
                 placeholder="Any notes for today's trail? (optional)"
                 rows={2}
-                className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+                className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
               />
               <div className="flex gap-2">
                 <button
                   onClick={submitTrail}
                   disabled={submitting}
-                  className="flex-1 bg-mise-deep text-white rounded-xl py-3 font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
+                  className="flex-1 bg-hospopilot-deep text-white rounded-xl py-3 font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
                 >
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   Submit & save trail
                 </button>
                 <button onClick={() => setShowSubmitForm(false)}
-                  className="px-4 border border-black/[0.08] rounded-xl text-sm text-mise-ink/40 hover:text-mise-ink transition-colors">
+                  className="px-4 border border-black/[0.08] rounded-xl text-sm text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors">
                   Cancel
                 </button>
               </div>
@@ -582,7 +582,7 @@ export default function TrailClient({ restaurantId, staffName }: { restaurantId:
             <button
               onClick={() => setShowSubmitForm(true)}
               className={`w-full rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2 transition-colors
-                ${allDone ? 'bg-mise-deep text-white hover:bg-mise-deep/90' : 'border border-black/[0.08] text-mise-ink/60 hover:bg-gray-50'}`}
+                ${allDone ? 'bg-hospopilot-deep text-white hover:bg-hospopilot-deep/90' : 'border border-black/[0.08] text-hospopilot-ink/60 hover:bg-gray-50'}`}
             >
               <Send className="h-4 w-4" /> Submit today&apos;s trail
             </button>

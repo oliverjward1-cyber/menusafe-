@@ -73,8 +73,8 @@ export default async function LearnHubPage() {
   return (
     <div className="space-y-10 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">Learning Hub</h1>
-        <p className="text-mise-ink/50 mt-1">Food safety and allergen training modules for your whole team.</p>
+        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Learning Hub</h1>
+        <p className="text-hospopilot-ink/50 mt-1">Food safety and allergen training modules for your whole team.</p>
       </div>
 
       {/* FOH Section */}
@@ -84,7 +84,7 @@ export default async function LearnHubPage() {
             <AlertTriangle className="h-4 w-4 text-amber-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-mise-ink">Front of House</h2>
+            <h2 className="text-lg font-semibold text-hospopilot-ink">Front of House</h2>
             <p className="text-xs text-gray-500">Customer-facing staff</p>
           </div>
         </div>
@@ -95,17 +95,17 @@ export default async function LearnHubPage() {
             <AlertTriangle className="h-5 w-5 text-amber-600" />
           </div>
           <div className="flex-1">
-            <p className="font-semibold text-mise-ink text-sm">FOH Allergen Awareness Guide</p>
+            <p className="font-semibold text-hospopilot-ink text-sm">FOH Allergen Awareness Guide</p>
             <p className="text-xs text-gray-500 mt-0.5">Responsibilities, customer communication, and Natasha&apos;s Law</p>
           </div>
-          <ChevronRight className="h-4 w-4 text-mise-ink/20 flex-shrink-0" />
+          <ChevronRight className="h-4 w-4 text-hospopilot-ink/20 flex-shrink-0" />
         </Link>
 
         {/* FOH allergen progress */}
         <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden mb-3">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div>
-              <p className="font-semibold text-mise-ink text-sm">Allergen Awareness — 14 Modules</p>
+              <p className="font-semibold text-hospopilot-ink text-sm">Allergen Awareness — 14 Modules</p>
               <p className="text-xs text-gray-500 mt-0.5">The 14 major allergens, customer communication, and Natasha's Law</p>
             </div>
             <span className="text-xs text-gray-400 whitespace-nowrap ml-4">{completedCount}/14 done</span>
@@ -113,7 +113,7 @@ export default async function LearnHubPage() {
           <div className="px-5 py-3">
             <div className="w-full bg-gray-100 rounded-full h-1.5 mb-3">
               <div
-                className="bg-mise-mid h-1.5 rounded-full transition-all"
+                className="bg-hospopilot-mid h-1.5 rounded-full transition-all"
                 style={{ width: `${(completedCount / 14) * 100}%` }}
               />
             </div>
@@ -129,7 +129,7 @@ export default async function LearnHubPage() {
                     }`}
                   >
                     <div className="text-xl mb-1">{module.emoji}</div>
-                    <p className="text-xs font-medium text-mise-ink leading-tight">{module.name}</p>
+                    <p className="text-xs font-medium text-hospopilot-ink leading-tight">{module.name}</p>
                     {done && (
                       <CheckCircle2 className="h-3 w-3 text-green-600 absolute top-1.5 right-1.5" />
                     )}
@@ -137,7 +137,7 @@ export default async function LearnHubPage() {
                 )
               })}
             </div>
-            <Link href="/owner/learn/celery" className="inline-flex items-center gap-1 text-xs text-mise-mid font-medium mt-3 hover:underline">
+            <Link href="/owner/learn/celery" className="inline-flex items-center gap-1 text-xs text-hospopilot-mid font-medium mt-3 hover:underline">
               Browse all allergen modules <ChevronRight className="h-3 w-3" />
             </Link>
           </div>
@@ -151,7 +151,7 @@ export default async function LearnHubPage() {
             <ShieldCheck className="h-4 w-4 text-emerald-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-mise-ink">Kitchen Team</h2>
+            <h2 className="text-lg font-semibold text-hospopilot-ink">Kitchen Team</h2>
             <p className="text-xs text-gray-500">Back of house staff</p>
           </div>
         </div>
@@ -164,7 +164,7 @@ export default async function LearnHubPage() {
                 <AlertTriangle className="h-5 w-5 text-red-600" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-mise-ink text-sm group-hover:text-mise-mid transition-colors">Kitchen Allergen Management</p>
+                <p className="font-semibold text-hospopilot-ink text-sm group-hover:text-hospopilot-mid transition-colors">Kitchen Allergen Management</p>
                 <p className="text-xs text-gray-500 mt-0.5">Handling allergen ingredients safely, labelling dishes, and communicating with FOH</p>
                 <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1"><Clock className="h-3 w-3" /> 12 min</p>
               </div>
@@ -183,7 +183,7 @@ export default async function LearnHubPage() {
                     <Icon className={`h-5 w-5 ${colour}`} />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-mise-ink text-sm group-hover:text-mise-mid transition-colors">{title}</p>
+                    <p className="font-semibold text-hospopilot-ink text-sm group-hover:text-hospopilot-mid transition-colors">{title}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{description}</p>
                     <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1"><Clock className="h-3 w-3" /> {duration}</p>
                   </div>

@@ -67,7 +67,7 @@ export default async function MenusPage() {
                 href={menuUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-mise-mid text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+                className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep transition-colors"
               >
                 <ExternalLink className="h-4 w-4" /> Preview live menu
               </a>

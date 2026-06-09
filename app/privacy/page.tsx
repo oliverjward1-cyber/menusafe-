@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { UtensilsCrossed } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — mise',
-  description: 'mise Privacy Policy and Data Retention Policy',
+  title: 'Privacy Policy — HospoPilot',
+  description: 'HospoPilot Privacy Policy and Data Retention Policy',
 }
 
 export default function PrivacyPage() {
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center gap-2 mb-2">
             <UtensilsCrossed className="h-5 w-5 text-green-400" />
-            <span className="text-sm font-medium text-green-400">mise</span>
+            <span className="text-sm font-medium text-green-400">HospoPilot</span>
           </div>
           <h1 className="text-2xl font-bold">Privacy & Data Retention Policy</h1>
           <p className="text-gray-400 mt-1 text-sm">Last updated: June 2025</p>
@@ -26,8 +26,8 @@ export default function PrivacyPage() {
         <section className="space-y-3">
           <h2 className="text-base font-bold text-gray-900">1. Who we are</h2>
           <p>
-            mise is a kitchen management SaaS platform operated by [Your Company Name]
-            (&quot;mise&quot;, &quot;we&quot;, &quot;us&quot;). This policy explains what data we collect,
+            HospoPilot is a kitchen management SaaS platform operated by [Your Company Name]
+            (&quot;HospoPilot&quot;, &quot;we&quot;, &quot;us&quot;). This policy explains what data we collect,
             how we use it, and how long we keep it. We are committed to complying with the
             UK GDPR and the Data Protection Act 2018.
           </p>
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
           <h2 className="text-base font-bold text-gray-900">2. Data we collect</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Account data:</strong> name, email address, role, restaurant name when you sign up.</li>
-            <li><strong>Operational records:</strong> temperature logs, cleaning logs, delivery records, incident reports, daily trail tasks — entered by your team while using mise.</li>
+            <li><strong>Operational records:</strong> temperature logs, cleaning logs, delivery records, incident reports, daily trail tasks — entered by your team while using HospoPilot.</li>
             <li><strong>Photos:</strong> invoice photos attached to delivery records; photos attached to incident reports. Stored in Supabase Storage.</li>
             <li><strong>Training records:</strong> staff quiz attempts and allergen module completions, including staff names and scores.</li>
             <li><strong>Recipe and allergen data:</strong> ingredients, recipes, allergen flags entered by your team.</li>
@@ -52,7 +52,7 @@ export default function PrivacyPage() {
         <section className="space-y-3">
           <h2 className="text-base font-bold text-gray-900">3. How we use your data</h2>
           <ul className="list-disc pl-5 space-y-2">
-            <li>To provide, maintain, and improve the mise platform.</li>
+            <li>To provide, maintain, and improve the HospoPilot platform.</li>
             <li>To generate compliance records and audit trails for your business.</li>
             <li>To send transactional emails (account setup, password reset, staff quiz reminders).</li>
             <li>To process subscription payments via Stripe.</li>
@@ -157,7 +157,7 @@ export default function PrivacyPage() {
         <section className="space-y-3">
           <h2 className="text-base font-bold text-gray-900">8. Cookies</h2>
           <p>
-            mise uses strictly necessary session cookies for authentication. We do not use
+            HospoPilot uses strictly necessary session cookies for authentication. We do not use
             advertising or tracking cookies. No consent banner is required under PECR for
             strictly necessary cookies.
           </p>
@@ -167,13 +167,13 @@ export default function PrivacyPage() {
           <h2 className="text-base font-bold text-gray-900">9. Changes to this policy</h2>
           <p>
             We may update this policy. Material changes will be notified by email or in-app notice.
-            The latest version is always available at mise.kitchen/privacy.
+            The latest version is always available at hospopilot.co.uk/privacy.
           </p>
         </section>
 
         <div className="pt-4 border-t border-gray-200 flex gap-4">
           <Link href="/terms" className="text-sm text-green-700 hover:underline">Terms of Service</Link>
-          <Link href="/" className="text-sm text-green-700 hover:underline">← Back to mise</Link>
+          <Link href="/" className="text-sm text-green-700 hover:underline">← Back to HospoPilot</Link>
         </div>
       </div>
     </div>
