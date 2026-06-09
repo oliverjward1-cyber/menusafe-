@@ -17,6 +17,7 @@ import {
   ClipboardCheck,
   ClipboardList,
   ListChecks,
+  BookMarked,
   GraduationCap,
   Thermometer,
   Sparkles,
@@ -150,7 +151,8 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
               { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
             ]}
           />
-          <Link href="/owner/trail" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/trail') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ListChecks className="h-4 w-4" /> Daily Trail</Link>
+          <Link href="/owner/trail" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname === '/owner/trail' ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ListChecks className="h-4 w-4" /> Daily Trail</Link>
+          <Link href="/owner/trail-history" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/trail-history') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><BookMarked className="h-4 w-4" /> Trail History</Link>
           <Link href="/owner/deliveries" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/deliveries') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Truck className="h-4 w-4" /> Deliveries</Link>
           <Link href="/owner/cleaning" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/cleaning') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Sparkles className="h-4 w-4" /> Cleaning</Link>
           <Link href="/owner/temperature-logs" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/temperature-logs') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Thermometer className="h-4 w-4" /> Temp Logs</Link>

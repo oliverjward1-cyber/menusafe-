@@ -3,8 +3,9 @@ import { useEffect, useState, useCallback } from 'react'
 import {
   CheckCircle2, Circle, Flag, ChevronDown, ChevronUp,
   Thermometer, ClipboardList, Sparkles, Truck, FileText,
-  Loader2, AlertTriangle, Plus, Minus,
+  Loader2, AlertTriangle, Plus, Minus, Send, History,
 } from 'lucide-react'
+import Link from 'next/link'
 
 type ChecklistItem = { id: string; label: string; required: boolean }
 
@@ -248,6 +249,10 @@ function TaskCard({
 export default function TrailClient({ restaurantId, staffName }: { restaurantId: string; staffName: string }) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
+  const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitNotes, setSubmitNotes] = useState('')
+  const [showSubmitForm, setShowSubmitForm] = useState(false)
 
   useEffect(() => {
     fetch(`/api/kitchen/trail?restaurantId=${restaurantId}`)
@@ -261,19 +266,38 @@ export default function TrailClient({ restaurantId, staffName }: { restaurantId:
       : t))
   }, [staffName])
 
+  async function submitTrail() {
+    setSubmitting(true)
+    await fetch('/api/kitchen/trail/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId, submittedBy: staffName, notes: submitNotes || undefined }),
+    })
+    setSubmitting(false)
+    setSubmitted(true)
+    setShowSubmitForm(false)
+  }
+
   const done = tasks.filter(t => t.status === 'done' || t.status === 'flagged').length
   const total = tasks.length
   const pct = total ? Math.round((done / total) * 100) : 0
+  const allDone = total > 0 && done === total
   const now = new Date()
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-mise-ink">Daily Trail</h1>
-        <p className="text-mise-ink/50 text-sm mt-0.5">
-          {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-mise-ink">Daily Trail</h1>
+          <p className="text-mise-ink/50 text-sm mt-0.5">
+            {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </p>
+        </div>
+        <Link href="/owner/trail-history"
+          className="flex items-center gap-1.5 text-sm text-mise-ink/40 hover:text-mise-ink transition-colors">
+          <History className="h-4 w-4" /> History
+        </Link>
       </div>
 
       {/* Progress */}
@@ -292,7 +316,6 @@ export default function TrailClient({ restaurantId, staffName }: { restaurantId:
         </div>
       )}
 
-      {/* Tasks */}
       {loading && (
         <div className="flex justify-center py-16">
           <Loader2 className="h-7 w-7 text-mise-mid animate-spin" />
@@ -312,11 +335,65 @@ export default function TrailClient({ restaurantId, staffName }: { restaurantId:
         ))}
       </div>
 
-      {!loading && pct === 100 && total > 0 && (
+      {/* Submit section — appears once tasks exist, regardless of completion */}
+      {!loading && total > 0 && !submitted && (
+        <div className={`rounded-2xl border p-5 space-y-3 ${allDone ? 'border-green-200 bg-green-50' : 'border-black/[0.06] bg-white'}`}>
+          {allDone && (
+            <div className="flex items-center gap-2 text-green-700 font-semibold">
+              <CheckCircle2 className="h-5 w-5 text-green-500" />
+              All tasks complete — ready to submit
+            </div>
+          )}
+          {!allDone && (
+            <p className="text-sm text-mise-ink/50">
+              {total - done} task{total - done !== 1 ? 's' : ''} still pending. You can submit now or complete them first.
+            </p>
+          )}
+          {showSubmitForm ? (
+            <div className="space-y-3">
+              <textarea
+                value={submitNotes}
+                onChange={e => setSubmitNotes(e.target.value)}
+                placeholder="Any notes for today's trail? (optional)"
+                rows={2}
+                className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={submitTrail}
+                  disabled={submitting}
+                  className="flex-1 bg-mise-deep text-white rounded-xl py-3 font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
+                >
+                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  Submit & save trail
+                </button>
+                <button onClick={() => setShowSubmitForm(false)}
+                  className="px-4 border border-black/[0.08] rounded-xl text-sm text-mise-ink/40 hover:text-mise-ink transition-colors">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowSubmitForm(true)}
+              className={`w-full rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2 transition-colors
+                ${allDone ? 'bg-mise-deep text-white hover:bg-mise-deep/90' : 'border border-black/[0.08] text-mise-ink/60 hover:bg-gray-50'}`}
+            >
+              <Send className="h-4 w-4" /> Submit today&apos;s trail
+            </button>
+          )}
+        </div>
+      )}
+
+      {submitted && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
           <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto mb-2" />
-          <p className="font-semibold text-green-700">All tasks complete!</p>
-          <p className="text-sm text-green-600/70 mt-0.5">Great work today.</p>
+          <p className="font-semibold text-green-700">Trail submitted!</p>
+          <p className="text-sm text-green-600/70 mt-0.5">Today&apos;s records have been saved.</p>
+          <Link href="/owner/trail-history"
+            className="inline-flex items-center gap-1.5 mt-3 text-sm text-green-700 underline underline-offset-2">
+            <History className="h-3.5 w-3.5" /> View history
+          </Link>
         </div>
       )}
     </div>
