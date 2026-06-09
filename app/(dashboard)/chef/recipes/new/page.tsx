@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency, calcSuggestedPrice } from '@/lib/utils'
 import { RECIPE_CATEGORIES } from '@/lib/constants/allergens'
-import { ChevronLeft, Search, X, AlertTriangle, Sparkles, Mic, Loader2, Camera, ImageIcon } from 'lucide-react'
+import { ChevronLeft, Search, X, AlertTriangle, Sparkles, Loader2, Camera, ImageIcon } from 'lucide-react'
 
 const ALLERGEN_MAP = [
   { offKey: 'gluten',                        dbKey: 'allergen_cereals_gluten', label: 'Gluten' },
@@ -162,7 +162,6 @@ export default function NewRecipePage() {
   const [aiLoading, setAiLoading] = useState(false)
   const [aiDone, setAiDone] = useState(false)
   const [aiError, setAiError] = useState('')
-  const [listening, setListening] = useState(false)
   const recognitionRef = useRef<any>(null)
   const [aiImage, setAiImage] = useState<{ base64: string; mediaType: string; preview: string } | null>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
@@ -213,33 +212,6 @@ export default function NewRecipePage() {
     reader.readAsDataURL(file)
   }
 
-  function startVoice() {
-    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition
-    if (!SR) { alert('Voice input not supported in this browser'); return }
-    const recognition = new SR()
-    recognition.lang = 'en-GB'
-    recognition.continuous = true       // keep going until manually stopped
-    recognition.interimResults = true   // show partial results while speaking
-    recognitionRef.current = recognition
-
-    recognition.onresult = (e: any) => {
-      // Concatenate all final + interim results into one string
-      let transcript = ''
-      for (let i = 0; i < e.results.length; i++) {
-        transcript += e.results[i][0].transcript
-      }
-      setAiInput(transcript)
-    }
-    recognition.onerror = () => { setListening(false); recognitionRef.current = null }
-    recognition.onend = () => { setListening(false); recognitionRef.current = null }
-    setListening(true)
-    recognition.start()
-  }
-
-  function stopVoice() {
-    recognitionRef.current?.stop()
-    setListening(false)
-  }
 
   useEffect(() => {
     async function load() {
@@ -619,13 +591,6 @@ export default function NewRecipePage() {
             )}
 
             <div className="flex gap-2">
-              <button
-                onClick={listening ? stopVoice : startVoice}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border font-medium transition-colors ${listening ? 'bg-red-100 border-red-300 text-red-600 animate-pulse' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
-              >
-                <Mic className="h-4 w-4" />
-                {listening ? 'Stop recording' : 'Voice'}
-              </button>
               <button
                 onClick={handleAiFill}
                 disabled={aiLoading || (!aiInput.trim() && !aiImage)}
