@@ -4,7 +4,7 @@ import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
   AlertTriangle, Globe, GlobeLock,
-  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck, AlertOctagon, Truck,
+  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck, AlertOctagon, Truck, ListChecks,
 } from 'lucide-react'
 
 function addMonths(date: Date, months: number): Date {
@@ -36,7 +36,7 @@ export default async function OwnerDashboard() {
     supabase.from('menus').select('id, name, daypart, is_published, updated_at')
       .eq('restaurant_id', rid).order('updated_at', { ascending: false }),
     supabase.from('staff_quiz_attempts')
-      .select('id, staff_name, score, total_questions, passed, completed_at')
+      .select('id, staff_name, score, total_questions, passed, completed_at, quiz_type')
       .eq('restaurant_id', rid).order('completed_at', { ascending: false }),
     supabase.from('kitchen_audits')
       .select('id, score, total, status, completed_at, completed_by')
@@ -53,11 +53,10 @@ export default async function OwnerDashboard() {
       .eq('restaurant_id', rid)
       .eq('resolved', false),
     supabase.from('ops_task_logs')
-      .select('data, task_type')
+      .select('id, title, task_type, status, scheduled_time, sort_order, data')
       .eq('restaurant_id', rid)
       .eq('scheduled_date', todayStr)
-      .eq('task_type', 'delivery')
-      .eq('status', 'done'),
+      .order('sort_order'),
   ])
 
   const restaurant = restaurantRes.data
@@ -81,22 +80,54 @@ export default async function OwnerDashboard() {
   if (amOverdue) tempAlerts.push('AM temperature check (due by 10:00)')
   if (pmOverdue) tempAlerts.push('PM temperature check (due by 18:00)')
 
-  // Get latest passing attempt per staff member
-  const latestByStaff = new Map<string, typeof allAttempts[number]>()
-  for (const a of allAttempts) {
-    if (a.passed && !latestByStaff.has(a.staff_name)) {
-      latestByStaff.set(a.staff_name, a)
+  // Today's trail progress
+  const allTrailTasks = todayTrailLogs.data ?? []
+  const trailDone = allTrailTasks.filter(t => t.status === 'done' || t.status === 'flagged').length
+  const trailFlagged = allTrailTasks.filter(t => t.status === 'flagged').length
+  const trailTotal = allTrailTasks.length
+  const trailPct = trailTotal > 0 ? Math.round((trailDone / trailTotal) * 100) : 0
+  const nowTimeStr = `${String(currentHour).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+  const pendingTrailTasks = allTrailTasks.filter(t => t.status === 'pending')
+  const missedTasks = pendingTrailTasks.filter(t => t.scheduled_time && t.scheduled_time < nowTimeStr)
+  const upcomingPending = pendingTrailTasks.filter(t => !t.scheduled_time || t.scheduled_time >= nowTimeStr)
+  const nextTask = upcomingPending[0] ?? null
+
+  // Today's delivery spend (from trail delivery tasks)
+  const deliveryLogs = allTrailTasks.filter(t => t.task_type === 'delivery' && t.status === 'done')
+  const todayDeliveries: { supplier: string; cost: number | null }[] = []
+  for (const log of deliveryLogs) {
+    for (const d of (log.data?.deliveries ?? [])) {
+      if (d.supplier) todayDeliveries.push({ supplier: d.supplier, cost: d.cost ?? null })
     }
   }
-  const trainedStaff = Array.from(latestByStaff.values())
+  const todaySpend = todayDeliveries.reduce((sum, d) => sum + (d.cost ?? 0), 0)
+
+  // Staff compliance helpers
   const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-  const expiringStaff = trainedStaff.filter(s => {
-    const expiry = addMonths(new Date(s.completed_at), 6)
-    return expiry > now && expiry <= thirtyDaysFromNow
-  })
-  const expiredStaff = trainedStaff.filter(s => {
-    return addMonths(new Date(s.completed_at), 6) < now
-  })
+
+  function buildCompliance(attempts: typeof allAttempts) {
+    type Record = { name: string; completedAt: Date; expiry: Date; status: 'valid' | 'expiring' | 'expired' }
+    const map = new Map<string, Record>()
+    for (const a of attempts) {
+      if (!a.passed || map.has(a.staff_name)) continue
+      const completedAt = new Date(a.completed_at)
+      const expiry = addMonths(completedAt, 6)
+      const status = expiry < now ? 'expired' : expiry <= thirtyDaysFromNow ? 'expiring' : 'valid'
+      map.set(a.staff_name, { name: a.staff_name, completedAt, expiry, status })
+    }
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name))
+  }
+
+  const fohCompliance = buildCompliance(allAttempts.filter(a => a.quiz_type === 'front_of_house'))
+  const bohCompliance = buildCompliance(allAttempts.filter(a => a.quiz_type === 'kitchen'))
+
+  const lastFohQuiz = allAttempts.filter(a => a.quiz_type === 'front_of_house')[0] ?? null
+  const lastBohQuiz = allAttempts.filter(a => a.quiz_type === 'kitchen')[0] ?? null
+
+  // Legacy: combined for old code
+  const trainedStaff = [...new Map([...fohCompliance, ...bohCompliance].map(s => [s.name, s])).values()]
+  const expiringStaff = trainedStaff.filter(s => s.status === 'expiring')
+  const expiredStaff = trainedStaff.filter(s => s.status === 'expired')
 
   function calcFoodCost(recipe: NonNullable<typeof recipesRes.data>[number]): number {
     if (!recipe?.recipe_ingredients) return 0
@@ -126,16 +157,6 @@ export default async function OwnerDashboard() {
     : null
   const belowTargetCount = recipeStats.filter(r => r.belowTarget).length
   const pendingCount = recipeStats.filter(r => r.status === 'draft').length
-
-  // Today's delivery spend from trail logs
-  const deliveryLogs = todayTrailLogs.data ?? []
-  const todayDeliveries: { supplier: string; cost: number | null }[] = []
-  for (const log of deliveryLogs) {
-    for (const d of (log.data?.deliveries ?? [])) {
-      if (d.supplier) todayDeliveries.push({ supplier: d.supplier, cost: d.cost ?? null })
-    }
-  }
-  const todaySpend = todayDeliveries.reduce((sum, d) => sum + (d.cost ?? 0), 0)
 
   const DAYPART_LABELS: Record<string, string> = {
     'all-day': 'All day', 'lunch': 'Lunch', 'dinner': 'Dinner',
@@ -193,6 +214,57 @@ export default async function OwnerDashboard() {
         </Link>
       </div>
 
+      {/* Today's Trail Progress */}
+      <Link href="/owner/trail" className="block">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm px-5 py-4 hover:border-mise-mid/30 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <ListChecks className="h-4 w-4 text-mise-mid" />
+              <h2 className="text-sm font-semibold text-mise-ink">Today&apos;s Trail</h2>
+            </div>
+            <span className={`text-xs font-semibold ${trailPct === 100 ? 'text-green-600' : trailPct > 0 ? 'text-mise-mid' : 'text-mise-ink/30'}`}>
+              {trailTotal === 0 ? 'No tasks yet' : `${trailDone}/${trailTotal} complete`}
+            </span>
+          </div>
+          {trailTotal > 0 && (
+            <>
+              <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+                <div className="h-full bg-mise-mid rounded-full transition-all" style={{ width: `${trailPct}%` }} />
+              </div>
+              <div className="flex items-center gap-4 flex-wrap text-xs">
+                {missedTasks.length > 0 && (
+                  <span className="flex items-center gap-1 text-red-600 font-semibold">
+                    <AlertTriangle className="h-3.5 w-3.5" />
+                    {missedTasks.length} task{missedTasks.length !== 1 ? 's' : ''} overdue
+                  </span>
+                )}
+                {trailFlagged > 0 && (
+                  <span className="flex items-center gap-1 text-amber-600 font-medium">
+                    ⚑ {trailFlagged} flagged
+                  </span>
+                )}
+                {nextTask && (
+                  <span className="text-mise-ink/50">
+                    Next: <span className="font-medium text-mise-ink">{nextTask.title}</span>
+                    {nextTask.scheduled_time && (
+                      <span className="ml-1 text-mise-ink/40">@ {nextTask.scheduled_time.slice(0, 5)}</span>
+                    )}
+                  </span>
+                )}
+                {trailPct === 100 && (
+                  <span className="flex items-center gap-1 text-green-600 font-semibold">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> All tasks complete
+                  </span>
+                )}
+              </div>
+            </>
+          )}
+          {trailTotal === 0 && (
+            <p className="text-xs text-mise-ink/40">Trail tasks will appear here once today&apos;s trail has been loaded.</p>
+          )}
+        </div>
+      </Link>
+
       {/* Today's delivery spend */}
       <Link href="/owner/trail" className="block">
         <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm px-5 py-4 flex items-center justify-between hover:border-mise-mid/30 transition-colors">
@@ -249,57 +321,164 @@ export default async function OwnerDashboard() {
         </div>
       </div>
 
-      {/* Kitchen audit card */}
+      {/* Staff Training — FOH + BOH side by side */}
       {(() => {
-        const auditScore = lastAudit ? Math.round((lastAudit.score / lastAudit.total) * 100) : null
-        const auditDate = lastAudit ? new Date(lastAudit.completed_at) : null
-        const nextDue = auditDate ? addMonths(auditDate, 1) : null
-        const isOverdue = nextDue ? nextDue < now : false
-        const isDueSoon = nextDue ? !isOverdue && nextDue <= new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) : false
-        const statusColour = lastAudit?.status === 'green' ? 'text-green-700' : lastAudit?.status === 'amber' ? 'text-amber-600' : lastAudit?.status === 'red' ? 'text-red-600' : 'text-gray-400'
-        return (
-          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <ClipboardCheck className="h-4 w-4 text-mise-mid" />
-                <h2 className="text-sm font-semibold text-mise-ink">Kitchen Audit</h2>
+        function CompliancePanel({ label, quizUrl, compliance, lastAttempt, colour }: {
+          label: string; quizUrl: string
+          compliance: { name: string; expiry: Date; status: 'valid' | 'expiring' | 'expired' }[]
+          lastAttempt: { completed_at: string } | null
+          colour: 'amber' | 'blue'
+        }) {
+          const valid = compliance.filter(s => s.status === 'valid')
+          const expiring = compliance.filter(s => s.status === 'expiring')
+          const expired = compliance.filter(s => s.status === 'expired')
+          const total = compliance.length
+          const pct = total > 0 ? Math.round((valid.length / total) * 100) : 0
+          const barColour = colour === 'amber' ? 'bg-amber-500' : 'bg-blue-500'
+          const iconColour = colour === 'amber' ? 'text-amber-600' : 'text-blue-600'
+          const bgLight = colour === 'amber' ? 'bg-amber-50' : 'bg-blue-50'
+          return (
+            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className={`h-4 w-4 ${iconColour}`} />
+                  <h2 className="text-sm font-semibold text-mise-ink">{label}</h2>
+                </div>
+                <Link href={quizUrl} className="text-xs text-mise-mid hover:text-mise-deep font-medium">View →</Link>
               </div>
-              <Link href="/chef/audit" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Run audit →</Link>
+              {total === 0 ? (
+                <div className="px-5 py-6 text-center">
+                  <p className="text-sm text-mise-ink/40">No {label.toLowerCase()} staff trained yet</p>
+                  <Link href={quizUrl} className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+                    Share quiz link <ArrowRight className="h-3 w-3" />
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <div className="px-5 py-4 border-b border-gray-100">
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-mise-ink/50 font-medium">{valid.length} of {total} fully trained</span>
+                      <span className={`font-bold ${pct === 100 ? 'text-green-600' : pct >= 70 ? 'text-amber-600' : 'text-red-600'}`}>{pct}%</span>
+                    </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className={`h-full ${barColour} rounded-full transition-all`} style={{ width: `${pct}%` }} />
+                    </div>
+                    <div className="flex gap-4 mt-3 text-xs">
+                      <span className="flex items-center gap-1 text-green-600"><CheckCircle2 className="h-3.5 w-3.5" /> {valid.length} valid</span>
+                      {expiring.length > 0 && <span className="flex items-center gap-1 text-amber-600"><Clock className="h-3.5 w-3.5" /> {expiring.length} expiring</span>}
+                      {expired.length > 0 && <span className="flex items-center gap-1 text-red-500"><AlertTriangle className="h-3.5 w-3.5" /> {expired.length} expired</span>}
+                    </div>
+                    {lastAttempt && (
+                      <p className="text-xs text-mise-ink/30 mt-2">Last quiz: {new Date(lastAttempt.completed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    )}
+                  </div>
+                  <div className="divide-y divide-gray-50 max-h-44 overflow-y-auto">
+                    {expired.map(s => (
+                      <div key={s.name} className="flex items-center justify-between px-4 py-2.5 bg-red-50/40">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
+                          <p className="text-sm font-medium text-mise-ink">{s.name}</p>
+                        </div>
+                        <p className="text-xs text-red-500 font-medium">Needs retraining</p>
+                      </div>
+                    ))}
+                    {expiring.map(s => {
+                      const daysLeft = Math.ceil((s.expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+                      return (
+                        <div key={s.name} className="flex items-center justify-between px-4 py-2.5 bg-amber-50/50">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                            <p className="text-sm font-medium text-mise-ink">{s.name}</p>
+                          </div>
+                          <p className="text-xs text-amber-600 font-medium">{daysLeft}d left</p>
+                        </div>
+                      )
+                    })}
+                    {valid.map(s => (
+                      <div key={s.name} className="flex items-center justify-between px-4 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                          <p className="text-sm text-gray-700">{s.name}</p>
+                        </div>
+                        <p className="text-xs text-mise-ink/40">Expires {s.expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
-            {!lastAudit ? (
-              <div className="text-center py-4">
-                <p className="text-sm text-mise-ink/40">No audits completed yet</p>
-                <Link href="/chef/audit/new" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
-                  Start first audit <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-            ) : (
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Last score</p>
-                  <p className={`text-2xl font-bold ${statusColour}`}>{auditScore}%</p>
-                  <p className="text-xs text-mise-ink/40 mt-0.5">by {lastAudit.completed_by}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Completed</p>
-                  <p className="text-sm font-semibold text-mise-ink">{auditDate!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Next due</p>
-                  <p className={`text-sm font-semibold ${isOverdue ? 'text-red-600' : isDueSoon ? 'text-amber-600' : 'text-mise-ink'}`}>
-                    {nextDue!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </p>
-                  {isOverdue && <p className="text-xs text-red-500 mt-0.5">Overdue</p>}
-                  {isDueSoon && !isOverdue && <p className="text-xs text-amber-600 mt-0.5">Due soon</p>}
-                </div>
-              </div>
-            )}
+          )
+        }
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <CompliancePanel
+              label="FOH Training"
+              quizUrl="/owner/staff-quiz?type=front_of_house&tab=compliance"
+              compliance={fohCompliance}
+              lastAttempt={lastFohQuiz}
+              colour="amber"
+            />
+            <CompliancePanel
+              label="BOH Training"
+              quizUrl="/owner/staff-quiz?type=kitchen&tab=compliance"
+              compliance={bohCompliance}
+              lastAttempt={lastBohQuiz}
+              colour="blue"
+            />
           </div>
         )
       })()}
 
-      {/* Published menus + staff training row */}
+      {/* Kitchen audit + Live menus row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Kitchen Audit */}
+        {(() => {
+          const auditScore = lastAudit ? Math.round((lastAudit.score / lastAudit.total) * 100) : null
+          const auditDate = lastAudit ? new Date(lastAudit.completed_at) : null
+          const nextDue = auditDate ? addMonths(auditDate, 1) : null
+          const isOverdue = nextDue ? nextDue < now : false
+          const isDueSoon = nextDue ? !isOverdue && nextDue <= new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) : false
+          const statusColour = lastAudit?.status === 'green' ? 'text-green-700' : lastAudit?.status === 'amber' ? 'text-amber-600' : lastAudit?.status === 'red' ? 'text-red-600' : 'text-gray-400'
+          return (
+            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <ClipboardCheck className="h-4 w-4 text-mise-mid" />
+                  <h2 className="text-sm font-semibold text-mise-ink">Kitchen Audit</h2>
+                </div>
+                <Link href="/chef/audit" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Run audit →</Link>
+              </div>
+              {!lastAudit ? (
+                <div className="text-center py-4">
+                  <p className="text-sm text-mise-ink/40">No audits completed yet</p>
+                  <Link href="/chef/audit/new" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+                    Start first audit <ArrowRight className="h-3 w-3" />
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Last score</p>
+                    <p className={`text-2xl font-bold ${statusColour}`}>{auditScore}%</p>
+                    <p className="text-xs text-mise-ink/40 mt-0.5">by {lastAudit.completed_by}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Completed</p>
+                    <p className="text-sm font-semibold text-mise-ink">{auditDate!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Next due</p>
+                    <p className={`text-sm font-semibold ${isOverdue ? 'text-red-600' : isDueSoon ? 'text-amber-600' : 'text-mise-ink'}`}>
+                      {nextDue!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                    {isOverdue && <p className="text-xs text-red-500 mt-0.5">Overdue</p>}
+                    {isDueSoon && !isOverdue && <p className="text-xs text-amber-600 mt-0.5">Due soon</p>}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })()}
 
         {/* Published menus */}
         <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
@@ -346,94 +525,6 @@ export default async function OwnerDashboard() {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Staff training */}
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-blue-600" />
-              <h2 className="text-sm font-semibold text-mise-ink">Staff Quiz</h2>
-            </div>
-            <Link href="/owner/staff-quiz" className="text-xs text-mise-mid hover:text-mise-deep font-medium">View all →</Link>
-          </div>
-
-          {trainedStaff.length === 0 ? (
-            <div className="px-5 py-8 text-center">
-              <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-mise-ink/40">No staff trained yet</p>
-              <Link href="/owner/staff-quiz" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
-                Set up staff quiz <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          ) : (
-            <div>
-              <div className="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100">
-                <div className="px-4 py-3 text-center">
-                  <p className="text-2xl font-bold text-green-700">{trainedStaff.length}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Trained</p>
-                </div>
-                <div className="px-4 py-3 text-center">
-                  <p className={`text-2xl font-bold ${expiringStaff.length > 0 ? 'text-amber-600' : 'text-gray-300'}`}>
-                    {expiringStaff.length}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">Expiring soon</p>
-                </div>
-                <div className="px-4 py-3 text-center">
-                  <p className={`text-2xl font-bold ${expiredStaff.length > 0 ? 'text-red-600' : 'text-gray-300'}`}>
-                    {expiredStaff.length}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">Expired</p>
-                </div>
-              </div>
-              <div className="divide-y divide-gray-50 max-h-48 overflow-y-auto">
-                {expiringStaff.length > 0 && (
-                  <div className="px-4 py-2 bg-amber-50">
-                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Expiring within 30 days</p>
-                  </div>
-                )}
-                {expiringStaff.map(s => {
-                  const expiry = addMonths(new Date(s.completed_at), 6)
-                  const daysLeft = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-                  return (
-                    <div key={s.id} className="flex items-center justify-between px-4 py-2.5 bg-amber-50/50">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                        <p className="text-sm font-medium text-mise-ink">{s.staff_name}</p>
-                      </div>
-                      <p className="text-xs text-amber-600 font-medium">{daysLeft}d left</p>
-                    </div>
-                  )
-                })}
-                {expiredStaff.length > 0 && (
-                  <div className="px-4 py-2 bg-red-50">
-                    <p className="text-xs font-semibold text-red-600 uppercase tracking-wide">Training expired</p>
-                  </div>
-                )}
-                {expiredStaff.map(s => (
-                  <div key={s.id} className="flex items-center justify-between px-4 py-2.5 bg-red-50/40">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
-                      <p className="text-sm font-medium text-mise-ink">{s.staff_name}</p>
-                    </div>
-                    <p className="text-xs text-red-500 font-medium">Needs retraining</p>
-                  </div>
-                ))}
-                {trainedStaff.filter(s => !expiringStaff.includes(s) && !expiredStaff.includes(s)).map(s => {
-                  const expiry = addMonths(new Date(s.completed_at), 6)
-                  return (
-                    <div key={s.id} className="flex items-center justify-between px-4 py-2.5">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
-                        <p className="text-sm text-gray-700">{s.staff_name}</p>
-                      </div>
-                      <p className="text-xs text-mise-ink/40">Expires {expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
