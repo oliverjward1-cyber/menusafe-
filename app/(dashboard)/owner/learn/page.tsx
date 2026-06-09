@@ -2,91 +2,186 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { ALLERGEN_MODULES } from '@/lib/constants/allergen-learning'
-import { BookOpen, CheckCircle2, Clock } from 'lucide-react'
+import { BookOpen, CheckCircle2, Clock, AlertTriangle, UtensilsCrossed, Scissors, Thermometer, ShieldCheck, ChevronRight } from 'lucide-react'
 
-export default async function AllergenLearnPage() {
+const KITCHEN_PRACTICE_MODULES = [
+  {
+    href: '/owner/learn/cross-contamination',
+    icon: UtensilsCrossed,
+    colour: 'text-purple-600',
+    bg: 'bg-purple-50',
+    border: 'border-purple-100',
+    title: 'Cross Contamination',
+    description: 'Preventing cross-contamination from raw ingredients, surfaces, equipment, and hands.',
+    duration: '10 min',
+  },
+  {
+    href: '/owner/learn/chopping-boards',
+    icon: Scissors,
+    colour: 'text-green-600',
+    bg: 'bg-green-50',
+    border: 'border-green-100',
+    title: 'Chopping Board Colour Codes',
+    description: 'The UK colour-coded chopping board system and why it matters for food safety.',
+    duration: '5 min',
+  },
+  {
+    href: '/owner/learn/cooking-temps',
+    icon: Thermometer,
+    colour: 'text-orange-600',
+    bg: 'bg-orange-50',
+    border: 'border-orange-100',
+    title: 'Cooking Temperatures',
+    description: 'Safe minimum core temperatures for meat, poultry, fish, and reheated food.',
+    duration: '8 min',
+  },
+  {
+    href: '/owner/learn/fridge-temps',
+    icon: Thermometer,
+    colour: 'text-blue-600',
+    bg: 'bg-blue-50',
+    border: 'border-blue-100',
+    title: 'Fridge & Storage Temperatures',
+    description: 'Correct chiller, freezer, and ambient storage temperatures to prevent bacterial growth.',
+    duration: '8 min',
+  },
+  {
+    href: '/owner/learn/kitchen-practices',
+    icon: ShieldCheck,
+    colour: 'text-emerald-600',
+    bg: 'bg-emerald-50',
+    border: 'border-emerald-100',
+    title: 'General Kitchen Practices',
+    description: 'Personal hygiene, waste management, pest control, and FIFO stock rotation.',
+    duration: '10 min',
+  },
+]
+
+export default async function LearnHubPage() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('profiles').select('restaurant_id').eq('id', user.id).single()
-  const rid = profile?.restaurant_id ?? ''
-
-  // Fetch completed modules for this user
   const { data: completions } = await supabase
     .from('allergen_module_completions')
-    .select('module_slug, score, completed_at')
+    .select('module_slug, score')
     .eq('user_id', user.id)
 
   const completed = new Map((completions ?? []).map(c => [c.module_slug, c]))
   const completedCount = completed.size
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink flex items-center gap-2">
-          <BookOpen className="h-6 w-6 text-mise-mid" />
-          Allergen Learning Hub
-        </h1>
-        <p className="text-sm text-mise-ink/50 mt-1">
-          14 modules covering every major allergen · Complete all 14 to earn your certification
-        </p>
+        <h1 className="text-2xl font-display font-semibold text-mise-ink">Learning Hub</h1>
+        <p className="text-mise-ink/50 mt-1">Food safety and allergen training modules for your whole team.</p>
       </div>
 
-      {/* Progress bar */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-mise-ink">{completedCount} of 14 modules completed</p>
-          {completedCount === 14 && (
-            <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Certified
-            </span>
-          )}
+      {/* FOH Section */}
+      <section>
+        <div className="flex items-center gap-2 mb-5">
+          <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-mise-ink">Front of House</h2>
+            <p className="text-xs text-gray-500">Customer-facing staff</p>
+          </div>
         </div>
-        <div className="w-full bg-black/[0.06] rounded-full h-2.5">
-          <div
-            className="bg-mise-mid h-2.5 rounded-full transition-all duration-500"
-            style={{ width: `${(completedCount / 14) * 100}%` }}
-          />
-        </div>
-      </div>
 
-      {/* Module grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {ALLERGEN_MODULES.map(module => {
-          const done = completed.get(module.slug)
-          return (
-            <Link
-              key={module.slug}
-              href={`/owner/learn/${module.slug}`}
-              className="group bg-white rounded-2xl border border-black/[0.06] shadow-sm hover:shadow-md hover:border-mise-mid/30 transition-all overflow-hidden"
-            >
-              <div className={`${module.colour} px-5 py-4`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-3xl">{module.emoji}</span>
-                  {done ? (
-                    <span className="inline-flex items-center gap-1 bg-white/80 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
-                      <CheckCircle2 className="h-3 w-3" /> {done.score}%
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 bg-white/60 text-mise-ink/50 text-xs px-2 py-1 rounded-full">
-                      <Clock className="h-3 w-3" /> ~5 min
-                    </span>
-                  )}
+        {/* FOH allergen progress */}
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden mb-3">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-mise-ink text-sm">Allergen Awareness — 14 Modules</p>
+              <p className="text-xs text-gray-500 mt-0.5">The 14 major allergens, customer communication, and Natasha's Law</p>
+            </div>
+            <span className="text-xs text-gray-400 whitespace-nowrap ml-4">{completedCount}/14 done</span>
+          </div>
+          <div className="px-5 py-3">
+            <div className="w-full bg-gray-100 rounded-full h-1.5 mb-3">
+              <div
+                className="bg-mise-mid h-1.5 rounded-full transition-all"
+                style={{ width: `${(completedCount / 14) * 100}%` }}
+              />
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+              {ALLERGEN_MODULES.map(module => {
+                const done = completed.get(module.slug)
+                return (
+                  <Link
+                    key={module.slug}
+                    href={`/owner/learn/${module.slug}`}
+                    className={`group relative rounded-xl border p-3 text-center transition-all hover:shadow-sm ${
+                      done ? 'border-green-200 bg-green-50' : 'border-gray-100 bg-gray-50 hover:border-amber-200 hover:bg-amber-50'
+                    }`}
+                  >
+                    <div className="text-xl mb-1">{module.emoji}</div>
+                    <p className="text-xs font-medium text-mise-ink leading-tight">{module.name}</p>
+                    {done && (
+                      <CheckCircle2 className="h-3 w-3 text-green-600 absolute top-1.5 right-1.5" />
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+            <Link href="/owner/learn/celery" className="inline-flex items-center gap-1 text-xs text-mise-mid font-medium mt-3 hover:underline">
+              Browse all allergen modules <ChevronRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Kitchen Section */}
+      <section>
+        <div className="flex items-center gap-2 mb-5">
+          <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-mise-ink">Kitchen Team</h2>
+            <p className="text-xs text-gray-500">Back of house staff</p>
+          </div>
+        </div>
+
+        {/* Kitchen allergen module */}
+        <Link href="/owner/learn/kitchen-allergens" className="block group mb-3">
+          <div className="bg-white rounded-2xl border border-red-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div className="px-5 py-4 flex gap-4 items-center">
+              <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-mise-ink text-sm group-hover:text-mise-mid transition-colors">Kitchen Allergen Management</p>
+                <p className="text-xs text-gray-500 mt-0.5">Handling allergen ingredients safely, labelling dishes, and communicating with FOH</p>
+                <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1"><Clock className="h-3 w-3" /> 12 min</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-gray-500 flex-shrink-0 transition-colors" />
+            </div>
+          </div>
+        </Link>
+
+        {/* Practice modules */}
+        <div className="space-y-3">
+          {KITCHEN_PRACTICE_MODULES.map(({ href, icon: Icon, colour, bg, border, title, description, duration }) => (
+            <Link key={href} href={href} className="block group">
+              <div className={`bg-white rounded-2xl border ${border} shadow-sm overflow-hidden hover:shadow-md transition-shadow`}>
+                <div className="px-5 py-4 flex gap-4 items-center">
+                  <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>
+                    <Icon className={`h-5 w-5 ${colour}`} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-mise-ink text-sm group-hover:text-mise-mid transition-colors">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+                    <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1"><Clock className="h-3 w-3" /> {duration}</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-gray-500 flex-shrink-0 transition-colors" />
                 </div>
               </div>
-              <div className="px-5 py-4">
-                <p className="font-semibold text-mise-ink text-sm">{module.name}</p>
-                <p className="text-xs text-mise-ink/50 mt-0.5">{module.tagline}</p>
-                <p className="text-xs text-mise-mid font-medium mt-3 group-hover:underline">
-                  {done ? 'Review module →' : 'Start module →'}
-                </p>
-              </div>
             </Link>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }
