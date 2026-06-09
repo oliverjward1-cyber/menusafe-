@@ -162,6 +162,11 @@ export default async function OwnerDashboard() {
   const weekCompletedDays = weekDays.filter(d => !d.isFuture && d.pct === 100).length
   const weekTotalDaysSoFar = weekDays.filter(d => !d.isFuture && d.total > 0).length
 
+  // Combined staff (for compliance check)
+  const trainedStaff = [...new Map([...fohCompliance, ...bohCompliance].map(s => [s.name, s])).values()]
+  const expiringStaff = trainedStaff.filter(s => s.status === 'expiring')
+  const expiredStaff = trainedStaff.filter(s => s.status === 'expired')
+
   // Daily compliance score
   type ComplianceIssue = { label: string; severity: 'critical' | 'warning' }
   const complianceIssues: ComplianceIssue[] = []
@@ -179,11 +184,6 @@ export default async function OwnerDashboard() {
   const complianceScore = complianceIssues.length === 0 ? 100
     : Math.max(0, 100 - criticalCount * 25 - (complianceIssues.length - criticalCount) * 10)
   const complianceStatus = complianceScore === 100 ? 'compliant' : criticalCount > 0 ? 'critical' : 'needs-attention'
-
-  // Legacy: combined for old code
-  const trainedStaff = [...new Map([...fohCompliance, ...bohCompliance].map(s => [s.name, s])).values()]
-  const expiringStaff = trainedStaff.filter(s => s.status === 'expiring')
-  const expiredStaff = trainedStaff.filter(s => s.status === 'expired')
 
   function calcFoodCost(recipe: NonNullable<typeof recipesRes.data>[number]): number {
     if (!recipe?.recipe_ingredients) return 0
