@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency, calcSuggestedPrice } from '@/lib/utils'
 import { RECIPE_CATEGORIES } from '@/lib/constants/allergens'
-import { ChevronLeft, Search, X, AlertTriangle, Sparkles, Mic, Loader2 } from 'lucide-react'
+import { ChevronLeft, Search, X, AlertTriangle, Sparkles, Mic, Loader2, Camera, ImageIcon } from 'lucide-react'
 
 const ALLERGEN_MAP = [
   { offKey: 'gluten',                        dbKey: 'allergen_cereals_gluten', label: 'Gluten' },
@@ -161,18 +161,26 @@ export default function NewRecipePage() {
   const [aiInput, setAiInput] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
   const [aiDone, setAiDone] = useState(false)
+  const [aiError, setAiError] = useState('')
   const [listening, setListening] = useState(false)
   const recognitionRef = useRef<any>(null)
+  const [aiImage, setAiImage] = useState<{ base64: string; mediaType: string; preview: string } | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
   async function handleAiFill() {
-    if (!aiInput.trim()) return
+    if (!aiInput.trim() && !aiImage) return
     setAiLoading(true)
     setAiDone(false)
+    setAiError('')
     try {
       const res = await fetch('/api/recipes/ai-describe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: aiInput }),
+        body: JSON.stringify({
+          description: aiInput,
+          imageBase64: aiImage?.base64 ?? null,
+          imageMediaType: aiImage?.mediaType ?? null,
+        }),
       })
       const data = await res.json()
       if (res.ok) {
@@ -182,14 +190,27 @@ export default function NewRecipePage() {
         if (data.portionSize) setPortionSize(String(data.portionSize))
         if (data.sellPrice) setSellPrice(String(data.sellPrice))
         setAiDone(true)
-        // Keep panel open so user can see "Fields filled ✓" confirmation
       } else {
-        alert(data.error ?? 'AI failed — please try again')
+        setAiError(data.error ?? 'AI failed — please try again')
       }
     } catch {
-      alert('Network error — please try again')
+      setAiError('Network error — please try again')
     }
     setAiLoading(false)
+  }
+
+  function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      // dataUrl is "data:image/jpeg;base64,<data>"
+      const [meta, base64] = dataUrl.split(',')
+      const mediaType = meta.match(/:(.*?);/)?.[1] ?? 'image/jpeg'
+      setAiImage({ base64, mediaType, preview: dataUrl })
+    }
+    reader.readAsDataURL(file)
   }
 
   function startVoice() {
@@ -545,16 +566,58 @@ export default function NewRecipePage() {
         </div>
         {aiMode && (
           <div className="space-y-3">
-            <p className="text-xs text-mise-ink/50">Describe your dish in plain English — the AI will fill in the name, description, category, portion size and price.</p>
-            <div className="flex gap-2">
-              <textarea
-                value={aiInput}
-                onChange={e => setAiInput(e.target.value)}
-                placeholder="e.g. Pan-seared salmon fillet served with a lemon butter sauce, wilted spinach and new potatoes. A main course, priced at £18.50."
-                rows={3}
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold resize-none"
-              />
-            </div>
+            <p className="text-xs text-mise-ink/50">
+              Describe your dish, use your voice, or take a photo of a recipe card — the AI will fill in the name, description, category, portion size and price.
+            </p>
+
+            {/* Photo upload */}
+            <input
+              ref={photoInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handlePhotoSelect}
+              className="hidden"
+            />
+            {aiImage ? (
+              <div className="relative inline-block">
+                <img src={aiImage.preview} alt="Recipe photo" className="h-28 rounded-xl object-cover border border-gray-200" />
+                <button
+                  onClick={() => { setAiImage(null); if (photoInputRef.current) photoInputRef.current.value = '' }}
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs hover:bg-red-600"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { if (photoInputRef.current) { photoInputRef.current.removeAttribute('capture'); photoInputRef.current.click() } }}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium transition-colors"
+                >
+                  <ImageIcon className="h-4 w-4" /> Upload photo
+                </button>
+                <button
+                  onClick={() => { if (photoInputRef.current) { photoInputRef.current.setAttribute('capture', 'environment'); photoInputRef.current.click() } }}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium transition-colors"
+                >
+                  <Camera className="h-4 w-4" /> Take photo
+                </button>
+              </div>
+            )}
+
+            <textarea
+              value={aiInput}
+              onChange={e => setAiInput(e.target.value)}
+              placeholder={aiImage ? 'Optional: add any extra details about the dish…' : 'e.g. Pan-seared salmon fillet with lemon butter sauce, wilted spinach and new potatoes. Main course, £18.50.'}
+              rows={2}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold resize-none"
+            />
+
+            {aiError && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{aiError}</p>
+            )}
+
             <div className="flex gap-2">
               <button
                 onClick={listening ? stopVoice : startVoice}
@@ -565,10 +628,10 @@ export default function NewRecipePage() {
               </button>
               <button
                 onClick={handleAiFill}
-                disabled={aiLoading || !aiInput.trim()}
+                disabled={aiLoading || (!aiInput.trim() && !aiImage)}
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-mise-mid text-white rounded-lg text-sm font-medium hover:bg-mise-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                {aiLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</> : <><Sparkles className="h-4 w-4" /> Fill in fields</>}
+                {aiLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Reading…</> : <><Sparkles className="h-4 w-4" /> Fill in fields</>}
               </button>
             </div>
           </div>
