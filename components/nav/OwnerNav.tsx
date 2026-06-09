@@ -79,30 +79,25 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
           { href: '/owner/billing', label: 'Billing', icon: CreditCard },
         ]} />
 
-        <NavSection label="Food" pathname={pathname} items={[
-          { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
-          { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
+        <NavSection label="Kitchens" pathname={pathname} items={[
           { href: '/chef/menus', label: 'Menus', icon: MenuSquare },
           { href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode },
           { href: '/chef/audit', label: 'Kitchen Audit', icon: ClipboardCheck },
-          { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
-        ]} />
-
-        <NavSection label="Allergens" pathname={pathname} items={[
-          { href: '/owner/learn', label: 'Learning Hub', icon: BookOpen },
-          { href: '/owner/staff-quiz', label: 'Staff Quiz', icon: Users },
-          { href: '/owner/quiz-questions', label: 'Quiz Questions', icon: GraduationCap },
-        ]} />
-
-        <NavSection label="Compliance" pathname={pathname} items={[
-          { href: '/owner/temperature-logs', label: 'Temp Logs', icon: Thermometer },
-          { href: '/owner/cleaning', label: 'Cleaning', icon: Sparkles },
           { href: '/owner/deliveries', label: 'Deliveries', icon: Truck },
+          { href: '/owner/cleaning', label: 'Cleaning', icon: Sparkles },
+          { href: '/owner/temperature-logs', label: 'Temp Logs', icon: Thermometer },
           { href: '/owner/incidents', label: 'Incidents', icon: AlertOctagon },
           { href: '/owner/haccp', label: 'HACCP & Calibration', icon: FlaskConical },
           { href: '/owner/eho', label: 'EHO Mode', icon: ShieldCheck },
           { href: '/owner/kitchen-settings', label: 'Kitchen Portal', icon: Tablet },
           { href: '/owner/history', label: 'History', icon: History },
+        ]} />
+
+        <NavSection label="Learning Hub" pathname={pathname} items={[
+          { href: '/owner/learn', label: 'Learning Modules', icon: BookOpen },
+          { href: '/owner/staff-quiz?role=foh', label: 'FOH Quiz', icon: Users },
+          { href: '/owner/staff-quiz?role=boh', label: 'BOH Quiz', icon: Users2 },
+          { href: '/owner/quiz-questions', label: 'Quiz Questions', icon: GraduationCap },
         ]} />
       </nav>
 
