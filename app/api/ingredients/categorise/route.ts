@@ -33,16 +33,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ updated: 0 })
   }
 
-  const list = ingredients.map(i => `${i.id}: ${i.name}`).join('\n')
-
   const anthropic = getClient()
-  const message = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 4096,
-    system: 'You are a professional chef. Return ONLY valid JSON, no markdown, no explanation.',
-    messages: [{
-      role: 'user',
-      content: `Categorise each ingredient as "chilled", "ambient", or "frozen":
+  const CHUNK = 50
+  const mapping: Record<string, string> = {}
+
+  for (let i = 0; i < ingredients.length; i += CHUNK) {
+    const batch = ingredients.slice(i, i + CHUNK)
+    const list = batch.map(ing => `${ing.id}: ${ing.name}`).join('\n')
+
+    const message = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 8192,
+      system: 'You are a professional chef. Return ONLY valid JSON, no markdown, no explanation.',
+      messages: [{
+        role: 'user',
+        content: `Categorise each ingredient as "chilled", "ambient", or "frozen":
 - chilled: dairy, fresh meat, fish, fresh veg, eggs, fresh herbs, opened sauces
 - frozen: frozen meat, frozen fish, ice cream, frozen veg, frozen pastry
 - ambient: dried spices, tinned goods, oils, vinegar, flour, sugar, dried pasta, rice, nuts, sealed sauces
@@ -51,15 +56,17 @@ Return ONLY a JSON object: {"<id>": "chilled"|"ambient"|"frozen"}
 
 Ingredients:
 ${list}`,
-    }],
-  })
+      }],
+    })
 
-  const text = (message.content[0] as { type: string; text: string }).text.trim()
-  let mapping: Record<string, string>
-  try {
-    mapping = JSON.parse(extractJson(text))
-  } catch {
-    return NextResponse.json({ error: 'AI returned invalid JSON' }, { status: 500 })
+    const text = (message.content[0] as { type: string; text: string }).text.trim()
+    let chunk: Record<string, string>
+    try {
+      chunk = JSON.parse(extractJson(text))
+    } catch {
+      return NextResponse.json({ error: 'AI returned invalid JSON' }, { status: 500 })
+    }
+    Object.assign(mapping, chunk)
   }
 
   let updated = 0
