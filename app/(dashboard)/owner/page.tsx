@@ -4,7 +4,7 @@ import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
   AlertTriangle, Globe, GlobeLock,
-  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck, AlertOctagon,
+  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck, AlertOctagon, Truck,
 } from 'lucide-react'
 
 function addMonths(date: Date, months: number): Date {
@@ -27,7 +27,7 @@ export default async function OwnerDashboard() {
   const todayStr = now.toISOString().split('T')[0]
   const currentHour = now.getHours()
 
-  const [restaurantRes, recipesRes, menusRes, quizRes, auditRes, tempLogsToday, openIncidentsRes] = await Promise.all([
+  const [restaurantRes, recipesRes, menusRes, quizRes, auditRes, tempLogsToday, openIncidentsRes, todayTrailLogs] = await Promise.all([
     supabase.from('restaurants').select('*').eq('id', rid).single(),
     supabase.from('recipes').select(`
       id, name, sell_price, status,
@@ -52,6 +52,12 @@ export default async function OwnerDashboard() {
       .select('id, severity')
       .eq('restaurant_id', rid)
       .eq('resolved', false),
+    supabase.from('ops_task_logs')
+      .select('data, task_type')
+      .eq('restaurant_id', rid)
+      .eq('scheduled_date', todayStr)
+      .eq('task_type', 'delivery')
+      .eq('status', 'done'),
   ])
 
   const restaurant = restaurantRes.data
@@ -121,6 +127,16 @@ export default async function OwnerDashboard() {
   const belowTargetCount = recipeStats.filter(r => r.belowTarget).length
   const pendingCount = recipeStats.filter(r => r.status === 'draft').length
 
+  // Today's delivery spend from trail logs
+  const deliveryLogs = todayTrailLogs.data ?? []
+  const todayDeliveries: { supplier: string; cost: number | null }[] = []
+  for (const log of deliveryLogs) {
+    for (const d of (log.data?.deliveries ?? [])) {
+      if (d.supplier) todayDeliveries.push({ supplier: d.supplier, cost: d.cost ?? null })
+    }
+  }
+  const todaySpend = todayDeliveries.reduce((sum, d) => sum + (d.cost ?? 0), 0)
+
   const DAYPART_LABELS: Record<string, string> = {
     'all-day': 'All day', 'lunch': 'Lunch', 'dinner': 'Dinner',
     'brunch': 'Brunch', 'specials': 'Specials',
@@ -176,6 +192,30 @@ export default async function OwnerDashboard() {
           EHO Inspection Mode
         </Link>
       </div>
+
+      {/* Today's delivery spend */}
+      <Link href="/owner/trail" className="block">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm px-5 py-4 flex items-center justify-between hover:border-mise-mid/30 transition-colors">
+          <div>
+            <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Today&apos;s delivery spend</p>
+            <p className="text-2xl font-display font-bold text-mise-ink">
+              {todayDeliveries.length === 0 ? '—' : `£${todaySpend.toFixed(2)}`}
+            </p>
+            {todayDeliveries.length > 0 && (
+              <p className="text-xs text-mise-ink/40 mt-1">
+                {todayDeliveries.length} deliver{todayDeliveries.length !== 1 ? 'ies' : 'y'} · {todayDeliveries.map(d => d.supplier).filter(Boolean).join(', ')}
+              </p>
+            )}
+            {todayDeliveries.length === 0 && (
+              <p className="text-xs text-mise-ink/40 mt-1">No deliveries logged today</p>
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-mise-ink/20">
+            <Truck className="h-6 w-6" />
+            <ArrowRight className="h-4 w-4" />
+          </div>
+        </div>
+      </Link>
 
       {/* Top stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

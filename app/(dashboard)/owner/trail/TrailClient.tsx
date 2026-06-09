@@ -70,10 +70,10 @@ function TaskCard({
 
   type DeliveryEntry = {
     id: string; supplier: string; items: string
-    temperature: string; happy: boolean | null; photoFile: File | null; photoPreview: string | null
+    temperature: string; cost: string; happy: boolean | null; photoFile: File | null; photoPreview: string | null
   }
   const [deliveries, setDeliveries] = useState<DeliveryEntry[]>([
-    { id: uid(), supplier: '', items: '', temperature: '', happy: null, photoFile: null, photoPreview: null }
+    { id: uid(), supplier: '', items: '', temperature: '', cost: '', happy: null, photoFile: null, photoPreview: null }
   ])
 
   function uid() { return Math.random().toString(36).slice(2, 9) }
@@ -82,7 +82,7 @@ function TaskCard({
     setDeliveries(p => p.map(d => d.id === id ? { ...d, [field]: val } : d))
   }
   function addDelivery() {
-    setDeliveries(p => [...p, { id: uid(), supplier: '', items: '', temperature: '', happy: null, photoFile: null, photoPreview: null }])
+    setDeliveries(p => [...p, { id: uid(), supplier: '', items: '', temperature: '', cost: '', happy: null, photoFile: null, photoPreview: null }])
   }
   function removeDelivery(id: string) {
     setDeliveries(p => p.filter(d => d.id !== id))
@@ -136,7 +136,7 @@ function TaskCard({
             photoUrl = pub.publicUrl
           }
         }
-        return { supplier: d.supplier, items: d.items, temperature: d.temperature || null, happy: d.happy, photoUrl }
+        return { supplier: d.supplier, items: d.items, temperature: d.temperature || null, cost: d.cost ? parseFloat(d.cost) : null, happy: d.happy, photoUrl }
       }))
       data = { deliveries: entries }
     }
@@ -280,6 +280,13 @@ function TaskCard({
                           onChange={e => updateDelivery(d.id, 'temperature', e.target.value)}
                           placeholder="Temp °C"
                           className="flex-1 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+                      </div>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-mise-ink/40 font-medium">£</span>
+                        <input type="number" step="0.01" min="0" value={d.cost}
+                          onChange={e => updateDelivery(d.id, 'cost', e.target.value)}
+                          placeholder="Invoice total"
+                          className="w-full border border-black/[0.08] rounded-xl pl-7 pr-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
                       </div>
                     </div>
                     {/* Happy / Issue toggle */}

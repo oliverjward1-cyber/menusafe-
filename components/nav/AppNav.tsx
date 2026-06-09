@@ -216,7 +216,6 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
 
           {/* Operations — owner, manager, head chef, kitchen chef */}
           {isKitchenStaff && (<>
-            <NavLink href="/owner/deliveries" label="Deliveries" icon={Truck} pathname={pathname} />
             <NavLink href="/owner/cleaning" label="Cleaning" icon={Sparkles} pathname={pathname} />
             <NavLink href="/owner/temperature-logs" label="Temp Logs" icon={Thermometer} pathname={pathname} />
             <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
