@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency, calcSuggestedPrice } from '@/lib/utils'
 import { RECIPE_CATEGORIES } from '@/lib/constants/allergens'
-import { ChevronLeft, Search, X, AlertTriangle, Sparkles, Mic, Loader2 } from 'lucide-react'
+import { ChevronLeft, Search, X, AlertTriangle, Sparkles, Loader2, Camera, ImageIcon } from 'lucide-react'
 
 const ALLERGEN_MAP = [
   { offKey: 'gluten',                        dbKey: 'allergen_cereals_gluten', label: 'Gluten' },
@@ -135,6 +135,10 @@ export default function NewRecipePage() {
   const [pending, setPending] = useState<Result | null>(null)
   const [qtyInput, setQtyInput] = useState('')
   const [costInput, setCostInput] = useState('')  // £/kg for OFF items
+  const [addingManual, setAddingManual] = useState(false)
+  const [manualName, setManualName] = useState('')
+  const [manualCostPerKg, setManualCostPerKg] = useState('')
+  const [manualQty, setManualQty] = useState('')
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [dropRect, setDropRect] = useState<{ top: number; left: number; width: number } | null>(null)
@@ -157,41 +161,57 @@ export default function NewRecipePage() {
   const [aiInput, setAiInput] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
   const [aiDone, setAiDone] = useState(false)
-  const [listening, setListening] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const recognitionRef = useRef<any>(null)
+  const [aiImage, setAiImage] = useState<{ base64: string; mediaType: string; preview: string } | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
   async function handleAiFill() {
-    if (!aiInput.trim()) return
+    if (!aiInput.trim() && !aiImage) return
     setAiLoading(true)
     setAiDone(false)
-    const res = await fetch('/api/recipes/ai-describe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ description: aiInput }),
-    })
-    const data = await res.json()
-    setAiLoading(false)
-    if (res.ok) {
-      if (data.name) setRecipeName(data.name)
-      if (data.description) setDescription(data.description)
-      if (data.category) setCategory(data.category)
-      if (data.portionSize) setPortionSize(data.portionSize)
-      if (data.sellPrice) setSellPrice(String(data.sellPrice))
-      setAiDone(true)
-      setAiMode(false)
+    setAiError('')
+    try {
+      const res = await fetch('/api/recipes/ai-describe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          description: aiInput,
+          imageBase64: aiImage?.base64 ?? null,
+          imageMediaType: aiImage?.mediaType ?? null,
+        }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        if (data.name) setRecipeName(data.name)
+        if (data.description) setDescription(data.description)
+        if (data.category) setCategory(data.category)
+        if (data.portionSize) setPortionSize(String(data.portionSize))
+        if (data.sellPrice) setSellPrice(String(data.sellPrice))
+        setAiDone(true)
+      } else {
+        setAiError(data.error ?? 'AI failed — please try again')
+      }
+    } catch {
+      setAiError('Network error — please try again')
     }
+    setAiLoading(false)
   }
 
-  function startVoice() {
-    const SpeechRecognition = (window as unknown as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown }).SpeechRecognition ?? (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition
-    if (!SpeechRecognition) { alert('Voice input not supported in this browser'); return }
-    const recognition = new (SpeechRecognition as new () => { lang: string; onresult: (e: { results: { transcript: string }[][] }) => void; onerror: () => void; onend: () => void; start: () => void })()
-    recognition.lang = 'en-GB'
-    recognition.onresult = (e) => { setAiInput(e.results[0][0].transcript) }
-    recognition.onerror = () => setListening(false)
-    recognition.onend = () => setListening(false)
-    setListening(true)
-    recognition.start()
+  function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      // dataUrl is "data:image/jpeg;base64,<data>"
+      const [meta, base64] = dataUrl.split(',')
+      const mediaType = meta.match(/:(.*?);/)?.[1] ?? 'image/jpeg'
+      setAiImage({ base64, mediaType, preview: dataUrl })
+    }
+    reader.readAsDataURL(file)
   }
+
 
   useEffect(() => {
     async function load() {
@@ -408,11 +428,42 @@ export default function NewRecipePage() {
         if (riErr) throw new Error(riErr.message)
       }
 
-      router.push('/chef/recipes')
+      router.push(`/chef/recipes/${recipe.id}/edit`)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setSaving(false)
     }
+  }
+
+  function startManualIngredient() {
+    setManualName(query)
+    setManualCostPerKg('')
+    setManualQty('')
+    setAddingManual(true)
+    setShowDrop(false)
+    setQuery('')
+    setPending(null)
+  }
+
+  function addManualLine() {
+    if (!manualName.trim() || !manualQty) return
+    const qty = parseFloat(manualQty)
+    if (!qty || qty <= 0) return
+    const costPerKg = manualCostPerKg ? parseFloat(manualCostPerKg) : 0
+    const allergens = detectAllergensFromName(manualName)
+    setLines(prev => [...prev, {
+      uid: uidCounter++,
+      name: manualName.trim(),
+      source: 'off',
+      qtyG: qty,
+      allergenDbKeys: allergens,
+      cpg: costPerKg / 1000,
+      costPerKg,
+    }])
+    setManualName('')
+    setManualCostPerKg('')
+    setManualQty('')
+    setAddingManual(false)
   }
 
   const dropdownEl = showDrop && dropRect ? (
@@ -420,15 +471,15 @@ export default function NewRecipePage() {
       style={{ position: 'fixed', top: dropRect.top, left: dropRect.left, width: dropRect.width, zIndex: 9999 }}
       className="bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-y-auto"
     >
-      {searching && <div className="px-3 py-2 text-xs text-hospopilot-ink/40">Searching…</div>}
+      {searching && <div className="px-3 py-2 text-xs text-mise-ink/40">Searching…</div>}
       {!searching && results.length === 0 && (
-        <div className="px-3 py-2 text-xs text-hospopilot-ink/40">No results found</div>
+        <div className="px-3 py-2 text-xs text-mise-ink/40">No results found</div>
       )}
       {results.map((r, i) => (
         <button key={i} onMouseDown={() => selectResult(r)}
           className="w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-50 last:border-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-hospopilot-ink">{r.name}</span>
+            <span className="text-sm font-medium text-mise-ink">{r.name}</span>
             {r.type === 'library' && (
               <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">Library</span>
             )}
@@ -446,6 +497,19 @@ export default function NewRecipePage() {
           </div>
         </button>
       ))}
+      {/* Always show "add manually" option at the bottom */}
+      {!searching && query.trim().length >= 2 && (
+        <button
+          onMouseDown={startManualIngredient}
+          className="w-full text-left px-3 py-2.5 border-t border-gray-100 hover:bg-green-50 flex items-center gap-2"
+        >
+          <span className="h-5 w-5 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-bold shrink-0">+</span>
+          <div>
+            <p className="text-sm font-medium text-green-800">Add "{query}" manually</p>
+            <p className="text-xs text-gray-400">Not in your library or the database</p>
+          </div>
+        </button>
+      )}
     </div>
   ) : null
 
@@ -457,48 +521,82 @@ export default function NewRecipePage() {
         <Link href="/chef/recipes" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Add recipe</h1>
+        <h1 className="text-2xl font-display font-semibold text-mise-ink">Add recipe</h1>
       </div>
 
       {/* AI assist panel */}
-      <div className="bg-hospopilot-deep/5 border border-hospopilot-deep/20 rounded-2xl p-4">
+      <div className="bg-mise-deep/5 border border-mise-deep/20 rounded-2xl p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-hospopilot-mid" />
-            <span className="text-sm font-semibold text-hospopilot-ink">AI recipe assist</span>
+            <Sparkles className="h-4 w-4 text-mise-mid" />
+            <span className="text-sm font-semibold text-mise-ink">AI recipe assist</span>
             {aiDone && <span className="text-xs text-green-600 font-medium">Fields filled ✓</span>}
           </div>
-          <button onClick={() => setAiMode(v => !v)} className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">
+          <button onClick={() => setAiMode(v => !v)} className="text-xs text-mise-mid hover:text-mise-deep font-medium">
             {aiMode ? 'Hide' : 'Describe dish'}
           </button>
         </div>
         {aiMode && (
           <div className="space-y-3">
-            <p className="text-xs text-hospopilot-ink/50">Describe your dish in plain English — the AI will fill in the name, description, category, portion size and price.</p>
+            <p className="text-xs text-mise-ink/50">
+              Describe your dish, use your voice, or take a photo of a recipe card — the AI will fill in the name, description, category, portion size and price.
+            </p>
+
+            {/* Photo upload */}
+            <input
+              ref={photoInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handlePhotoSelect}
+              className="hidden"
+            />
+            {aiImage ? (
+              <div className="relative inline-block">
+                <img src={aiImage.preview} alt="Recipe photo" className="h-28 rounded-xl object-cover border border-gray-200" />
+                <button
+                  onClick={() => { setAiImage(null); if (photoInputRef.current) photoInputRef.current.value = '' }}
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs hover:bg-red-600"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { if (photoInputRef.current) { photoInputRef.current.removeAttribute('capture'); photoInputRef.current.click() } }}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium transition-colors"
+                >
+                  <ImageIcon className="h-4 w-4" /> Upload photo
+                </button>
+                <button
+                  onClick={() => { if (photoInputRef.current) { photoInputRef.current.setAttribute('capture', 'environment'); photoInputRef.current.click() } }}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium transition-colors"
+                >
+                  <Camera className="h-4 w-4" /> Take photo
+                </button>
+              </div>
+            )}
+
+            <textarea
+              value={aiInput}
+              onChange={e => setAiInput(e.target.value)}
+              placeholder={aiImage ? 'Optional: add any extra details about the dish…' : 'e.g. Pan-seared salmon fillet with lemon butter sauce, wilted spinach and new potatoes. Main course, £18.50.'}
+              rows={2}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold resize-none"
+            />
+
+            {aiError && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{aiError}</p>
+            )}
+
             <div className="flex gap-2">
-              <textarea
-                value={aiInput}
-                onChange={e => setAiInput(e.target.value)}
-                placeholder="e.g. Pan-seared salmon fillet served with a lemon butter sauce, wilted spinach and new potatoes. A main course, priced at £18.50."
-                rows={3}
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-hospopilot-gold resize-none"
-              />
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={startVoice}
-                disabled={listening}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border font-medium transition-colors ${listening ? 'bg-red-100 border-red-300 text-red-600 animate-pulse' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
-              >
-                <Mic className="h-4 w-4" />
-                {listening ? 'Listening…' : 'Voice'}
-              </button>
               <button
                 onClick={handleAiFill}
-                disabled={aiLoading || !aiInput.trim()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-hospopilot-mid text-white rounded-lg text-sm font-medium hover:bg-hospopilot-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                disabled={aiLoading || (!aiInput.trim() && !aiImage)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-mise-mid text-white rounded-lg text-sm font-medium hover:bg-mise-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                {aiLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</> : <><Sparkles className="h-4 w-4" /> Fill in fields</>}
+                {aiLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Reading…</> : <><Sparkles className="h-4 w-4" /> Fill in fields</>}
               </button>
             </div>
           </div>
@@ -512,14 +610,14 @@ export default function NewRecipePage() {
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Recipe name</label>
+            <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Recipe name</label>
             <input type="text" value={recipeName} onChange={(e) => setRecipeName(e.target.value)}
               placeholder="e.g. Grilled Chicken Caesar"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-hospopilot-gold/10" />
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-mise-gold/10" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Category</label>
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Category</label>
               <select value={category} onChange={(e) => setCategory(e.target.value)}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none">
                 <option value="">Select category</option>
@@ -527,24 +625,24 @@ export default function NewRecipePage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Portion size</label>
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Portion size</label>
               <input type="text" value={portionSize} onChange={(e) => setPortionSize(e.target.value)}
                 placeholder="e.g. 280g"
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Description</label>
+            <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Description</label>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)}
               rows={2} placeholder="Brief description for the menu..."
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none resize-none" />
           </div>
           <div>
-            <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Sell price (£)</label>
+            <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Sell price (£)</label>
             <input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)}
               placeholder="0.00" step="0.01" min="0"
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
-            <p className="mt-1 text-xs text-hospopilot-ink/40">Used to calculate gross profit % in the summary below.</p>
+            <p className="mt-1 text-xs text-mise-ink/40">Used to calculate gross profit % in the summary below.</p>
           </div>
         </div>
       </div>
@@ -560,7 +658,7 @@ export default function NewRecipePage() {
         </div>
 
         {lines.length === 0 ? (
-          <div className="py-10 text-center text-sm text-hospopilot-ink/40">
+          <div className="py-10 text-center text-sm text-mise-ink/40">
             No ingredients yet — search below to add one.
           </div>
         ) : (
@@ -584,7 +682,7 @@ export default function NewRecipePage() {
                     <tr key={l.uid} className="hover:bg-gray-50/50">
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">{l.name}</div>
-                        {l.brand && <div className="text-xs text-hospopilot-ink/40">{l.brand}</div>}
+                        {l.brand && <div className="text-xs text-mise-ink/40">{l.brand}</div>}
                         {l.source === 'library'
                           ? <div className="text-xs text-green-600 mt-0.5">From your library</div>
                           : l.kcalPer100 && <div className="text-xs text-gray-400 mt-0.5">{l.kcalPer100} kcal/100g</div>}
@@ -615,7 +713,7 @@ export default function NewRecipePage() {
                                   {allergenLabel(k)}
                                 </span>
                               ))
-                            : <span className="text-xs text-hospopilot-ink/40">None detected</span>}
+                            : <span className="text-xs text-mise-ink/40">None detected</span>}
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -636,7 +734,7 @@ export default function NewRecipePage() {
         <div className="p-4 border-t border-gray-100 bg-gray-50 space-y-3 rounded-b-xl">
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_110px_130px_auto] gap-3 items-end">
             <div>
-              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Search ingredient</label>
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Search ingredient</label>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
                 <input ref={searchInputRef} type="text" value={query}
@@ -648,14 +746,14 @@ export default function NewRecipePage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Qty (g)</label>
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Qty (g)</label>
               <input type="number" value={qtyInput} onChange={(e) => setQtyInput(e.target.value)}
                 placeholder="0" min="0" step="1"
                 onKeyDown={(e) => e.key === 'Enter' && addLine()}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none" />
             </div>
             <div>
-              <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">
+              <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">
                 Cost (£/kg)
                 {pending?.type === 'library' && <span className="ml-1 text-green-600 normal-case font-normal">auto</span>}
               </label>
@@ -676,9 +774,68 @@ export default function NewRecipePage() {
             </button>
           </div>
           {pending?.type === 'off' && (
-            <p className="text-xs text-hospopilot-ink/40">
+            <p className="text-xs text-mise-ink/40">
               Enter cost price per kg so food cost and GP can be calculated accurately.
             </p>
+          )}
+
+          {/* Manual ingredient inline form */}
+          {addingManual && (
+            <div className="border border-green-200 bg-green-50 rounded-xl p-4 space-y-3">
+              <p className="text-xs font-semibold text-green-800 uppercase tracking-widest">Add manually</p>
+              <div className="grid grid-cols-1 sm:grid-cols-[1fr_110px_130px] gap-3">
+                <div>
+                  <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Name</label>
+                  <input
+                    type="text"
+                    value={manualName}
+                    onChange={e => setManualName(e.target.value)}
+                    placeholder="Ingredient name"
+                    autoFocus
+                    className="w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm focus:border-green-600 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Qty (g)</label>
+                  <input
+                    type="number"
+                    value={manualQty}
+                    onChange={e => setManualQty(e.target.value)}
+                    placeholder="0"
+                    min="0"
+                    onKeyDown={e => e.key === 'Enter' && addManualLine()}
+                    className="w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm focus:border-green-600 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Cost (£/kg)</label>
+                  <input
+                    type="number"
+                    value={manualCostPerKg}
+                    onChange={e => setManualCostPerKg(e.target.value)}
+                    placeholder="e.g. 3.50"
+                    step="0.01" min="0"
+                    onKeyDown={e => e.key === 'Enter' && addManualLine()}
+                    className="w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm focus:border-green-600 focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={addManualLine}
+                  disabled={!manualName.trim() || !manualQty}
+                  className="px-4 py-2 bg-green-800 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-40 transition-colors"
+                >
+                  Add ingredient
+                </button>
+                <button
+                  onClick={() => setAddingManual(false)}
+                  className="px-4 py-2 border border-gray-200 text-sm text-gray-500 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { InviteChef } from '../InviteChef'
 import { ResendInviteButton } from './ResendInviteButton'
+import { ChevronRight } from 'lucide-react'
 
 function RoleBadge({ role }: { role: string | null }) {
   if (role === 'owner') {
@@ -86,7 +88,7 @@ export default async function TeamPage() {
             </div>
           ) : (
             members.map(member => (
-              <div key={member.id} className="flex items-center justify-between px-5 py-3.5">
+              <Link key={member.id} href={`/owner/team/${member.id}`} className="flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="h-8 w-8 rounded-full bg-hospopilot-mid/10 flex items-center justify-center shrink-0">
                     <span className="text-xs font-semibold text-hospopilot-mid">
@@ -107,8 +109,11 @@ export default async function TeamPage() {
                     </p>
                   </div>
                 </div>
-                <RoleBadge role={member.role} />
-              </div>
+                <div className="flex items-center gap-2">
+                  <RoleBadge role={member.role} />
+                  <ChevronRight className="h-4 w-4 text-gray-300" />
+                </div>
+              </Link>
             ))
           )}
         </div>

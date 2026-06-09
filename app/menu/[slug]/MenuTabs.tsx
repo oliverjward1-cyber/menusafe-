@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { DishCard } from './DishCard'
 import type { ALLERGENS } from '@/lib/constants/allergens'
+import { Clock } from 'lucide-react'
 
 type AllergenKey = (typeof ALLERGENS)[number]['key']
 
@@ -27,6 +28,8 @@ interface Menu {
   name: string
   description: string | null
   daypart: string
+  serviceStart?: string | null
+  serviceEnd?: string | null
   categories: Category[]
 }
 
@@ -46,33 +49,45 @@ export function MenuTabs({ menus }: { menus: Menu[] }) {
 
   return (
     <div>
-      {/* Tab bar — only show if more than one menu */}
-      {menus.length > 1 && (
-        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-          <div className="max-w-2xl mx-auto px-4">
-            <div className="flex gap-1 overflow-x-auto py-2 scrollbar-hide">
+      {/* Menu switcher — always visible */}
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-2xl mx-auto px-4">
+          {menus.length > 1 ? (
+            // Multiple menus: tab strip
+            <div className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
               {menus.map(m => (
                 <button
                   key={m.id}
                   onClick={() => setActiveId(m.id)}
-                  className={`shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap ${
                     m.id === activeId
                       ? 'bg-gray-900 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
                   }`}
                 >
                   {m.name}
-                  {m.daypart !== 'all-day' && (
-                    <span className={`ml-1.5 text-xs ${m.id === activeId ? 'text-gray-300' : 'text-gray-400'}`}>
-                      {DAYPART_LABELS[m.daypart] ?? m.daypart}
+                  {m.serviceStart && m.serviceEnd && (
+                    <span className={`ml-2 text-xs font-normal ${m.id === activeId ? 'text-gray-300' : 'text-gray-400'}`}>
+                      {m.serviceStart}–{m.serviceEnd}
                     </span>
                   )}
                 </button>
               ))}
             </div>
-          </div>
+          ) : (
+            // Single menu: just show its name and times as a header band
+            <div className="flex items-center justify-between py-3">
+              <span className="text-sm font-semibold text-gray-900">{active.name}</span>
+              {active.serviceStart && active.serviceEnd && (
+                <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                  <Clock className="h-3.5 w-3.5" />
+                  {active.serviceStart} – {active.serviceEnd}
+                </span>
+              )}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-10">
         {active.description && (

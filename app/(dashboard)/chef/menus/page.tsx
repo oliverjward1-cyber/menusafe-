@@ -2,9 +2,10 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
-import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye } from 'lucide-react'
+import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye, Clock, ExternalLink } from 'lucide-react'
 import { PublishToggle } from './PublishToggle'
 import { DuplicateMenuButton } from './DuplicateMenuButton'
+import { DeleteMenuButton } from './DeleteMenuButton'
 
 const DAYPART_LABELS: Record<string, string> = {
   'all-day': 'All day',
@@ -31,7 +32,7 @@ export default async function MenusPage() {
   const { data: menus } = rid
     ? await supabase
         .from('menus')
-        .select('id, name, description, daypart, is_published, created_at, menu_recipes(count)')
+        .select('id, name, description, daypart, is_published, service_start, service_end, created_at, menu_recipes(count)')
         .eq('restaurant_id', rid)
         .order('created_at', { ascending: false })
     : { data: [] }
@@ -61,12 +62,22 @@ export default async function MenusPage() {
               <p className="text-sm font-mono text-green-800 break-all">{menuUrl}</p>
               <p className="text-xs text-gray-400 mt-1">Share this link or display the QR code on your tables. Customers see all published menus.</p>
             </div>
-            <Link
-              href={`/chef/menus/qr`}
-              className="shrink-0 inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-            >
-              <QrCode className="h-4 w-4" /> QR code
-            </Link>
+            <div className="flex items-center gap-2 shrink-0">
+              <a
+                href={menuUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-mise-mid text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" /> Preview live menu
+              </a>
+              <Link
+                href={`/chef/menus/qr`}
+                className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                <QrCode className="h-4 w-4" /> QR code
+              </Link>
+            </div>
           </div>
         </Card>
       )}
@@ -114,7 +125,15 @@ export default async function MenusPage() {
                       {menu.description && (
                         <p className="text-sm text-hospopilot-ink/50 mt-0.5">{menu.description}</p>
                       )}
-                      <p className="text-xs text-gray-400 mt-1">{count} dish{count !== 1 ? 'es' : ''}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <p className="text-xs text-gray-400">{count} dish{count !== 1 ? 'es' : ''}</p>
+                        {(menu.service_start || menu.service_end) && (
+                          <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                            <Clock className="h-3 w-3" />
+                            {menu.service_start ?? '—'} – {menu.service_end ?? '—'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <Link
                       href={`/chef/menus/${menu.id}`}
@@ -132,6 +151,7 @@ export default async function MenusPage() {
                     </Link>
                     <DuplicateMenuButton menuId={menu.id} />
                     <PublishToggle menuId={menu.id} isPublished={menu.is_published} />
+                    <DeleteMenuButton menuId={menu.id} menuName={menu.name} />
                   </div>
                 </div>
               </Card>

@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import PhotoUpload from '@/components/ui/PhotoUpload'
 
 const TYPES = [
   { value: 'allergen_reaction', label: '⚠️ Allergen reaction' },
@@ -14,6 +16,7 @@ const TYPES = [
 
 export default function IncidentForm({ restaurantId, reportedBy }: { restaurantId: string; reportedBy: string }) {
   const router = useRouter()
+  const supabase = createClient()
   const [saving, setSaving] = useState(false)
   const [type, setType] = useState('allergen_reaction')
   const [severity, setSeverity] = useState('medium')
@@ -22,15 +25,31 @@ export default function IncidentForm({ restaurantId, reportedBy }: { restaurantI
   const [affectedPerson, setAffectedPerson] = useState('')
   const [actionTaken, setActionTaken] = useState('')
   const [reporter, setReporter] = useState(reportedBy)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim() || !description.trim()) return
     setSaving(true)
+
+    let photoUrl: string | null = null
+    if (photoFile) {
+      const ext = photoFile.name.split('.').pop() ?? 'jpg'
+      const path = `${restaurantId}/${Date.now()}.${ext}`
+      const { error: uploadErr } = await supabase.storage
+        .from('incident-photos')
+        .upload(path, photoFile, { upsert: true })
+      if (!uploadErr) {
+        const { data } = supabase.storage.from('incident-photos').getPublicUrl(path)
+        photoUrl = data.publicUrl
+      }
+    }
+
     const res = await fetch('/api/compliance/incidents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ restaurantId, type, severity, title, description, affectedPerson, actionTaken, reportedBy: reporter }),
+      body: JSON.stringify({ restaurantId, type, severity, title, description, affectedPerson, actionTaken, reportedBy: reporter, photoUrl }),
     })
     setSaving(false)
     if (res.ok) {
@@ -40,6 +59,8 @@ export default function IncidentForm({ restaurantId, reportedBy }: { restaurantI
       setActionTaken('')
       setSeverity('medium')
       setType('allergen_reaction')
+      setPhotoFile(null)
+      setPhotoPreview(null)
       router.refresh()
     }
   }
@@ -99,6 +120,13 @@ export default function IncidentForm({ restaurantId, reportedBy }: { restaurantI
             className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
         </div>
       </div>
+
+      <PhotoUpload
+        label="Photo evidence (optional)"
+        preview={photoPreview}
+        onFileSelected={(file, preview) => { setPhotoFile(file); setPhotoPreview(preview) }}
+        onClear={() => { setPhotoFile(null); setPhotoPreview(null) }}
+      />
 
       <button type="submit" disabled={saving || !title.trim() || !description.trim()}
         className="bg-red-600 text-white rounded-xl px-5 py-2.5 text-sm font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors">

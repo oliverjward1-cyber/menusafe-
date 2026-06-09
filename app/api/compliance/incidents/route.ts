@@ -7,7 +7,7 @@ function getResend() { return new Resend(process.env.RESEND_API_KEY) }
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { restaurantId, type, severity, title, description, affectedPerson, actionTaken, reportedBy, source } = body
+  const { restaurantId, type, severity, title, description, affectedPerson, actionTaken, reportedBy, source, photoUrl } = body
 
   const adminSupabase = createAdminClient()
 
@@ -31,6 +31,7 @@ export async function POST(request: Request) {
     affected_person: affectedPerson || null,
     action_taken: actionTaken || null,
     reported_by: reportedBy,
+    photo_url: photoUrl || null,
   }).select().single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

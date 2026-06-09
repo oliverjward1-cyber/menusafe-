@@ -25,7 +25,7 @@ function complianceStatus(expiryDate: Date): 'valid' | 'expiring' | 'expired' {
 export default async function StaffQuizPage({
   searchParams,
 }: {
-  searchParams: { tab?: string }
+  searchParams: { tab?: string; type?: string }
 }) {
   const supabase = createClient()
   const {
@@ -54,6 +54,7 @@ export default async function StaffQuizPage({
   const fohUrl = `/quiz/${restaurant?.slug}?type=front_of_house`
   const kitchenUrl = `/quiz/${restaurant?.slug}?type=kitchen`
   const activeTab = searchParams.tab === 'compliance' ? 'compliance' : 'setup'
+  const typeFilter = searchParams.type ?? null // 'front_of_house' | 'kitchen' | null
 
   // Build compliance records: latest PASSED attempt per (staff_name, quiz_type)
   type ComplianceRecord = {
@@ -90,16 +91,30 @@ export default async function StaffQuizPage({
     a.staffName.localeCompare(b.staffName)
   )
 
-  const totalAttempts = attempts?.length ?? 0
-  const totalPassed = attempts?.filter((a) => a.passed).length ?? 0
+  const filteredAttempts = typeFilter
+    ? (attempts ?? []).filter(a => a.quiz_type === typeFilter)
+    : (attempts ?? [])
+
+  const totalAttempts = filteredAttempts.length
+  const totalPassed = filteredAttempts.filter((a) => a.passed).length
   const passRate = totalAttempts > 0 ? Math.round((totalPassed / totalAttempts) * 100) : null
+  const typeLabel = typeFilter === 'front_of_house' ? 'Front of House' : typeFilter === 'kitchen' ? 'Kitchen' : null
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Staff Allergen Quiz</h1>
-          <p className="text-hospopilot-ink/50 mt-1">Manage quizzes and track staff compliance</p>
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">
+            {typeLabel ? `${typeLabel} Quiz` : 'Staff Allergen Quiz'}
+          </h1>
+          <p className="text-mise-ink/50 mt-1">
+            {typeLabel ? `Results filtered to ${typeLabel} staff` : 'Manage quizzes and track staff compliance'}
+          </p>
+          {typeLabel && (
+            <a href="/owner/staff-quiz" className="text-xs text-mise-mid hover:underline mt-0.5 inline-block">
+              ← Show all quiz types
+            </a>
+          )}
         </div>
         <PrintButton label="Print compliance records" />
       </div>
@@ -138,12 +153,12 @@ export default async function StaffQuizPage({
           {/* QR codes */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Card>
-              <h2 className="text-base font-semibold text-hospopilot-ink mb-1">Front of House quiz</h2>
+              <h2 className="text-base font-semibold text-mise-ink mb-1">Front of House quiz</h2>
               <p className="text-xs text-gray-500 mb-4">For waitstaff, hosts, and floor team</p>
               <QrCodeDisplay quizUrl={fohUrl} restaurantSlug={restaurant?.slug ?? ''} />
             </Card>
             <Card>
-              <h2 className="text-base font-semibold text-hospopilot-ink mb-1">Kitchen Staff quiz</h2>
+              <h2 className="text-base font-semibold text-mise-ink mb-1">Kitchen Staff quiz</h2>
               <p className="text-xs text-gray-500 mb-4">For chefs, prep staff, and kitchen team</p>
               <QrCodeDisplay quizUrl={kitchenUrl} restaurantSlug={restaurant?.slug ?? ''} />
             </Card>
@@ -151,19 +166,19 @@ export default async function StaffQuizPage({
 
           {/* Stats */}
           <Card>
-            <h2 className="text-base font-semibold text-hospopilot-ink mb-4">Overall results</h2>
+            <h2 className="text-base font-semibold text-mise-ink mb-4">Overall results</h2>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-xs text-hospopilot-ink/50">Total attempts</p>
-                <p className="text-2xl font-display font-semibold text-hospopilot-ink mt-1">{totalAttempts}</p>
+                <p className="text-xs text-mise-ink/50">Total attempts</p>
+                <p className="text-2xl font-display font-semibold text-mise-ink mt-1">{totalAttempts}</p>
               </div>
               <div>
-                <p className="text-xs text-hospopilot-ink/50">Passed</p>
+                <p className="text-xs text-mise-ink/50">Passed</p>
                 <p className="text-2xl font-bold text-green-700 mt-1">{totalPassed}</p>
               </div>
               <div>
-                <p className="text-xs text-hospopilot-ink/50">Pass rate</p>
-                <p className="text-2xl font-display font-semibold text-hospopilot-ink mt-1">
+                <p className="text-xs text-mise-ink/50">Pass rate</p>
+                <p className="text-2xl font-display font-semibold text-mise-ink mt-1">
                   {passRate !== null ? `${passRate}%` : '—'}
                 </p>
               </div>
@@ -173,10 +188,10 @@ export default async function StaffQuizPage({
           {/* Audit trail */}
           <Card padding={false}>
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-base font-semibold text-hospopilot-ink">Audit trail</h2>
-              <p className="text-sm text-hospopilot-ink/50">All quiz attempts</p>
+              <h2 className="text-base font-semibold text-mise-ink">Audit trail</h2>
+              <p className="text-sm text-mise-ink/50">All quiz attempts</p>
             </div>
-            {!attempts || attempts.length === 0 ? (
+            {filteredAttempts.length === 0 ? (
               <div className="py-12 text-center text-gray-500 text-sm">
                 No quiz attempts yet. Share the QR codes with your staff.
               </div>
@@ -186,19 +201,21 @@ export default async function StaffQuizPage({
                   <thead>
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Staff member</th>
-                      <th className="text-left px-4 py-3 font-medium text-gray-600">Quiz type</th>
+                      {!typeFilter && <th className="text-left px-4 py-3 font-medium text-gray-600">Quiz type</th>}
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Score</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Result</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Completed</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {attempts.map((attempt) => (
+                    {filteredAttempts.map((attempt) => (
                       <tr key={attempt.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3 font-medium text-gray-900">{attempt.staff_name}</td>
-                        <td className="px-4 py-3 text-gray-500 text-xs">
-                          {attempt.quiz_type === 'front_of_house' ? 'Front of House' : 'Kitchen'}
-                        </td>
+                        {!typeFilter && (
+                          <td className="px-4 py-3 text-gray-500 text-xs">
+                            {attempt.quiz_type === 'front_of_house' ? 'Front of House' : 'Kitchen'}
+                          </td>
+                        )}
                         <td className="px-4 py-3 text-gray-600">
                           {attempt.score}/{attempt.total_questions}
                         </td>
@@ -238,8 +255,8 @@ export default async function StaffQuizPage({
         <div className="space-y-6">
           <Card padding={false}>
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-base font-semibold text-hospopilot-ink">Staff compliance</h2>
-              <p className="text-sm text-hospopilot-ink/50">
+              <h2 className="text-base font-semibold text-mise-ink">Staff compliance</h2>
+              <p className="text-sm text-mise-ink/50">
                 Certificates valid for 6 months from last passed quiz
               </p>
             </div>

@@ -41,7 +41,7 @@ export default async function PublicMenuPage({ params }: Props) {
   // Get all published menus for this restaurant
   const { data: publishedMenus } = await supabase
     .from('menus')
-    .select('id, name, description, daypart')
+    .select('id, name, description, daypart, service_start, service_end')
     .eq('restaurant_id', restaurant.id)
     .eq('is_published', true)
     .order('created_at')
@@ -164,6 +164,8 @@ export default async function PublicMenuPage({ params }: Props) {
           name: menu.name,
           description: menu.description,
           daypart: menu.daypart,
+          serviceStart: (menu as any).service_start ?? null,
+          serviceEnd: (menu as any).service_end ?? null,
           categories: Object.entries(groupByCategory(menu.recipes)).map(([cat, dishes]) => ({
             name: cat,
             dishes: dishes.map(dish => ({

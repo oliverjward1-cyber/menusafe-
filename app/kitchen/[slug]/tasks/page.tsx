@@ -4,7 +4,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   Thermometer, Sparkles, Truck, AlertOctagon, BookOpen,
-  CheckCircle2, Clock, ArrowRight, LogOut,
+  CheckCircle2, Clock, ArrowRight, LogOut, ListChecks,
 } from 'lucide-react'
 
 type Task = {
@@ -123,6 +123,21 @@ export default function StaffTaskBoard() {
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-1">
           {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
         </p>
+
+        {/* Daily Trail CTA */}
+        <Link href={`/kitchen/${slug}/trail`}
+          className="flex items-center gap-4 p-4 rounded-2xl border-2 border-mise-mid bg-mise-mid/5 shadow-sm active:scale-[0.98] transition-transform">
+          <div className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center bg-mise-mid/10">
+            <ListChecks className="h-5 w-5 text-mise-mid" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-mise-ink text-sm">Today&apos;s Trail</p>
+            <p className="text-xs mt-0.5 text-mise-ink/50">Work through your daily tasks in order</p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-mise-mid flex-shrink-0" />
+        </Link>
+
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-1 pt-1">Quick log</p>
 
         {tasks.map(task => (
           <Link key={task.id} href={task.href}

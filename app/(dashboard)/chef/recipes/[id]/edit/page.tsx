@@ -118,6 +118,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
   const supabase = supabaseRef.current
 
   const [loading, setLoading] = useState(true)
+  const [saved, setSaved] = useState(false)
   const [recipeName, setRecipeName] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('')
@@ -420,7 +421,9 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
         if (riErr) throw new Error(riErr.message)
       }
 
-      router.push('/chef/recipes')
+      setSaving(false)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setSaving(false)
@@ -757,11 +760,16 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
         >
           {deleting ? 'Deleting…' : 'Delete recipe'}
         </button>
-        <div className="flex gap-3">
-          <button type="button" onClick={() => router.push('/chef/recipes')}
+        <div className="flex items-center gap-3">
+          {saved && (
+            <span className="text-sm font-medium text-green-700 flex items-center gap-1">
+              ✓ Saved
+            </span>
+          )}
+          <Link href="/chef/recipes"
             className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            Cancel
-          </button>
+            ← Back to recipes
+          </Link>
           <button onClick={handleSave} disabled={saving || !recipeName.trim()}
             className="px-5 py-2.5 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
             {saving ? 'Saving…' : 'Save changes'}
