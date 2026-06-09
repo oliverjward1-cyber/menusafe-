@@ -427,32 +427,67 @@ export function MenuEditor({
             </div>
           </div>
 
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">Dish</th>
-                <th className="text-right pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">Cost</th>
-                <th className="text-right pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">Sell</th>
-                <th className="text-right pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">GP%</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {menuRecipes.map(r => {
-                const cost = foodCost(r)
-                const gp = gpPct(r)
-                return (
-                  <tr key={r.id}>
-                    <td className="py-2 text-gray-900">{r.name}</td>
-                    <td className="py-2 text-right text-mise-ink/50">{formatCurrency(cost)}</td>
-                    <td className="py-2 text-right text-mise-ink/50">{r.sell_price ? formatCurrency(r.sell_price) : '—'}</td>
-                    <td className={`py-2 text-right font-medium ${gp == null ? 'text-gray-300' : gp >= 65 ? 'text-green-700' : gp >= 55 ? 'text-amber-600' : 'text-red-600'}`}>
-                      {gp != null ? `${gp.toFixed(1)}%` : '—'}
-                    </td>
+          {(() => {
+            const CATEGORY_ORDER = ['Starters', 'Mains', 'Desserts', 'Sides', 'Other']
+            const grouped = menuRecipes.reduce<Record<string, Recipe[]>>((acc, r) => {
+              const cat = r.category ?? 'Other'
+              if (!acc[cat]) acc[cat] = []
+              acc[cat].push(r)
+              return acc
+            }, {})
+            const cats = CATEGORY_ORDER.filter(c => grouped[c]?.length)
+              .concat(Object.keys(grouped).filter(c => !CATEGORY_ORDER.includes(c)))
+
+            return (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    <th className="text-left pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">Dish</th>
+                    <th className="text-right pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">Cost</th>
+                    <th className="text-right pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">Sell</th>
+                    <th className="text-right pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">GP%</th>
                   </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {cats.map(cat => {
+                    const recipes = grouped[cat]
+                    const catCost = recipes.reduce((s, r) => s + foodCost(r), 0)
+                    const catRevenue = recipes.reduce((s, r) => s + (r.sell_price ?? 0), 0)
+                    const catGp = catRevenue > 0 ? ((catRevenue - catCost) / catRevenue) * 100 : null
+                    return (
+                      <>
+                        <tr key={`${cat}-header`} className="border-t border-gray-100">
+                          <td colSpan={4} className="pt-3 pb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-widest">{cat}</td>
+                        </tr>
+                        {recipes.map(r => {
+                          const cost = foodCost(r)
+                          const gp = gpPct(r)
+                          return (
+                            <tr key={r.id} className="border-b border-gray-50">
+                              <td className="py-2 text-gray-900 pl-2">{r.name}</td>
+                              <td className="py-2 text-right text-mise-ink/50">{formatCurrency(cost)}</td>
+                              <td className="py-2 text-right text-mise-ink/50">{r.sell_price ? formatCurrency(r.sell_price) : '—'}</td>
+                              <td className={`py-2 text-right font-medium ${gp == null ? 'text-gray-300' : gp >= 65 ? 'text-green-700' : gp >= 55 ? 'text-amber-600' : 'text-red-600'}`}>
+                                {gp != null ? `${gp.toFixed(1)}%` : '—'}
+                              </td>
+                            </tr>
+                          )
+                        })}
+                        <tr key={`${cat}-subtotal`} className="bg-gray-50/60">
+                          <td className="py-1.5 pl-2 text-xs font-semibold text-gray-500">{cat} subtotal</td>
+                          <td className="py-1.5 text-right text-xs font-semibold text-mise-ink/60">{formatCurrency(catCost)}</td>
+                          <td className="py-1.5 text-right text-xs font-semibold text-mise-ink/60">{catRevenue > 0 ? formatCurrency(catRevenue) : '—'}</td>
+                          <td className={`py-1.5 text-right text-xs font-semibold ${catGp == null ? 'text-gray-300' : catGp >= 65 ? 'text-green-700' : catGp >= 55 ? 'text-amber-600' : 'text-red-600'}`}>
+                            {catGp != null ? `${catGp.toFixed(1)}%` : '—'}
+                          </td>
+                        </tr>
+                      </>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )
+          })()}
 
           {avgGp != null && avgGp < 60 && (
             <div className="mt-4 flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
