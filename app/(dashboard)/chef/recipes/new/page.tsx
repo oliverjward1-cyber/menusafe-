@@ -135,6 +135,10 @@ export default function NewRecipePage() {
   const [pending, setPending] = useState<Result | null>(null)
   const [qtyInput, setQtyInput] = useState('')
   const [costInput, setCostInput] = useState('')  // £/kg for OFF items
+  const [addingManual, setAddingManual] = useState(false)
+  const [manualName, setManualName] = useState('')
+  const [manualCostPerKg, setManualCostPerKg] = useState('')
+  const [manualQty, setManualQty] = useState('')
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [dropRect, setDropRect] = useState<{ top: number; left: number; width: number } | null>(null)
@@ -158,39 +162,62 @@ export default function NewRecipePage() {
   const [aiLoading, setAiLoading] = useState(false)
   const [aiDone, setAiDone] = useState(false)
   const [listening, setListening] = useState(false)
+  const recognitionRef = useRef<any>(null)
 
   async function handleAiFill() {
     if (!aiInput.trim()) return
     setAiLoading(true)
     setAiDone(false)
-    const res = await fetch('/api/recipes/ai-describe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ description: aiInput }),
-    })
-    const data = await res.json()
-    setAiLoading(false)
-    if (res.ok) {
-      if (data.name) setRecipeName(data.name)
-      if (data.description) setDescription(data.description)
-      if (data.category) setCategory(data.category)
-      if (data.portionSize) setPortionSize(data.portionSize)
-      if (data.sellPrice) setSellPrice(String(data.sellPrice))
-      setAiDone(true)
-      setAiMode(false)
+    try {
+      const res = await fetch('/api/recipes/ai-describe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: aiInput }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        if (data.name) setRecipeName(data.name)
+        if (data.description) setDescription(data.description)
+        if (data.category) setCategory(data.category)
+        if (data.portionSize) setPortionSize(String(data.portionSize))
+        if (data.sellPrice) setSellPrice(String(data.sellPrice))
+        setAiDone(true)
+        // Keep panel open so user can see "Fields filled ✓" confirmation
+      } else {
+        alert(data.error ?? 'AI failed — please try again')
+      }
+    } catch {
+      alert('Network error — please try again')
     }
+    setAiLoading(false)
   }
 
   function startVoice() {
-    const SpeechRecognition = (window as unknown as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown }).SpeechRecognition ?? (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition
-    if (!SpeechRecognition) { alert('Voice input not supported in this browser'); return }
-    const recognition = new (SpeechRecognition as new () => { lang: string; onresult: (e: { results: { transcript: string }[][] }) => void; onerror: () => void; onend: () => void; start: () => void })()
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition
+    if (!SR) { alert('Voice input not supported in this browser'); return }
+    const recognition = new SR()
     recognition.lang = 'en-GB'
-    recognition.onresult = (e) => { setAiInput(e.results[0][0].transcript) }
-    recognition.onerror = () => setListening(false)
-    recognition.onend = () => setListening(false)
+    recognition.continuous = true       // keep going until manually stopped
+    recognition.interimResults = true   // show partial results while speaking
+    recognitionRef.current = recognition
+
+    recognition.onresult = (e: any) => {
+      // Concatenate all final + interim results into one string
+      let transcript = ''
+      for (let i = 0; i < e.results.length; i++) {
+        transcript += e.results[i][0].transcript
+      }
+      setAiInput(transcript)
+    }
+    recognition.onerror = () => { setListening(false); recognitionRef.current = null }
+    recognition.onend = () => { setListening(false); recognitionRef.current = null }
     setListening(true)
     recognition.start()
+  }
+
+  function stopVoice() {
+    recognitionRef.current?.stop()
+    setListening(false)
   }
 
   useEffect(() => {
@@ -408,11 +435,42 @@ export default function NewRecipePage() {
         if (riErr) throw new Error(riErr.message)
       }
 
-      router.push('/chef/recipes')
+      router.push(`/chef/recipes/${recipe.id}/edit`)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setSaving(false)
     }
+  }
+
+  function startManualIngredient() {
+    setManualName(query)
+    setManualCostPerKg('')
+    setManualQty('')
+    setAddingManual(true)
+    setShowDrop(false)
+    setQuery('')
+    setPending(null)
+  }
+
+  function addManualLine() {
+    if (!manualName.trim() || !manualQty) return
+    const qty = parseFloat(manualQty)
+    if (!qty || qty <= 0) return
+    const costPerKg = manualCostPerKg ? parseFloat(manualCostPerKg) : 0
+    const allergens = detectAllergensFromName(manualName)
+    setLines(prev => [...prev, {
+      uid: uidCounter++,
+      name: manualName.trim(),
+      source: 'off',
+      qtyG: qty,
+      allergenDbKeys: allergens,
+      cpg: costPerKg / 1000,
+      costPerKg,
+    }])
+    setManualName('')
+    setManualCostPerKg('')
+    setManualQty('')
+    setAddingManual(false)
   }
 
   const dropdownEl = showDrop && dropRect ? (
@@ -446,6 +504,19 @@ export default function NewRecipePage() {
           </div>
         </button>
       ))}
+      {/* Always show "add manually" option at the bottom */}
+      {!searching && query.trim().length >= 2 && (
+        <button
+          onMouseDown={startManualIngredient}
+          className="w-full text-left px-3 py-2.5 border-t border-gray-100 hover:bg-green-50 flex items-center gap-2"
+        >
+          <span className="h-5 w-5 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-bold shrink-0">+</span>
+          <div>
+            <p className="text-sm font-medium text-green-800">Add "{query}" manually</p>
+            <p className="text-xs text-gray-400">Not in your library or the database</p>
+          </div>
+        </button>
+      )}
     </div>
   ) : null
 
@@ -486,12 +557,11 @@ export default function NewRecipePage() {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={startVoice}
-                disabled={listening}
+                onClick={listening ? stopVoice : startVoice}
                 className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm border font-medium transition-colors ${listening ? 'bg-red-100 border-red-300 text-red-600 animate-pulse' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
               >
                 <Mic className="h-4 w-4" />
-                {listening ? 'Listening…' : 'Voice'}
+                {listening ? 'Stop recording' : 'Voice'}
               </button>
               <button
                 onClick={handleAiFill}
