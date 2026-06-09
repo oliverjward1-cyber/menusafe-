@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { UtensilsCrossed } from 'lucide-react'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy — HospoPilot',
@@ -10,13 +10,12 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gray-900 text-white px-6 py-8">
+      <div className="bg-hospopilot-ink text-white px-6 py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-2 mb-2">
-            <UtensilsCrossed className="h-5 w-5 text-green-400" />
-            <span className="text-sm font-medium text-green-400">HospoPilot</span>
+          <div className="mb-3">
+            <HospoPilotLogo onDark />
           </div>
-          <h1 className="text-2xl font-bold">Privacy & Data Retention Policy</h1>
+          <h1 className="text-2xl font-bold">Privacy &amp; Data Retention Policy</h1>
           <p className="text-gray-400 mt-1 text-sm">Last updated: June 2025</p>
         </div>
       </div>
