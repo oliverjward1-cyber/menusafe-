@@ -37,6 +37,14 @@ export async function POST(request: Request) {
 
     const adminClient = createAdminClient()
 
+    const { data: restaurant } = await adminClient
+      .from('restaurants')
+      .select('name')
+      .eq('id', profile.restaurant_id)
+      .single()
+
+    const restaurantName = restaurant?.name ?? 'mise'
+
     const { data: invite, error: insertError } = await adminClient
       .from('invites')
       .insert({ restaurant_id: profile.restaurant_id, email, role: inviteRole })
@@ -54,15 +62,15 @@ export async function POST(request: Request) {
     const resend = new Resend(process.env.RESEND_API_KEY)
 
     const { error: emailError } = await resend.emails.send({
-      from: 'mise <noreply@mise.app>',
+      from: `${restaurantName} <noreply@mise.kitchen>`,
       to: email,
-      subject: "You've been invited to mise",
+      subject: `You've been invited to join ${restaurantName}`,
       html: `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>You've been invited to mise</title>
+  <title>You've been invited to join ${restaurantName}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:40px 0;">
@@ -72,15 +80,16 @@ export async function POST(request: Request) {
           <!-- Header -->
           <tr>
             <td style="background-color:#1a3d2b;padding:32px 40px;text-align:center;">
-              <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">mise</h1>
+              <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">${restaurantName}</h1>
+              <p style="margin:8px 0 0;color:#a7c4b5;font-size:13px;">Powered by mise</p>
             </td>
           </tr>
           <!-- Body -->
           <tr>
             <td style="padding:40px 40px 32px;">
-              <h2 style="margin:0 0 16px;color:#1a1a1a;font-size:22px;font-weight:600;">You've been invited!</h2>
+              <h2 style="margin:0 0 16px;color:#1a1a1a;font-size:22px;font-weight:600;">You've been invited to join the team</h2>
               <p style="margin:0 0 16px;color:#444444;font-size:16px;line-height:1.6;">
-                You've been invited to join a restaurant team on <strong>mise</strong> — the platform that keeps your kitchen team aligned on menu knowledge and allergen safety.
+                <strong>${restaurantName}</strong> has invited you to join their team on mise — the platform that keeps kitchen teams aligned on compliance, allergen safety and menu knowledge.
               </p>
               <p style="margin:0 0 32px;color:#444444;font-size:16px;line-height:1.6;">
                 Click the button below to set up your account and get started. This invite link expires in 7 days.
