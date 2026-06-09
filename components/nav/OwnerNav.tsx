@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -25,6 +26,8 @@ import {
   FlaskConical,
   CreditCard,
   History,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react'
 import { MiseLogo } from '@/components/MiseLogo'
 
@@ -40,6 +43,51 @@ function NavSection({ label, items, pathname }: { label: string; items: { href: 
           </Link>
         )
       })}
+    </div>
+  )
+}
+
+function CollapsibleNavSection({ label, icon: SectionIcon, items, pathname }: {
+  label: string
+  icon: any
+  items: { href: string; label: string; icon: any }[]
+  pathname: string
+}) {
+  const isAnyActive = items.some(i => pathname.startsWith(i.href))
+  const [open, setOpen] = useState(isAnyActive)
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={cn(
+          'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+          isAnyActive ? 'text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+        )}
+      >
+        <SectionIcon className="h-4 w-4 shrink-0" />
+        <span className="flex-1 text-left">{label}</span>
+        {open ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+      </button>
+      {open && (
+        <div className="ml-4 mt-0.5 pl-3 border-l border-gray-700 space-y-0.5">
+          {items.map(({ href, label, icon: Icon }) => {
+            const active = pathname.startsWith(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  active ? 'bg-mise-mid text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                )}
+              >
+                <Icon className="h-3.5 w-3.5" />{label}
+              </Link>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
@@ -79,14 +127,29 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
           { href: '/owner/billing', label: 'Billing', icon: CreditCard },
         ]} />
 
-        <NavSection label="Food" pathname={pathname} items={[
-          { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
-          { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
-          { href: '/chef/menus', label: 'Menus', icon: MenuSquare },
-          { href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode },
-          { href: '/chef/audit', label: 'Kitchen Audit', icon: ClipboardCheck },
-          { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
-        ]} />
+        <div>
+          <p className="px-3 mb-1 text-xs font-semibold text-gray-500 uppercase tracking-widest">Food</p>
+          <CollapsibleNavSection
+            label="Menus"
+            icon={MenuSquare}
+            pathname={pathname}
+            items={[
+              { href: '/chef/menus', label: 'Build Menu', icon: MenuSquare },
+              { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
+              { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
+              { href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode },
+            ]}
+          />
+          <CollapsibleNavSection
+            label="Kitchen Audit"
+            icon={ClipboardCheck}
+            pathname={pathname}
+            items={[
+              { href: '/chef/audit', label: 'Run Audit', icon: ClipboardCheck },
+              { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
+            ]}
+          />
+        </div>
 
         <NavSection label="Allergens" pathname={pathname} items={[
           { href: '/owner/learn', label: 'Learning Hub', icon: BookOpen },
