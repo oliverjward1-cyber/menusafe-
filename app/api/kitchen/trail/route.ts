@@ -11,6 +11,14 @@ export async function GET(req: NextRequest) {
   const today = new Date().toISOString().split('T')[0]
   const todayDow = new Date().getDay() // 0=Sun
 
+  // Always fetch templates so we can enrich logs with checklist_items
+  const { data: templates } = await supabase
+    .from('ops_task_templates')
+    .select('*')
+    .eq('restaurant_id', restaurantId)
+    .eq('is_active', true)
+    .order('sort_order')
+
   // Check if today's logs already exist
   const { data: existing } = await supabase
     .from('ops_task_logs')
@@ -20,16 +28,12 @@ export async function GET(req: NextRequest) {
     .order('sort_order')
 
   if (existing && existing.length > 0) {
-    return NextResponse.json({ tasks: existing })
+    const enriched = existing.map(log => {
+      const tmpl = (templates ?? []).find(t => t.id === log.template_id)
+      return { ...log, checklist_items: tmpl?.checklist_items ?? null, description: tmpl?.description ?? null }
+    })
+    return NextResponse.json({ tasks: enriched })
   }
-
-  // Generate today's task instances from active templates
-  const { data: templates } = await supabase
-    .from('ops_task_templates')
-    .select('*')
-    .eq('restaurant_id', restaurantId)
-    .eq('is_active', true)
-    .order('sort_order')
 
   if (!templates || templates.length === 0) {
     return NextResponse.json({ tasks: [] })
