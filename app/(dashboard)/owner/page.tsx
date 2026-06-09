@@ -163,7 +163,7 @@ export default async function OwnerDashboard() {
   const weekTotalDaysSoFar = weekDays.filter(d => !d.isFuture && d.total > 0).length
 
   // Combined staff (for compliance check)
-  const trainedStaff = [...new Map([...fohCompliance, ...bohCompliance].map(s => [s.name, s])).values()]
+  const trainedStaff = Array.from(new Map([...fohCompliance, ...bohCompliance].map(s => [s.name, s])).values())
   const expiringStaff = trainedStaff.filter(s => s.status === 'expiring')
   const expiredStaff = trainedStaff.filter(s => s.status === 'expired')
 
