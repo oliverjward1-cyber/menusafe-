@@ -22,6 +22,7 @@ type Task = {
   description: string | null
   data: any
   notes: string | null
+  flag_reason: string | null
 }
 
 const TYPE_ICON: Record<string, any> = {
