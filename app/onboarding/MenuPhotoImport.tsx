@@ -99,11 +99,11 @@ export function MenuPhotoImport({ restaurantId }: Props) {
       <div className="space-y-4">
         <div
           onClick={() => fileRef.current?.click()}
-          className="border-2 border-dashed border-white/20 rounded-2xl p-10 text-center cursor-pointer hover:border-hospopilot-gold hover:bg-hospopilot-gold/10 transition-colors group"
+          className="border-2 border-dashed border-[#C7D0D5] rounded-2xl p-10 text-center cursor-pointer hover:border-hospopilot-gold hover:bg-hospopilot-gold/10 transition-colors group"
         >
-          <ImagePlus className="h-10 w-10 text-white/30 group-hover:text-hospopilot-gold mx-auto mb-3 transition-colors" />
-          <p className="text-sm font-semibold text-white mb-1">Upload a photo of your menu</p>
-          <p className="text-xs text-white/40">JPG, PNG or WEBP · Works with printed menus, PDFs photographed, or digital screenshots</p>
+          <ImagePlus className="h-10 w-10 text-[#97A1A7] group-hover:text-hospopilot-gold mx-auto mb-3 transition-colors" />
+          <p className="text-sm font-semibold text-[#141A1E] mb-1">Upload a photo of your menu</p>
+          <p className="text-xs text-[#677077]">JPG, PNG or WEBP · Works with printed menus, PDFs photographed, or digital screenshots</p>
           <input
             ref={fileRef}
             type="file"
@@ -114,7 +114,7 @@ export function MenuPhotoImport({ restaurantId }: Props) {
           />
         </div>
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-900/30 border border-red-500/40 rounded-xl text-sm text-red-300">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
             <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
           </div>
         )}
@@ -129,8 +129,8 @@ export function MenuPhotoImport({ restaurantId }: Props) {
           <img src={preview} alt="menu" className="h-32 w-32 object-cover rounded-xl mx-auto mb-6 opacity-50" />
         )}
         <Loader2 className="h-8 w-8 animate-spin text-hospopilot-gold mx-auto mb-3" />
-        <p className="text-sm font-semibold text-white">Reading your menu…</p>
-        <p className="text-xs text-white/40 mt-1">This takes about 10 seconds</p>
+        <p className="text-sm font-semibold text-[#141A1E]">Reading your menu…</p>
+        <p className="text-xs text-[#677077] mt-1">This takes about 10 seconds</p>
       </div>
     )
   }

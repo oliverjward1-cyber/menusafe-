@@ -17,7 +17,7 @@ export default async function KitchenPage({ params }: { params: { slug: string }
     <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <HospoPilotLogo className="mx-auto mb-4 opacity-80" />
+          <HospoPilotLogo className="mx-auto mb-4 opacity-80" onDark />
           <h1 className="text-2xl font-display font-semibold text-white">{restaurant.name}</h1>
           <p className="text-sm text-white/50 mt-1">Staff portal</p>
         </div>

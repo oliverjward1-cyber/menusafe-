@@ -66,7 +66,7 @@ supabase/migrations/ database schema
 
 ## Brand quick reference
 
-- Name **HospoPilot**, 2×2 grid mark with one gold tile
+- Name **HospoPilot**, rounded dark-green square with a gold star mark; two-tone "Hospo**Pilot**" wordmark
 - Palette (Tailwind `hospopilot-*` tokens): deep green `#1B4332` · mid `#2D6A4F` · fresh `#52B788` · gold `#D4A017` · cream `#F8F4E3` · ink `#1C2B24`
 - Display serif: Cormorant Garamond · UI/body: Hanken Grotesk
 - Transactional email sends from `support@hospopilot.co.uk`

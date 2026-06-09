@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-hospopilot-ink flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
-          <HospoPilotLogo />
+          <HospoPilotLogo onDark />
         </div>
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
           <h1 className="text-lg font-semibold text-white mb-1">Admin access</h1>

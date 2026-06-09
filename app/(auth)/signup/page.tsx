@@ -116,17 +116,17 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#F8FAFB] font-sans text-[#3A474E] flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
-          <HospoPilotLogo className="mb-3 scale-125" />
-          <p className="text-hospopilot-fresh/70 text-sm mt-1 font-sans">Create your account</p>
+          <HospoPilotLogo className="scale-110" />
+          <p className="text-[#677077] text-sm mt-3">Create your account</p>
         </div>
 
-        <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
+        <div className="bg-white rounded-2xl border border-[#E3E9EC] shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.18)] p-8">
           {/* Role selector */}
           <div className="mb-6">
-            <p className="text-sm font-medium text-gray-300 mb-3">I am a&hellip;</p>
+            <p className="text-sm font-medium text-[#3A474E] mb-3">I am a&hellip;</p>
             <div className="grid grid-cols-2 gap-3">
               {(['owner', 'chef'] as Role[]).map((r) => (
                 <button
@@ -135,8 +135,8 @@ export default function SignupPage() {
                   onClick={() => setRole(r)}
                   className={`rounded-lg border-2 p-3 text-sm font-medium transition-colors ${
                     role === r
-                      ? 'border-hospopilot-fresh bg-hospopilot-mid/30 text-white'
-                      : 'border-white/10 text-gray-400 hover:border-white/20'
+                      ? 'border-hospopilot-mid bg-hospopilot-mid/10 text-[#1B4332]'
+                      : 'border-[#E3E9EC] text-[#677077] hover:border-[#C7D0D5]'
                   }`}
                 >
                   {r === 'owner' ? '👤 Owner' : '👨‍🍳 Chef / Staff'}
@@ -194,13 +194,13 @@ export default function SignupPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-[#3A474E] mb-1">
                 How did you hear about us?
               </label>
               <select
                 value={hearAbout}
                 onChange={(e) => setHearAbout(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-hospopilot-fresh"
+                className="w-full rounded-lg border border-[#C7D0D5] bg-white px-3 py-2 text-sm text-[#141A1E] focus:outline-none focus:border-[#2D6A4F] focus:ring-1 focus:ring-[#2D6A4F]"
               >
                 <option value="">Select an option</option>
                 <option value="Google search">Google search</option>
@@ -219,15 +219,15 @@ export default function SignupPage() {
               </div>
             )}
 
-            <Button type="submit" loading={loading} size="lg" className="w-full">
+            <Button type="submit" loading={loading} size="lg" className="w-full !bg-hospopilot-mid hover:!bg-hospopilot-deep">
               Create account
             </Button>
           </form>
         </div>
 
-        <p className="text-center text-sm text-gray-400 mt-6">
+        <p className="text-center text-sm text-[#677077] mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-hospopilot-fresh hover:text-hospopilot-gold font-medium">
+          <Link href="/login" className="text-[#2D6A4F] hover:text-[#1B4332] font-semibold">
             Sign in
           </Link>
         </p>

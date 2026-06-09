@@ -73,18 +73,18 @@ export default function InviteAcceptPage() {
 
   if (expired) {
     return (
-      <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen bg-[#F8FAFB] font-sans text-[#3A474E] flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-md">
           <div className="flex flex-col items-center mb-10">
-            <HospoPilotLogo className="mb-3 scale-125" />
+            <HospoPilotLogo className="scale-110" />
           </div>
-          <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8 text-center">
+          <div className="bg-white rounded-2xl border border-[#E3E9EC] shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.18)] p-8 text-center">
             <p className="text-2xl mb-3">🔗</p>
-            <h1 className="text-xl font-display font-semibold text-white mb-2">Link expired</h1>
-            <p className="text-hospopilot-fresh/70 text-sm">
+            <h1 className="text-xl font-bold text-[#1B4332] mb-2">Link expired</h1>
+            <p className="text-[#677077] text-sm">
               This invite link has expired or already been used. Ask your restaurant owner to send a new invite.
             </p>
-            <Link href="/login" className="mt-4 inline-block text-sm text-hospopilot-fresh hover:text-white transition-colors">
+            <Link href="/login" className="mt-4 inline-block text-sm text-[#2D6A4F] hover:text-[#1B4332] font-semibold transition-colors">
               Go to login
             </Link>
           </div>
@@ -94,15 +94,15 @@ export default function InviteAcceptPage() {
   }
 
   return (
-    <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F8FAFB] font-sans text-[#3A474E] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
-          <HospoPilotLogo className="mb-3 scale-125" />
-          <p className="text-hospopilot-fresh/70 text-sm mt-1 font-sans">You&apos;ve been invited to join HospoPilot as head chef</p>
+          <HospoPilotLogo className="scale-110" />
+          <p className="text-[#677077] text-sm mt-3">You&apos;ve been invited to join HospoPilot as head chef</p>
         </div>
 
-        <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
-          <h1 className="text-xl font-display font-semibold text-white mb-6">Set up your account</h1>
+        <div className="bg-white rounded-2xl border border-[#E3E9EC] shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.18)] p-8">
+          <h1 className="text-xl font-bold text-[#1B4332] mb-6">Set up your account</h1>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <Input
@@ -137,11 +137,11 @@ export default function InviteAcceptPage() {
                 required
                 autoComplete="new-password"
               />
-              {pwError && <p className="text-xs text-red-400 mt-1">{pwError}</p>}
+              {pwError && <p className="text-xs text-red-600 mt-1">{pwError}</p>}
             </div>
 
             {error && (
-              <div className="rounded-lg bg-red-900/30 border border-red-500/40 px-4 py-3 text-sm text-red-300">
+              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                 {error}
               </div>
             )}

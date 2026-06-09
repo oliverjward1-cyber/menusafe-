@@ -35,7 +35,7 @@ export function ChefNav({ restaurantName }: { restaurantName: string }) {
   return (
     <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
       <div className="p-4 border-b border-gray-700">
-        <Link href="/chef"><HospoPilotLogo className="mb-2" /></Link>
+        <Link href="/chef"><HospoPilotLogo className="mb-2" onDark /></Link>
         <p className="text-xs text-gray-400 truncate">{restaurantName}</p>
         <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs bg-hospopilot-mid/40 text-hospopilot-fresh">
           Kitchen

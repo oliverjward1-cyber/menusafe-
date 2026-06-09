@@ -65,14 +65,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-hospopilot-ink flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F8FAFB] font-sans text-[#3A474E] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
-          <HospoPilotLogo className="mb-3 scale-125" />
-          <p className="text-hospopilot-fresh/70 text-sm mt-1 font-sans">Sign in to your account</p>
+          <HospoPilotLogo className="scale-110" />
+          <p className="text-[#677077] text-sm mt-3">Sign in to your account</p>
         </div>
 
-        <div className="bg-white/5 rounded-2xl border border-white/10 shadow-xl p-8">
+        <div className="bg-white rounded-2xl border border-[#E3E9EC] shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.18)] p-8">
           <form onSubmit={handleLogin} className="space-y-5">
             <Input
               label="Email address"
@@ -93,13 +93,13 @@ export default function LoginPage() {
               autoComplete="current-password"
             />
             <div className="text-right -mt-2">
-              <Link href="/forgot-password" className="text-xs text-gray-500 hover:text-gray-300">
+              <Link href="/forgot-password" className="text-xs text-[#677077] hover:text-[#1B4332]">
                 Forgot password?
               </Link>
             </div>
 
             {error && (
-              <div className="rounded-lg bg-red-900/30 border border-red-500/40 px-4 py-3 text-sm text-red-300">
+              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                 {error}
               </div>
             )}
@@ -110,9 +110,9 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-gray-400 mt-6">
+        <p className="text-center text-sm text-[#677077] mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-hospopilot-fresh hover:text-hospopilot-gold font-medium">
+          <Link href="/signup" className="text-[#2D6A4F] hover:text-[#1B4332] font-semibold">
             Create one
           </Link>
         </p>
