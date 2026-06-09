@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { AllergenBadge } from '@/components/allergen/AllergenBadge'
 import { ALLERGENS } from '@/lib/constants/allergens'
 import { formatCurrency } from '@/lib/utils'
-import { Plus, Package, Upload, Pencil, Camera, Thermometer, Box, Snowflake } from 'lucide-react'
+import { Plus, Package, Upload, Camera, Thermometer, Box, Snowflake, Sparkles } from 'lucide-react'
 import { CategoriseButton } from './CategoriseButton'
 
 const STORAGE_GROUPS = [
@@ -44,21 +44,21 @@ export default async function IngredientsPage() {
           {(ingredients?.length ?? 0) > 0 && <CategoriseButton />}
           <Link
             href="/chef/ingredients/scan"
-            className="inline-flex items-center gap-2 border border-green-200 text-green-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
           >
             <Camera className="h-4 w-4" />
             Scan invoice
           </Link>
           <Link
             href="/chef/ingredients/upload"
-            className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
           >
             <Upload className="h-4 w-4" />
             Upload sheet
           </Link>
           <Link
             href="/chef/ingredients/new"
-            className="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add ingredient
@@ -97,28 +97,28 @@ export default async function IngredientsPage() {
                           <th className="text-left px-4 py-2.5 font-medium text-gray-500 text-xs uppercase tracking-wide">Cost / unit</th>
                           <th className="text-left px-4 py-2.5 font-medium text-gray-500 text-xs uppercase tracking-wide">Unit</th>
                           <th className="text-left px-4 py-2.5 font-medium text-gray-500 text-xs uppercase tracking-wide">Allergens</th>
-                          <th className="px-4 py-2.5" />
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
                         {items.map(ing => {
                           const presentAllergens = ALLERGENS.filter(a => ing[a.key])
                           return (
-                            <tr key={ing.id} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-5 py-3 font-medium text-gray-900">{ing.name}</td>
-                              <td className="px-4 py-3 text-gray-600">{formatCurrency(ing.cost_per_unit)}</td>
-                              <td className="px-4 py-3 text-gray-600">{ing.unit_type}</td>
+                            <tr key={ing.id} className="hover:bg-gray-50 transition-colors cursor-pointer group">
+                              <td className="px-5 py-3 font-medium text-gray-900">
+                                <Link href={`/chef/ingredients/${ing.id}/edit`} className="hover:text-mise-mid transition-colors">{ing.name}</Link>
+                              </td>
+                              <td className="px-4 py-3 text-gray-600">
+                                <Link href={`/chef/ingredients/${ing.id}/edit`} className="block">{formatCurrency(ing.cost_per_unit)}</Link>
+                              </td>
+                              <td className="px-4 py-3 text-gray-600">
+                                <Link href={`/chef/ingredients/${ing.id}/edit`} className="block">{ing.unit_type}</Link>
+                              </td>
                               <td className="px-4 py-3">
                                 <div className="flex flex-wrap gap-1">
                                   {presentAllergens.length > 0
                                     ? presentAllergens.map(a => <AllergenBadge key={a.key} allergenKey={a.key} size="sm" />)
                                     : <span className="text-gray-400 text-xs">None</span>}
                                 </div>
-                              </td>
-                              <td className="px-4 py-3 text-right">
-                                <Link href={`/chef/ingredients/${ing.id}/edit`} className="inline-flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors" aria-label={`Edit ${ing.name}`}>
-                                  <Pencil className="h-4 w-4" />
-                                </Link>
                               </td>
                             </tr>
                           )
