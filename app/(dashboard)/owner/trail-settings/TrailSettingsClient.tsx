@@ -19,6 +19,7 @@ type Template = {
   checklist_items: ChecklistItem[] | null
   is_active: boolean
   sort_order: number
+  target_team: 'kitchen' | 'foh' | 'all'
 }
 
 const TASK_TYPES = [
@@ -63,6 +64,7 @@ function TemplateEditor({
 }) {
   const [title, setTitle] = useState(initial?.title ?? '')
   const [description, setDescription] = useState(initial?.description ?? '')
+  const [targetTeam, setTargetTeam] = useState<'kitchen' | 'foh' | 'all'>(initial?.target_team ?? 'kitchen')
   const [taskType, setTaskType] = useState(initial?.task_type ?? 'checklist')
   const [scheduleType, setScheduleType] = useState(initial?.schedule_type ?? 'daily')
   const [scheduleDays, setScheduleDays] = useState<number[]>(initial?.schedule_type === 'weekly' ? [] : [])
@@ -93,6 +95,7 @@ function TemplateEditor({
       title: title.trim(),
       description: description.trim() || null,
       task_type: taskType,
+      target_team: targetTeam,
       schedule_type: scheduleType,
       schedule_days: scheduleType === 'weekly' ? scheduleDays : null,
       scheduled_time: scheduledTime || null,
@@ -134,6 +137,23 @@ function TemplateEditor({
               placeholder="Brief instruction for staff"
               className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
             />
+          </div>
+
+          {/* Team */}
+          <div>
+            <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Team</label>
+            <div className="flex gap-2">
+              {([['kitchen', 'Kitchen'], ['foh', 'FOH'], ['all', 'All staff']] as const).map(([val, lbl]) => (
+                <button
+                  key={val}
+                  onClick={() => setTargetTeam(val)}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors
+                    ${targetTeam === val ? 'border-mise-mid bg-mise-mid text-white' : 'border-black/[0.08] text-mise-ink/60 hover:bg-gray-50'}`}
+                >
+                  {lbl}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Task type */}
@@ -298,6 +318,12 @@ function TemplateRow({
           </span>
           {template.checklist_items && (
             <span className="text-xs text-hospopilot-ink/30">{template.checklist_items.length} items</span>
+          )}
+          {template.target_team === 'foh' && (
+            <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">FOH</span>
+          )}
+          {template.target_team === 'all' && (
+            <span className="text-xs text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">All</span>
           )}
           {!template.is_active && (
             <span className="text-xs text-gray-400 italic">inactive</span>
