@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye } from 'lucide-react'
 import { PublishToggle } from './PublishToggle'
 import { DuplicateMenuButton } from './DuplicateMenuButton'
+import { DeleteMenuButton } from './DeleteMenuButton'
 
 const DAYPART_LABELS: Record<string, string> = {
   'all-day': 'All day',
@@ -132,6 +133,7 @@ export default async function MenusPage() {
                     </Link>
                     <DuplicateMenuButton menuId={menu.id} />
                     <PublishToggle menuId={menu.id} isPublished={menu.is_published} />
+                    <DeleteMenuButton menuId={menu.id} menuName={menu.name} />
                   </div>
                 </div>
               </Card>
