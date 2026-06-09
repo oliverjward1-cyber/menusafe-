@@ -426,38 +426,6 @@ export default async function OwnerDashboard() {
         </div>
       </Link>
 
-      {/* Top stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Total dishes</p>
-          <p className="text-3xl font-display font-semibold text-mise-ink mt-1">{recipeStats.length}</p>
-          <Link href="/chef/recipes" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
-            View all <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
-        <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Avg menu GP</p>
-          <p className={`text-3xl font-bold mt-1 ${avgGp === null ? 'text-gray-400' : avgGp >= targetGp ? 'text-green-700' : 'text-red-600'}`}>
-            {avgGp !== null ? formatPercent(avgGp) : '—'}
-          </p>
-          <p className="text-xs text-mise-ink/40 mt-2">Target: {targetGp}%</p>
-        </div>
-        <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Below target GP</p>
-          <p className={`text-3xl font-bold mt-1 ${belowTargetCount > 0 ? 'text-red-600' : 'text-green-700'}`}>
-            {belowTargetCount}
-          </p>
-          <p className="text-xs text-mise-ink/40 mt-2">{belowTargetCount === 0 ? 'All dishes on target' : `dish${belowTargetCount !== 1 ? 'es' : ''} need pricing review`}</p>
-        </div>
-        <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Pending approval</p>
-          <p className={`text-3xl font-bold mt-1 ${pendingCount > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
-            {pendingCount}
-          </p>
-          <p className="text-xs text-mise-ink/40 mt-2">{pendingCount === 0 ? 'All up to date' : `recipe${pendingCount !== 1 ? 's' : ''} awaiting review`}</p>
-        </div>
-      </div>
-
       {/* Staff Training — FOH + BOH side by side */}
       {(() => {
         function CompliancePanel({ label, quizUrl, compliance, lastAttempt, colour }: {
