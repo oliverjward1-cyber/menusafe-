@@ -89,6 +89,18 @@ export default async function LearnHubPage() {
           </div>
         </div>
 
+        {/* FOH training link */}
+        <Link href="/owner/learn/foh" className="flex items-center gap-4 bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-3 hover:border-amber-200 transition-colors">
+          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-mise-ink text-sm">FOH Allergen Awareness Guide</p>
+            <p className="text-xs text-gray-500 mt-0.5">Responsibilities, customer communication, and Natasha&apos;s Law</p>
+          </div>
+          <ChevronRight className="h-4 w-4 text-mise-ink/20 flex-shrink-0" />
+        </Link>
+
         {/* FOH allergen progress */}
         <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden mb-3">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">

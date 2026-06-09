@@ -166,8 +166,9 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
 
         <NavSection label="Learning Hub" pathname={pathname} items={[
           { href: '/owner/learn', label: 'Learning Modules', icon: BookOpen },
-          { href: '/owner/staff-quiz?role=foh', label: 'FOH Quiz', icon: Users },
-          { href: '/owner/staff-quiz?role=boh', label: 'BOH Quiz', icon: Users2 },
+          { href: '/owner/learn/foh', label: 'FOH Training', icon: Users },
+          { href: '/owner/staff-quiz?type=front_of_house', label: 'FOH Quiz', icon: Users },
+          { href: '/owner/staff-quiz?type=kitchen', label: 'BOH Quiz', icon: Users2 },
           { href: '/owner/quiz-questions', label: 'Quiz Questions', icon: GraduationCap },
         ]} />
       </nav>

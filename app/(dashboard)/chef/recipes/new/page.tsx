@@ -778,6 +778,65 @@ export default function NewRecipePage() {
               Enter cost price per kg so food cost and GP can be calculated accurately.
             </p>
           )}
+
+          {/* Manual ingredient inline form */}
+          {addingManual && (
+            <div className="border border-green-200 bg-green-50 rounded-xl p-4 space-y-3">
+              <p className="text-xs font-semibold text-green-800 uppercase tracking-widest">Add manually</p>
+              <div className="grid grid-cols-1 sm:grid-cols-[1fr_110px_130px] gap-3">
+                <div>
+                  <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Name</label>
+                  <input
+                    type="text"
+                    value={manualName}
+                    onChange={e => setManualName(e.target.value)}
+                    placeholder="Ingredient name"
+                    autoFocus
+                    className="w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm focus:border-green-600 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Qty (g)</label>
+                  <input
+                    type="number"
+                    value={manualQty}
+                    onChange={e => setManualQty(e.target.value)}
+                    placeholder="0"
+                    min="0"
+                    onKeyDown={e => e.key === 'Enter' && addManualLine()}
+                    className="w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm focus:border-green-600 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Cost (£/kg)</label>
+                  <input
+                    type="number"
+                    value={manualCostPerKg}
+                    onChange={e => setManualCostPerKg(e.target.value)}
+                    placeholder="e.g. 3.50"
+                    step="0.01" min="0"
+                    onKeyDown={e => e.key === 'Enter' && addManualLine()}
+                    className="w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm focus:border-green-600 focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={addManualLine}
+                  disabled={!manualName.trim() || !manualQty}
+                  className="px-4 py-2 bg-green-800 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-40 transition-colors"
+                >
+                  Add ingredient
+                </button>
+                <button
+                  onClick={() => setAddingManual(false)}
+                  className="px-4 py-2 border border-gray-200 text-sm text-gray-500 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

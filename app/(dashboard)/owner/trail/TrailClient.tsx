@@ -3,9 +3,10 @@ import { useEffect, useState, useCallback } from 'react'
 import {
   CheckCircle2, Circle, Flag, ChevronDown, ChevronUp,
   Thermometer, ClipboardList, Sparkles, Truck, FileText,
-  Loader2, AlertTriangle, Plus, Minus, Send, History,
+  Loader2, AlertTriangle, Plus, Minus, Send, History, Camera, X, Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 type ChecklistItem = { id: string; label: string; required: boolean }
 
@@ -63,6 +64,34 @@ function TaskCard({
     { location: 'Freezer 1', temperature: '' },
     { location: 'Freezer 2', temperature: '' },
   ])
+
+  type DeliveryEntry = {
+    id: string; supplier: string; items: string
+    temperature: string; happy: boolean | null; photoFile: File | null; photoPreview: string | null
+  }
+  const [deliveries, setDeliveries] = useState<DeliveryEntry[]>([
+    { id: uid(), supplier: '', items: '', temperature: '', happy: null, photoFile: null, photoPreview: null }
+  ])
+
+  function uid() { return Math.random().toString(36).slice(2, 9) }
+
+  function updateDelivery(id: string, field: keyof DeliveryEntry, val: any) {
+    setDeliveries(p => p.map(d => d.id === id ? { ...d, [field]: val } : d))
+  }
+  function addDelivery() {
+    setDeliveries(p => [...p, { id: uid(), supplier: '', items: '', temperature: '', happy: null, photoFile: null, photoPreview: null }])
+  }
+  function removeDelivery(id: string) {
+    setDeliveries(p => p.filter(d => d.id !== id))
+  }
+  function handleDeliveryPhoto(id: string, file: File) {
+    const reader = new FileReader()
+    reader.onload = e => {
+      updateDelivery(id, 'photoPreview', e.target?.result as string)
+      updateDelivery(id, 'photoFile', file)
+    }
+    reader.readAsDataURL(file)
+  }
   const [notes, setNotes] = useState('')
   const [flagReason, setFlagReason] = useState('')
   const [flagging, setFlagging] = useState(false)
@@ -79,6 +108,22 @@ function TaskCard({
     let data: any = undefined
     if (task.task_type === 'checklist') data = { checks }
     else if (task.task_type === 'temperature') data = { readings: temps.filter(r => r.temperature !== '') }
+    else if (task.task_type === 'delivery') {
+      const supabase = createClient()
+      const entries = await Promise.all(deliveries.filter(d => d.supplier || d.items).map(async d => {
+        let photoUrl: string | null = null
+        if (d.photoFile) {
+          const path = `${Date.now()}-${d.id}.${d.photoFile.name.split('.').pop() ?? 'jpg'}`
+          const { error: upErr } = await supabase.storage.from('delivery-photos').upload(path, d.photoFile, { upsert: true })
+          if (!upErr) {
+            const { data: pub } = supabase.storage.from('delivery-photos').getPublicUrl(path)
+            photoUrl = pub.publicUrl
+          }
+        }
+        return { supplier: d.supplier, items: d.items, temperature: d.temperature || null, happy: d.happy, photoUrl }
+      }))
+      data = { deliveries: entries }
+    }
 
     await fetch(`/api/kitchen/trail/${task.id}`, {
       method: 'PATCH',
@@ -193,7 +238,73 @@ function TaskCard({
           )}
 
           {task.task_type === 'delivery' && (
-            <p className="text-sm text-mise-ink/50 italic">Add notes below and mark done, or flag if there is an issue.</p>
+            <div className="space-y-3">
+              {deliveries.map((d, i) => {
+                const photoInputId = `photo-${task.id}-${d.id}`
+                return (
+                  <div key={d.id} className="border border-black/[0.08] rounded-xl p-3 space-y-2 bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-semibold text-mise-ink/50 uppercase tracking-widest">Delivery {i + 1}</p>
+                      {deliveries.length > 1 && (
+                        <button onClick={() => removeDelivery(d.id)} className="text-mise-ink/20 hover:text-red-500 transition-colors">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input value={d.supplier} onChange={e => updateDelivery(d.id, 'supplier', e.target.value)}
+                        placeholder="Supplier name"
+                        className="col-span-2 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+                      <input value={d.items} onChange={e => updateDelivery(d.id, 'items', e.target.value)}
+                        placeholder="Items delivered"
+                        className="border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+                      <div className="flex items-center gap-1">
+                        <input type="number" step="0.1" value={d.temperature}
+                          onChange={e => updateDelivery(d.id, 'temperature', e.target.value)}
+                          placeholder="Temp °C"
+                          className="flex-1 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+                      </div>
+                    </div>
+                    {/* Happy / Issue toggle */}
+                    <div className="flex gap-2">
+                      <button onClick={() => updateDelivery(d.id, 'happy', true)}
+                        className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors
+                          ${d.happy === true ? 'bg-green-500 text-white border-green-500' : 'border-black/[0.08] text-mise-ink/50 hover:bg-green-50'}`}>
+                        ✓ Happy with delivery
+                      </button>
+                      <button onClick={() => updateDelivery(d.id, 'happy', false)}
+                        className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors
+                          ${d.happy === false ? 'bg-red-500 text-white border-red-500' : 'border-black/[0.08] text-mise-ink/50 hover:bg-red-50'}`}>
+                        ✗ Issue
+                      </button>
+                    </div>
+                    {/* Invoice photo */}
+                    <div>
+                      <input type="file" accept="image/*" capture="environment" id={photoInputId} className="hidden"
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleDeliveryPhoto(d.id, f) }} />
+                      {d.photoPreview ? (
+                        <div className="relative inline-block">
+                          <img src={d.photoPreview} alt="invoice" className="h-24 rounded-xl object-cover border border-gray-200" />
+                          <button onClick={() => { updateDelivery(d.id, 'photoPreview', null); updateDelivery(d.id, 'photoFile', null) }}
+                            className="absolute -top-1.5 -right-1.5 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label htmlFor={photoInputId}
+                          className="flex items-center gap-2 text-xs text-mise-ink/40 hover:text-mise-mid cursor-pointer transition-colors">
+                          <Camera className="h-4 w-4" /> Photo invoice
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+              <button onClick={addDelivery}
+                className="w-full border-2 border-dashed border-black/[0.08] rounded-xl py-2.5 text-sm text-mise-ink/40 hover:border-mise-mid/30 hover:text-mise-mid transition-colors flex items-center justify-center gap-1.5">
+                <Plus className="h-4 w-4" /> Add another delivery
+              </button>
+            </div>
           )}
 
           <textarea

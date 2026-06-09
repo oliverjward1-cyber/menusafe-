@@ -25,7 +25,7 @@ function complianceStatus(expiryDate: Date): 'valid' | 'expiring' | 'expired' {
 export default async function StaffQuizPage({
   searchParams,
 }: {
-  searchParams: { tab?: string }
+  searchParams: { tab?: string; type?: string }
 }) {
   const supabase = createClient()
   const {
@@ -54,6 +54,7 @@ export default async function StaffQuizPage({
   const fohUrl = `/quiz/${restaurant?.slug}?type=front_of_house`
   const kitchenUrl = `/quiz/${restaurant?.slug}?type=kitchen`
   const activeTab = searchParams.tab === 'compliance' ? 'compliance' : 'setup'
+  const typeFilter = searchParams.type ?? null // 'front_of_house' | 'kitchen' | null
 
   // Build compliance records: latest PASSED attempt per (staff_name, quiz_type)
   type ComplianceRecord = {
@@ -90,16 +91,30 @@ export default async function StaffQuizPage({
     a.staffName.localeCompare(b.staffName)
   )
 
-  const totalAttempts = attempts?.length ?? 0
-  const totalPassed = attempts?.filter((a) => a.passed).length ?? 0
+  const filteredAttempts = typeFilter
+    ? (attempts ?? []).filter(a => a.quiz_type === typeFilter)
+    : (attempts ?? [])
+
+  const totalAttempts = filteredAttempts.length
+  const totalPassed = filteredAttempts.filter((a) => a.passed).length
   const passRate = totalAttempts > 0 ? Math.round((totalPassed / totalAttempts) * 100) : null
+  const typeLabel = typeFilter === 'front_of_house' ? 'Front of House' : typeFilter === 'kitchen' ? 'Kitchen' : null
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">Staff Allergen Quiz</h1>
-          <p className="text-mise-ink/50 mt-1">Manage quizzes and track staff compliance</p>
+          <h1 className="text-2xl font-display font-semibold text-mise-ink">
+            {typeLabel ? `${typeLabel} Quiz` : 'Staff Allergen Quiz'}
+          </h1>
+          <p className="text-mise-ink/50 mt-1">
+            {typeLabel ? `Results filtered to ${typeLabel} staff` : 'Manage quizzes and track staff compliance'}
+          </p>
+          {typeLabel && (
+            <a href="/owner/staff-quiz" className="text-xs text-mise-mid hover:underline mt-0.5 inline-block">
+              ← Show all quiz types
+            </a>
+          )}
         </div>
         <PrintButton label="Print compliance records" />
       </div>
@@ -176,7 +191,7 @@ export default async function StaffQuizPage({
               <h2 className="text-base font-semibold text-mise-ink">Audit trail</h2>
               <p className="text-sm text-mise-ink/50">All quiz attempts</p>
             </div>
-            {!attempts || attempts.length === 0 ? (
+            {filteredAttempts.length === 0 ? (
               <div className="py-12 text-center text-gray-500 text-sm">
                 No quiz attempts yet. Share the QR codes with your staff.
               </div>
@@ -186,19 +201,21 @@ export default async function StaffQuizPage({
                   <thead>
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Staff member</th>
-                      <th className="text-left px-4 py-3 font-medium text-gray-600">Quiz type</th>
+                      {!typeFilter && <th className="text-left px-4 py-3 font-medium text-gray-600">Quiz type</th>}
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Score</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Result</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Completed</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {attempts.map((attempt) => (
+                    {filteredAttempts.map((attempt) => (
                       <tr key={attempt.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3 font-medium text-gray-900">{attempt.staff_name}</td>
-                        <td className="px-4 py-3 text-gray-500 text-xs">
-                          {attempt.quiz_type === 'front_of_house' ? 'Front of House' : 'Kitchen'}
-                        </td>
+                        {!typeFilter && (
+                          <td className="px-4 py-3 text-gray-500 text-xs">
+                            {attempt.quiz_type === 'front_of_house' ? 'Front of House' : 'Kitchen'}
+                          </td>
+                        )}
                         <td className="px-4 py-3 text-gray-600">
                           {attempt.score}/{attempt.total_questions}
                         </td>
