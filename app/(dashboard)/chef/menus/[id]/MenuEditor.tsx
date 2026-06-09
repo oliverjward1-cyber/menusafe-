@@ -50,6 +50,8 @@ function gpPct(recipe: Recipe): number | null {
   return ((recipe.sell_price - cost) / recipe.sell_price) * 100
 }
 
+const COURSE_OPTIONS = ['Starters', 'Mains', 'Sides', 'Desserts', 'Drinks', 'Snacks', 'Specials', 'Other']
+
 interface Props {
   menuId: string
   menuName: string
@@ -60,12 +62,13 @@ interface Props {
   isPublished: boolean
   allRecipes: Recipe[]
   initialSelectedIds: string[]
+  initialCategoryOverrides: Record<string, string>
   menuUrl: string | null
 }
 
 export function MenuEditor({
   menuId, menuName, menuDescription, menuDaypart, menuServiceStart, menuServiceEnd, isPublished,
-  allRecipes, initialSelectedIds, menuUrl,
+  allRecipes, initialSelectedIds, initialCategoryOverrides, menuUrl,
 }: Props) {
   const router = useRouter()
   const supabaseRef = useRef(createClient())
@@ -76,6 +79,8 @@ export function MenuEditor({
   const [daypart, setDaypart] = useState(menuDaypart)
   const [serviceStart, setServiceStart] = useState(menuServiceStart ?? '')
   const [serviceEnd, setServiceEnd] = useState(menuServiceEnd ?? '')
+  // Per-menu course overrides: recipeId → course name
+  const [categoryOverrides, setCategoryOverrides] = useState<Record<string, string>>(initialCategoryOverrides)
   const [published, setPublished] = useState(isPublished)
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
@@ -176,7 +181,12 @@ export function MenuEditor({
     await supabase.from('menu_recipes').delete().eq('menu_id', menuId)
     if (menuOrder.length > 0) {
       await supabase.from('menu_recipes').insert(
-        menuOrder.map((recipe_id, position) => ({ menu_id: menuId, recipe_id, position }))
+        menuOrder.map((recipe_id, position) => ({
+          menu_id: menuId,
+          recipe_id,
+          position,
+          display_category: categoryOverrides[recipe_id] ?? null,
+        }))
       )
     }
 
@@ -428,21 +438,27 @@ export function MenuEditor({
           </div>
 
           {(() => {
-            const CATEGORY_ORDER = ['Starters', 'Mains', 'Desserts', 'Sides', 'Other']
-            const grouped = menuRecipes.reduce<Record<string, Recipe[]>>((acc, r) => {
-              const cat = r.category ?? 'Other'
-              if (!acc[cat]) acc[cat] = []
-              acc[cat].push(r)
+            // Resolve each recipe's effective course (override takes priority over recipe's own category)
+            const recipesWithCourse = menuRecipes.map(r => ({
+              ...r,
+              effectiveCat: categoryOverrides[r.id] ?? r.category ?? 'Other',
+            }))
+
+            const grouped = recipesWithCourse.reduce<Record<string, typeof recipesWithCourse>>((acc, r) => {
+              if (!acc[r.effectiveCat]) acc[r.effectiveCat] = []
+              acc[r.effectiveCat].push(r)
               return acc
             }, {})
-            const cats = CATEGORY_ORDER.filter(c => grouped[c]?.length)
-              .concat(Object.keys(grouped).filter(c => !CATEGORY_ORDER.includes(c)))
+
+            const cats = COURSE_OPTIONS.filter(c => grouped[c]?.length)
+              .concat(Object.keys(grouped).filter(c => !COURSE_OPTIONS.includes(c) && grouped[c]?.length))
 
             return (
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100">
                     <th className="text-left pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">Dish</th>
+                    <th className="pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide text-center">Course</th>
                     <th className="text-right pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">Cost</th>
                     <th className="text-right pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">Sell</th>
                     <th className="text-right pb-2 text-xs font-medium text-gray-400 uppercase tracking-wide">GP%</th>
@@ -457,7 +473,7 @@ export function MenuEditor({
                     return (
                       <>
                         <tr key={`${cat}-header`} className="border-t border-gray-100">
-                          <td colSpan={4} className="pt-3 pb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-widest">{cat}</td>
+                          <td colSpan={5} className="pt-3 pb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-widest">{cat}</td>
                         </tr>
                         {recipes.map(r => {
                           const cost = foodCost(r)
@@ -465,6 +481,18 @@ export function MenuEditor({
                           return (
                             <tr key={r.id} className="border-b border-gray-50">
                               <td className="py-2 text-gray-900 pl-2">{r.name}</td>
+                              <td className="py-1.5 text-center">
+                                <select
+                                  value={r.effectiveCat}
+                                  onChange={e => {
+                                    setCategoryOverrides(prev => ({ ...prev, [r.id]: e.target.value }))
+                                    setSaved(false)
+                                  }}
+                                  className="text-xs border border-gray-200 rounded-md px-2 py-1 bg-white text-gray-600 focus:outline-none focus:ring-1 focus:ring-mise-gold"
+                                >
+                                  {COURSE_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                              </td>
                               <td className="py-2 text-right text-mise-ink/50">{formatCurrency(cost)}</td>
                               <td className="py-2 text-right text-mise-ink/50">{r.sell_price ? formatCurrency(r.sell_price) : '—'}</td>
                               <td className={`py-2 text-right font-medium ${gp == null ? 'text-gray-300' : gp >= 65 ? 'text-green-700' : gp >= 55 ? 'text-amber-600' : 'text-red-600'}`}>
@@ -474,7 +502,7 @@ export function MenuEditor({
                           )
                         })}
                         <tr key={`${cat}-subtotal`} className="bg-gray-50/60">
-                          <td className="py-1.5 pl-2 text-xs font-semibold text-gray-500">{cat} subtotal</td>
+                          <td colSpan={2} className="py-1.5 pl-2 text-xs font-semibold text-gray-500">{cat} subtotal</td>
                           <td className="py-1.5 text-right text-xs font-semibold text-mise-ink/60">{formatCurrency(catCost)}</td>
                           <td className="py-1.5 text-right text-xs font-semibold text-mise-ink/60">{catRevenue > 0 ? formatCurrency(catRevenue) : '—'}</td>
                           <td className={`py-1.5 text-right text-xs font-semibold ${catGp == null ? 'text-gray-300' : catGp >= 65 ? 'text-green-700' : catGp >= 55 ? 'text-amber-600' : 'text-red-600'}`}>

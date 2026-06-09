@@ -40,7 +40,7 @@ export default async function MenuEditPage({ params }: Props) {
   // Recipes already in this menu, ordered by position
   const { data: menuRecipes } = await supabase
     .from('menu_recipes')
-    .select('recipe_id, position')
+    .select('recipe_id, position, display_category')
     .eq('menu_id', params.id)
     .order('position', { ascending: true })
 
@@ -53,6 +53,11 @@ export default async function MenuEditPage({ params }: Props) {
     : null
 
   const selectedIds = (menuRecipes ?? []).map(r => r.recipe_id)
+  const initialCategoryOverrides = Object.fromEntries(
+    (menuRecipes ?? [])
+      .filter(r => r.display_category)
+      .map(r => [r.recipe_id, r.display_category as string])
+  )
 
   return (
     <div className="space-y-5 max-w-4xl">
@@ -95,6 +100,7 @@ export default async function MenuEditPage({ params }: Props) {
         isPublished={menu.is_published}
         allRecipes={(allRecipes ?? []) as any}
         initialSelectedIds={selectedIds}
+        initialCategoryOverrides={initialCategoryOverrides}
         menuUrl={menuUrl}
       />
     </div>
