@@ -38,18 +38,16 @@ export async function POST(req: NextRequest) {
   const anthropic = getClient()
   const message = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
-    max_tokens: 2048,
+    max_tokens: 4096,
+    system: 'You are a professional chef. Return ONLY valid JSON, no markdown, no explanation.',
     messages: [{
       role: 'user',
-      content: `You are a professional chef. Categorise each ingredient below as either "chilled", "ambient", or "frozen" based on how it is typically stored in a commercial kitchen.
+      content: `Categorise each ingredient as "chilled", "ambient", or "frozen":
+- chilled: dairy, fresh meat, fish, fresh veg, eggs, fresh herbs, opened sauces
+- frozen: frozen meat, frozen fish, ice cream, frozen veg, frozen pastry
+- ambient: dried spices, tinned goods, oils, vinegar, flour, sugar, dried pasta, rice, nuts, sealed sauces
 
-Rules:
-- chilled: refrigerated items (dairy, fresh meat, fish, fresh veg, eggs, opened sauces, fresh herbs)
-- frozen: items kept in freezer (frozen meat, frozen fish, ice cream, frozen veg, frozen pastry)
-- ambient: room temperature (dried spices, tinned goods, oils, vinegar, flour, sugar, dried pasta, rice, nuts, sealed sauces)
-
-Return ONLY a JSON object mapping ingredient ID to storage type. No other text.
-Example: {"abc-123": "chilled", "def-456": "ambient"}
+Return ONLY a JSON object: {"<id>": "chilled"|"ambient"|"frozen"}
 
 Ingredients:
 ${list}`,
