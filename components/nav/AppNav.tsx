@@ -166,7 +166,7 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
         {isOwnerOrManager && (
           <NavSection label="People">
             <NavLink href="/owner/team" label="Team" icon={Users2} pathname={pathname} />
-            {isOwner && <NavLink href="/owner/billing" label="Billing" icon={CreditCard} pathname={pathname} />}
+            <NavLink href="/owner/billing" label="Billing" icon={CreditCard} pathname={pathname} />
           </NavSection>
         )}
 
