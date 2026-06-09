@@ -1,12 +1,25 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 
 const PLANS = [
-  { key: 'compliance', name: 'Compliance', price: '£79/mo', description: 'EHO, allergens, temp logs, cleaning, audits & more.' },
-  { key: 'compliance_kitchen', name: 'Compliance + Kitchen', price: '£129/mo', description: 'Everything in Compliance, plus recipes, menus & GP costing.' },
+  {
+    key: 'compliance',
+    name: 'Compliance',
+    price: '£79/mo',
+    description: 'EHO readiness, allergen management, temp logs, cleaning, incident reporting and more.',
+    highlights: ['EHO Inspection Mode', 'Full allergen matrix', 'Staff training & quizzes', 'Printable compliance sheets'],
+  },
+  {
+    key: 'compliance_kitchen',
+    name: 'Compliance + Kitchen',
+    price: '£129/mo',
+    description: 'Everything in Compliance, plus a full recipe and menu management suite with GP costing.',
+    highlights: ['Everything in Compliance', 'Recipe builder & GP calculator', 'Menu management', 'Kitchen audit scoring'],
+  },
 ] as const
 
 export default function PlanSelector({ currentPlan }: { currentPlan: string | null }) {
@@ -48,13 +61,30 @@ export default function PlanSelector({ currentPlan }: { currentPlan: string | nu
             type="button"
             onClick={() => setPlan(p.key)}
             className={cn(
-              'text-left p-4 rounded-xl border-2 transition-colors',
+              'text-left p-4 rounded-xl border-2 transition-colors space-y-3',
               plan === p.key ? 'border-mise-mid bg-mise-mid/5' : 'border-gray-200 hover:border-gray-300'
             )}
           >
-            <p className="font-display text-lg font-semibold text-mise-ink">{p.name}</p>
-            <p className="text-2xl font-bold text-mise-mid mt-1">{p.price}</p>
-            <p className="text-sm text-gray-500 mt-2">{p.description}</p>
+            <div>
+              <p className="font-display text-lg font-semibold text-mise-ink">{p.name}</p>
+              <p className="text-2xl font-bold text-mise-mid mt-1">{p.price}</p>
+              <p className="text-sm text-gray-500 mt-2">{p.description}</p>
+            </div>
+            <ul className="space-y-1">
+              {p.highlights.map(h => (
+                <li key={h} className="text-xs text-gray-500 flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-mise-mid shrink-0" />
+                  {h}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/owner/billing/plans"
+              onClick={e => e.stopPropagation()}
+              className="inline-block text-xs font-semibold text-mise-mid hover:text-mise-deep underline underline-offset-2"
+            >
+              See full feature list →
+            </Link>
           </button>
         ))}
       </div>
