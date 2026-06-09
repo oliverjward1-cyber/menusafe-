@@ -204,6 +204,11 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
           {/* Daily Trail — all roles */}
           <NavLink href="/owner/trail" label="Daily Trail" icon={ListChecks} pathname={pathname} />
 
+          {/* FOH Daily Checks — foh + management */}
+          {(isOwnerOrManager || isHeadChef || isFOH) && (
+            <NavLink href="/owner/foh-trail" label="FOH Daily Checks" icon={Users2} pathname={pathname} />
+          )}
+
           {/* Trail History — owner, manager, head chef */}
           {(isOwnerOrManager || isHeadChef) && (
             <NavLink href="/owner/trail-history" label="Trail History" icon={BookMarked} pathname={pathname} />

@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
       title: body.title,
       description: body.description ?? null,
       task_type: body.task_type,
+      target_team: body.target_team ?? 'kitchen',
       schedule_type: body.schedule_type ?? 'daily',
       schedule_days: body.schedule_days ?? null,
       scheduled_time: body.scheduled_time ?? null,
