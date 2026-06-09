@@ -57,6 +57,10 @@ function TaskCard({
   const [checks, setChecks] = useState<Record<string, boolean>>({})
   const [temps, setTemps] = useState<{ location: string; temperature: string }[]>([
     { location: 'Walk-in fridge', temperature: '' },
+    { location: 'Fridge 1', temperature: '' },
+    { location: 'Fridge 2', temperature: '' },
+    { location: 'Freezer 1', temperature: '' },
+    { location: 'Freezer 2', temperature: '' },
   ])
   const [notes, setNotes] = useState('')
   const [flagReason, setFlagReason] = useState('')
