@@ -141,14 +141,14 @@ function TemplateEditor({
 
           {/* Team */}
           <div>
-            <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Team</label>
+            <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Team</label>
             <div className="flex gap-2">
               {([['kitchen', 'Kitchen'], ['foh', 'FOH'], ['all', 'All staff']] as const).map(([val, lbl]) => (
                 <button
                   key={val}
                   onClick={() => setTargetTeam(val)}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors
-                    ${targetTeam === val ? 'border-mise-mid bg-mise-mid text-white' : 'border-black/[0.08] text-mise-ink/60 hover:bg-gray-50'}`}
+                    ${targetTeam === val ? 'border-hospopilot-mid bg-hospopilot-mid text-white' : 'border-black/[0.08] text-hospopilot-ink/60 hover:bg-gray-50'}`}
                 >
                   {lbl}
                 </button>

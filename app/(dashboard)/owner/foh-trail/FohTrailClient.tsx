@@ -98,7 +98,7 @@ function TaskCard({ task, staffName, onDone }: {
           <Icon className="h-4 w-4" />
         </span>
         <div className="flex-1 min-w-0">
-          <p className={`text-sm font-medium truncate ${isComplete ? 'text-gray-400 line-through' : 'text-mise-ink'}`}>{task.title}</p>
+          <p className={`text-sm font-medium truncate ${isComplete ? 'text-gray-400 line-through' : 'text-hospopilot-ink'}`}>{task.title}</p>
           {task.scheduled_time && (
             <p className="text-xs text-gray-400">{fmt(task.scheduled_time)}</p>
           )}
@@ -122,7 +122,7 @@ function TaskCard({ task, staffName, onDone }: {
                     type="checkbox"
                     checked={!!checks[item.id]}
                     onChange={e => setChecks(p => ({ ...p, [item.id]: e.target.checked }))}
-                    className="h-4 w-4 rounded border-gray-300 text-mise-mid"
+                    className="h-4 w-4 rounded border-gray-300 text-hospopilot-mid"
                   />
                   <span className="text-sm text-gray-700">
                     {item.label}
@@ -140,13 +140,13 @@ function TaskCard({ task, staffName, onDone }: {
                 onChange={e => setNotes(e.target.value)}
                 placeholder="Notes (optional)"
                 rows={2}
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-mise-mid"
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-hospopilot-mid"
               />
               <div className="flex gap-2">
                 <button
                   onClick={() => complete('done')}
                   disabled={saving || !allRequiredChecked || !calibrationReady}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-mise-mid text-white text-sm font-semibold disabled:opacity-40"
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-hospopilot-mid text-white text-sm font-semibold disabled:opacity-40"
                 >
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                   Mark done
@@ -223,7 +223,7 @@ export default function FohTrailClient({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-mise-mid" />
+        <Loader2 className="h-6 w-6 animate-spin text-hospopilot-mid" />
       </div>
     )
   }
@@ -233,12 +233,12 @@ export default function FohTrailClient({
       {/* Progress */}
       <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="font-medium text-mise-ink">{done + flagged} of {total} complete</span>
+          <span className="font-medium text-hospopilot-ink">{done + flagged} of {total} complete</span>
           <span className="text-gray-400">{pct}%</span>
         </div>
         <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-mise-mid rounded-full transition-all"
+            className="h-full bg-hospopilot-mid rounded-full transition-all"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -261,7 +261,7 @@ export default function FohTrailClient({
       {pending.length === 0 && total > 0 && (
         <div className="text-center py-8">
           <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-mise-ink">All FOH checks complete!</p>
+          <p className="text-sm font-semibold text-hospopilot-ink">All FOH checks complete!</p>
           <p className="text-xs text-gray-400 mt-1">Great work — everything is signed off for today.</p>
         </div>
       )}
