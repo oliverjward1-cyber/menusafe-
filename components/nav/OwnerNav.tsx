@@ -128,7 +128,7 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
         ]} />
 
         <div>
-          <p className="px-3 mb-1 text-xs font-semibold text-gray-500 uppercase tracking-widest">Food</p>
+          <p className="px-3 mb-1 text-xs font-semibold text-gray-500 uppercase tracking-widest">Kitchens</p>
           <CollapsibleNavSection
             label="Menus"
             icon={MenuSquare}
@@ -149,23 +149,21 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
               { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
             ]}
           />
+          <Link href="/owner/deliveries" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/deliveries') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Truck className="h-4 w-4" /> Deliveries</Link>
+          <Link href="/owner/cleaning" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/cleaning') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Sparkles className="h-4 w-4" /> Cleaning</Link>
+          <Link href="/owner/temperature-logs" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/temperature-logs') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Thermometer className="h-4 w-4" /> Temp Logs</Link>
+          <Link href="/owner/incidents" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/incidents') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><AlertOctagon className="h-4 w-4" /> Incidents</Link>
+          <Link href="/owner/haccp" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/haccp') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><FlaskConical className="h-4 w-4" /> HACCP & Calibration</Link>
+          <Link href="/owner/eho" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/eho') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ShieldCheck className="h-4 w-4" /> EHO Mode</Link>
+          <Link href="/owner/kitchen-settings" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/kitchen-settings') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Tablet className="h-4 w-4" /> Kitchen Portal</Link>
+          <Link href="/owner/history" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/history') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><History className="h-4 w-4" /> History</Link>
         </div>
 
-        <NavSection label="Allergens" pathname={pathname} items={[
-          { href: '/owner/learn', label: 'Learning Hub', icon: BookOpen },
-          { href: '/owner/staff-quiz', label: 'Staff Quiz', icon: Users },
+        <NavSection label="Learning Hub" pathname={pathname} items={[
+          { href: '/owner/learn', label: 'Learning Modules', icon: BookOpen },
+          { href: '/owner/staff-quiz?role=foh', label: 'FOH Quiz', icon: Users },
+          { href: '/owner/staff-quiz?role=boh', label: 'BOH Quiz', icon: Users2 },
           { href: '/owner/quiz-questions', label: 'Quiz Questions', icon: GraduationCap },
-        ]} />
-
-        <NavSection label="Compliance" pathname={pathname} items={[
-          { href: '/owner/temperature-logs', label: 'Temp Logs', icon: Thermometer },
-          { href: '/owner/cleaning', label: 'Cleaning', icon: Sparkles },
-          { href: '/owner/deliveries', label: 'Deliveries', icon: Truck },
-          { href: '/owner/incidents', label: 'Incidents', icon: AlertOctagon },
-          { href: '/owner/haccp', label: 'HACCP & Calibration', icon: FlaskConical },
-          { href: '/owner/eho', label: 'EHO Mode', icon: ShieldCheck },
-          { href: '/owner/kitchen-settings', label: 'Kitchen Portal', icon: Tablet },
-          { href: '/owner/history', label: 'History', icon: History },
         ]} />
       </nav>
 

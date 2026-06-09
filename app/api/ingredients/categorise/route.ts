@@ -2,7 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic()
+function getClient() {
+  if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not configured')
+  return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+}
+
+function extractJson(text: string): string {
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+  if (fence) return fence[1].trim()
+  const start = text.indexOf('{'); const end = text.lastIndexOf('}')
+  if (start !== -1 && end !== -1) return text.slice(start, end + 1)
+  return text.trim()
+}
 
 export async function POST(req: NextRequest) {
   const supabase = createClient()
@@ -24,6 +35,7 @@ export async function POST(req: NextRequest) {
 
   const list = ingredients.map(i => `${i.id}: ${i.name}`).join('\n')
 
+  const anthropic = getClient()
   const message = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 2048,
@@ -47,9 +59,7 @@ ${list}`,
   const text = (message.content[0] as { type: string; text: string }).text.trim()
   let mapping: Record<string, string>
   try {
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) throw new Error('no JSON found')
-    mapping = JSON.parse(jsonMatch[0])
+    mapping = JSON.parse(extractJson(text))
   } catch {
     return NextResponse.json({ error: 'AI returned invalid JSON' }, { status: 500 })
   }
