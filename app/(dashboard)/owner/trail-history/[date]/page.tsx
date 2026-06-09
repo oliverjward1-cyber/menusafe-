@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle2, Flag, Clock, Thermometer, ClipboardList, Sparkles, Truck, FileText } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Flag, Clock, Thermometer, ClipboardList, Sparkles, Truck, FileText, FlaskConical } from 'lucide-react'
 
 const TYPE_LABEL: Record<string, string> = {
   checklist: 'Checklist',
@@ -9,6 +9,7 @@ const TYPE_LABEL: Record<string, string> = {
   cleaning: 'Cleaning',
   delivery: 'Delivery',
   custom: 'Custom',
+  calibration: 'Calibration',
 }
 
 const TYPE_ICON: Record<string, any> = {
@@ -17,6 +18,7 @@ const TYPE_ICON: Record<string, any> = {
   cleaning: Sparkles,
   delivery: Truck,
   custom: FileText,
+  calibration: FlaskConical,
 }
 
 function fmt(time: string | null) {
@@ -97,6 +99,26 @@ function TaskDetail({ task }: { task: any }) {
               <span className={val ? 'text-mise-ink' : 'text-mise-ink/40 line-through'}>{key}</span>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Calibration results */}
+      {task.task_type === 'calibration' && data.ice_point != null && (
+        <div className="bg-white rounded-xl border border-black/[0.06] divide-y divide-black/[0.04]">
+          {[
+            { label: 'Ice point', value: data.ice_point, pass: data.ice_point >= -1 && data.ice_point <= 1, unit: '°C (–1 to +1)' },
+            { label: 'Boiling point', value: data.boiling_point, pass: data.boiling_point >= 99 && data.boiling_point <= 101, unit: '°C (99 to 101)' },
+          ].map(r => (
+            <div key={r.label} className="flex items-center justify-between px-3 py-2.5">
+              <span className="text-sm text-mise-ink">{r.label} <span className="text-xs text-mise-ink/40">{r.unit}</span></span>
+              <span className={`text-sm font-mono font-semibold ${r.pass ? 'text-green-600' : 'text-red-600'}`}>
+                {r.value}°C {r.pass ? '✓' : '⚠'}
+              </span>
+            </div>
+          ))}
+          <div className={`px-3 py-2.5 text-sm font-semibold ${data.pass ? 'text-green-700' : 'text-red-700'}`}>
+            {data.pass ? '✓ Probe passed calibration' : '✗ Probe FAILED calibration'}
+          </div>
         </div>
       )}
 

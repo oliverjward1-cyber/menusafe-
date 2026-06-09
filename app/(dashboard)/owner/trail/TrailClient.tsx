@@ -4,6 +4,7 @@ import {
   CheckCircle2, Circle, Flag, ChevronDown, ChevronUp,
   Thermometer, ClipboardList, Sparkles, Truck, FileText,
   Loader2, AlertTriangle, Plus, Minus, Send, History, Camera, X, Trash2,
+  FlaskConical,
 } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -13,7 +14,7 @@ type ChecklistItem = { id: string; label: string; required: boolean }
 type Task = {
   id: string
   title: string
-  task_type: 'checklist' | 'temperature' | 'cleaning' | 'delivery' | 'custom'
+  task_type: 'checklist' | 'temperature' | 'cleaning' | 'delivery' | 'custom' | 'calibration'
   scheduled_time: string | null
   sort_order: number
   status: 'pending' | 'done' | 'flagged' | 'skipped'
@@ -32,6 +33,7 @@ const TYPE_ICON: Record<string, any> = {
   cleaning: Sparkles,
   delivery: Truck,
   custom: FileText,
+  calibration: FlaskConical,
 }
 
 const TYPE_COLOR: Record<string, string> = {
@@ -40,6 +42,7 @@ const TYPE_COLOR: Record<string, string> = {
   cleaning: 'bg-green-100 text-green-600',
   delivery: 'bg-purple-100 text-purple-600',
   custom: 'bg-gray-100 text-gray-500',
+  calibration: 'bg-cyan-100 text-cyan-600',
 }
 
 function fmt(time: string | null) {
@@ -92,9 +95,17 @@ function TaskCard({
     }
     reader.readAsDataURL(file)
   }
+  const [icePoint, setIcePoint] = useState('')
+  const [boilingPoint, setBoilingPoint] = useState('')
   const [notes, setNotes] = useState('')
   const [flagReason, setFlagReason] = useState('')
   const [flagging, setFlagging] = useState(false)
+
+  const calibrationPass =
+    icePoint !== '' && boilingPoint !== ''
+      ? parseFloat(icePoint) >= -1 && parseFloat(icePoint) <= 1 &&
+        parseFloat(boilingPoint) >= 99 && parseFloat(boilingPoint) <= 101
+      : null
 
   const isDone = task.status === 'done'
   const isFlagged = task.status === 'flagged'
@@ -108,6 +119,11 @@ function TaskCard({
     let data: any = undefined
     if (task.task_type === 'checklist') data = { checks }
     else if (task.task_type === 'temperature') data = { readings: temps.filter(r => r.temperature !== '') }
+    else if (task.task_type === 'calibration') data = {
+      ice_point: icePoint !== '' ? parseFloat(icePoint) : null,
+      boiling_point: boilingPoint !== '' ? parseFloat(boilingPoint) : null,
+      pass: calibrationPass,
+    }
     else if (task.task_type === 'delivery') {
       const supabase = createClient()
       const entries = await Promise.all(deliveries.filter(d => d.supplier || d.items).map(async d => {
@@ -143,6 +159,7 @@ function TaskCard({
     ? task.checklist_items.filter(i => i.required).every(i => checks[i.id])
     : true
   const tempReady = task.task_type === 'temperature' ? temps.some(r => r.temperature !== '') : true
+  const calibrationReady = task.task_type === 'calibration' ? (icePoint !== '' && boilingPoint !== '') : true
 
   return (
     <div className={`rounded-2xl border shadow-sm transition-colors overflow-hidden
@@ -307,6 +324,36 @@ function TaskCard({
             </div>
           )}
 
+          {task.task_type === 'calibration' && (
+            <div className="space-y-3">
+              <div className="bg-cyan-50 border border-cyan-100 rounded-xl p-3 text-xs text-cyan-700 space-y-0.5">
+                <p className="font-semibold">Probe Calibration Checks</p>
+                <p>Ice point: –1 to +1 °C &nbsp;|&nbsp; Boiling point: 99 to 101 °C</p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs text-mise-ink/50 mb-1 font-medium">Ice point reading (°C)</label>
+                  <input type="number" step="0.1" value={icePoint} onChange={e => setIcePoint(e.target.value)}
+                    placeholder="e.g. 0.2"
+                    className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40" />
+                </div>
+                <div>
+                  <label className="block text-xs text-mise-ink/50 mb-1 font-medium">Boiling point reading (°C)</label>
+                  <input type="number" step="0.1" value={boilingPoint} onChange={e => setBoilingPoint(e.target.value)}
+                    placeholder="e.g. 100.1"
+                    className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40" />
+                </div>
+              </div>
+              {calibrationPass !== null && (
+                <div className={`rounded-xl p-3 text-sm font-semibold flex items-center gap-2
+                  ${calibrationPass ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {calibrationPass ? <CheckCircle2 className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                  {calibrationPass ? 'Probe passed calibration' : 'Probe OUT OF RANGE — flag this task'}
+                </div>
+              )}
+            </div>
+          )}
+
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
@@ -328,7 +375,7 @@ function TaskCard({
           <div className="flex gap-2">
             <button
               onClick={() => complete('done')}
-              disabled={saving || !checklistReady || !tempReady}
+              disabled={saving || !checklistReady || !tempReady || !calibrationReady}
               className="flex-1 bg-mise-deep text-white rounded-xl py-3 font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
