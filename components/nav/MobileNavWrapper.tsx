@@ -26,7 +26,6 @@ export function MobileNavWrapper({ nav, children }: Props) {
     <>
       {/* Mobile top bar — fixed so it always sits above content */}
       <div className="md:hidden fixed top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 bg-gray-900 text-white border-b border-gray-700">
-        <Link href="/chef"><MiseLogo /></Link>
         <button
           onClick={() => setOpen(true)}
           className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors"
@@ -34,6 +33,7 @@ export function MobileNavWrapper({ nav, children }: Props) {
         >
           <Menu className="h-5 w-5" />
         </button>
+        <Link href="/chef"><MiseLogo /></Link>
       </div>
 
       {/* Spacer so content doesn't hide under fixed bar on mobile */}
