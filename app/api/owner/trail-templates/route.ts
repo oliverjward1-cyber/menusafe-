@@ -61,5 +61,12 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Wipe today's generated logs so trail regenerates with updated templates
+  const today = new Date().toISOString().split('T')[0]
+  await supabase.from('ops_task_logs').delete()
+    .eq('restaurant_id', profile.restaurant_id)
+    .eq('scheduled_date', today)
+
   return NextResponse.json({ template: data })
 }

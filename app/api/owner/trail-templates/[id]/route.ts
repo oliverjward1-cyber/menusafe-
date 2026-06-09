@@ -16,6 +16,16 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Wipe today's logs so trail regenerates
+  const { data: profile } = await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
+  if (profile?.restaurant_id) {
+    const today = new Date().toISOString().split('T')[0]
+    await supabase.from('ops_task_logs').delete()
+      .eq('restaurant_id', profile.restaurant_id)
+      .eq('scheduled_date', today)
+  }
+
   return NextResponse.json({ template: data })
 }
 

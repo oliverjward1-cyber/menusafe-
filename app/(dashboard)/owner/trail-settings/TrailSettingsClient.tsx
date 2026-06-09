@@ -14,6 +14,7 @@ type Template = {
   description: string | null
   task_type: string
   schedule_type: string
+  schedule_days: number[] | null
   scheduled_time: string | null
   checklist_items: ChecklistItem[] | null
   is_active: boolean
@@ -416,8 +417,8 @@ export default function TrailSettingsClient({
           </button>
         </div>
 
-        <p className="text-xs text-mise-ink/40 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">
-          Changes take effect from the next day — today&apos;s trail has already been generated.
+        <p className="text-xs text-mise-ink/40 bg-blue-50 border border-blue-100 rounded-xl px-3 py-2.5">
+          Changes take effect immediately — today&apos;s trail will regenerate next time it&apos;s opened.
         </p>
 
         {templates.length === 0 && (
