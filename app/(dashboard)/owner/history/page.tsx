@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import PrintButton from '@/components/ui/PrintButton'
-import { History, Thermometer, Sparkles, Truck, AlertOctagon, ClipboardCheck } from 'lucide-react'
+import { History, Thermometer, Sparkles, Truck, AlertOctagon, ClipboardCheck, Flag } from 'lucide-react'
 
 type HistoryEntry = {
   id: string
-  type: 'temp' | 'cleaning' | 'delivery' | 'incident' | 'audit'
+  type: 'temp' | 'cleaning' | 'delivery' | 'incident' | 'audit' | 'trail_flag'
   title: string
   detail: string
   by: string | null
@@ -18,6 +18,7 @@ const TYPE_META: Record<HistoryEntry['type'], { label: string; icon: any; color:
   delivery: { label: 'Delivery', icon: Truck, color: 'text-amber-600 bg-amber-50' },
   incident: { label: 'Incident', icon: AlertOctagon, color: 'text-red-600 bg-red-50' },
   audit: { label: 'Kitchen audit', icon: ClipboardCheck, color: 'text-mise-mid bg-mise-mid/10' },
+  trail_flag: { label: 'Trail flag', icon: Flag, color: 'text-amber-600 bg-amber-50' },
 }
 
 export default async function HistoryPage({
@@ -39,13 +40,14 @@ export default async function HistoryPage({
   if (!rid) redirect('/onboarding')
   if (profile?.role === 'foh' || profile?.role === 'chef') redirect('/owner')
 
-  const [{ data: temps }, { data: cleans }, { data: deliveries }, { data: incidents }, { data: audits }] =
+  const [{ data: temps }, { data: cleans }, { data: deliveries }, { data: incidents }, { data: audits }, { data: trailFlags }] =
     await Promise.all([
       supabase.from('temperature_logs').select('id, location, temperature, unit, check_type, recorded_by, logged_at').eq('restaurant_id', rid).order('logged_at', { ascending: false }).limit(100),
       supabase.from('cleaning_logs').select('id, task_name, signed_by, notes, completed_at').eq('restaurant_id', rid).order('completed_at', { ascending: false }).limit(100),
       supabase.from('delivery_records').select('id, supplier, condition, received_by, delivered_at').eq('restaurant_id', rid).order('delivered_at', { ascending: false }).limit(100),
       supabase.from('incidents').select('id, type, severity, title, reported_by, occurred_at').eq('restaurant_id', rid).order('occurred_at', { ascending: false }).limit(100),
       supabase.from('kitchen_audits').select('id, completed_by, score, total, status, completed_at').eq('restaurant_id', rid).order('completed_at', { ascending: false }).limit(100),
+      supabase.from('ops_task_logs').select('id, title, flag_reason, completed_by, completed_at').eq('restaurant_id', rid).eq('status', 'flagged').order('completed_at', { ascending: false }).limit(100),
     ])
 
   const entries: HistoryEntry[] = [
@@ -89,6 +91,14 @@ export default async function HistoryPage({
       by: a.completed_by,
       at: a.completed_at,
     })),
+    ...(trailFlags ?? []).filter(t => t.completed_at).map((t): HistoryEntry => ({
+      id: `trail-${t.id}`,
+      type: 'trail_flag',
+      title: t.title ?? 'Trail task',
+      detail: t.flag_reason ?? 'Issue flagged',
+      by: t.completed_by,
+      at: t.completed_at,
+    })),
   ].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
 
   const activeType = searchParams.type
@@ -101,6 +111,7 @@ export default async function HistoryPage({
     { key: 'delivery', label: 'Deliveries' },
     { key: 'incident', label: 'Incidents' },
     { key: 'audit', label: 'Audits' },
+    { key: 'trail_flag', label: 'Trail flags' },
   ]
 
   return (

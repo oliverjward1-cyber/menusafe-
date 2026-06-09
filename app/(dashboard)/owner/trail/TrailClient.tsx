@@ -100,6 +100,16 @@ function TaskCard({
   const [notes, setNotes] = useState('')
   const [flagReason, setFlagReason] = useState('')
   const [flagging, setFlagging] = useState(false)
+  const [flagPhotoFile, setFlagPhotoFile] = useState<File | null>(null)
+  const [flagPhotoPreview, setFlagPhotoPreview] = useState<string | null>(null)
+  const flagPhotoInputId = `flag-photo-${task.id}`
+
+  function handleFlagPhoto(file: File) {
+    const reader = new FileReader()
+    reader.onload = e => setFlagPhotoPreview(e.target?.result as string)
+    reader.readAsDataURL(file)
+    setFlagPhotoFile(file)
+  }
 
   const calibrationPass =
     icePoint !== '' && boilingPoint !== ''
@@ -124,6 +134,17 @@ function TaskCard({
       boiling_point: boilingPoint !== '' ? parseFloat(boilingPoint) : null,
       pass: calibrationPass,
     }
+    let flagPhotoUrl: string | null = null
+    if (status === 'flagged' && flagPhotoFile) {
+      const supabase = createClient()
+      const path = `trail-flags/${Date.now()}-${task.id}.${flagPhotoFile.name.split('.').pop() ?? 'jpg'}`
+      const { error: upErr } = await supabase.storage.from('incident-photos').upload(path, flagPhotoFile, { upsert: true })
+      if (!upErr) {
+        const { data: pub } = supabase.storage.from('incident-photos').getPublicUrl(path)
+        flagPhotoUrl = pub.publicUrl
+      }
+    }
+
     else if (task.task_type === 'delivery') {
       const supabase = createClient()
       const entries = await Promise.all(deliveries.filter(d => d.supplier || d.items).map(async d => {
@@ -148,6 +169,7 @@ function TaskCard({
         status, completed_by: staffName, data,
         notes: notes || undefined,
         flag_reason: status === 'flagged' ? (flagReason || 'Issue flagged') : undefined,
+        ...(flagPhotoUrl ? { data: { ...data, flag_photo_url: flagPhotoUrl } } : {}),
       }),
     })
     setSaving(false)
@@ -370,13 +392,31 @@ function TaskCard({
           />
 
           {flagging && (
-            <textarea
-              value={flagReason}
-              onChange={e => setFlagReason(e.target.value)}
-              placeholder="Describe the issue…"
-              rows={2}
-              className="w-full border border-amber-200 rounded-xl px-3 py-2.5 text-sm bg-amber-50 resize-none focus:outline-none focus:ring-2 focus:ring-amber-300/40"
-            />
+            <div className="space-y-2">
+              <textarea
+                value={flagReason}
+                onChange={e => setFlagReason(e.target.value)}
+                placeholder="Describe the issue…"
+                rows={2}
+                className="w-full border border-amber-200 rounded-xl px-3 py-2.5 text-sm bg-amber-50 resize-none focus:outline-none focus:ring-2 focus:ring-amber-300/40"
+              />
+              <input type="file" accept="image/*" capture="environment" id={flagPhotoInputId} className="hidden"
+                onChange={e => { const f = e.target.files?.[0]; if (f) handleFlagPhoto(f) }} />
+              {flagPhotoPreview ? (
+                <div className="relative inline-block">
+                  <img src={flagPhotoPreview} alt="evidence" className="h-24 rounded-xl object-cover border border-amber-200" />
+                  <button type="button" onClick={() => { setFlagPhotoPreview(null); setFlagPhotoFile(null) }}
+                    className="absolute -top-1.5 -right-1.5 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center">
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <label htmlFor={flagPhotoInputId}
+                  className="flex items-center gap-2 text-xs text-amber-600 hover:text-amber-700 cursor-pointer transition-colors">
+                  <Camera className="h-4 w-4" /> Add photo evidence (optional)
+                </label>
+              )}
+            </div>
           )}
 
           <div className="flex gap-2">
