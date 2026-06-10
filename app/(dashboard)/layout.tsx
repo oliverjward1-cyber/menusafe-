@@ -63,7 +63,7 @@ export default async function DashboardLayout({
       {isImpersonating && (
         <ImpersonationBanner role={role} restaurantName={restaurant?.name ?? ''} />
       )}
-      <MobileNavWrapper nav={nav}>{children}</MobileNavWrapper>
+      <MobileNavWrapper nav={nav} extra={isDeveloper ? <DevPanel currentRole={role} currentRestaurantId={restaurantId} /> : null}>{children}</MobileNavWrapper>
     </div>
   )
 }

@@ -9,9 +9,10 @@ import Link from 'next/link'
 interface Props {
   nav: React.ReactNode
   children: React.ReactNode
+  extra?: React.ReactNode
 }
 
-export function MobileNavWrapper({ nav, children }: Props) {
+export function MobileNavWrapper({ nav, children, extra }: Props) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
@@ -34,6 +35,7 @@ export function MobileNavWrapper({ nav, children }: Props) {
           <Menu className="h-5 w-5" />
         </button>
         <Link href="/chef"><HospoPilotLogo onDark /></Link>
+        <div className="flex items-center">{extra}</div>
       </div>
 
       {/* Spacer so content doesn't hide under fixed bar on mobile */}

@@ -24,7 +24,7 @@ function ViewSwitcherInner({ menuUrl, extra }: { menuUrl: string; extra?: React.
   }
 
   return (
-    <div className="bg-white border-b border-black/[0.06] px-4 flex items-center justify-between gap-1 h-10 shrink-0">
+    <div className="hidden md:flex bg-white border-b border-black/[0.06] px-4 items-center justify-between gap-1 h-10 shrink-0">
     <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
       {ROLE_TABS.map(({ label, value, icon: Icon }) => (
         <button
