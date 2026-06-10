@@ -108,6 +108,62 @@ export default function HospoPilotLanding() {
         </div>
       </main>
 
+      {/* ---------- WHAT HOSPOPILOT DOES (pain points) ---------- */}
+      <section className="border-t border-[#E3E9EC] py-10 md:py-14">
+        <div className="mx-auto w-full max-w-[1080px] px-6">
+          <div className="text-center max-w-[680px] mx-auto">
+            <span className="font-['IBM_Plex_Mono'] text-[13px] font-medium tracking-[0.14em] uppercase text-[#2D6A4F]">
+              Peace of mind
+            </span>
+            <h2 className="text-[clamp(26px,4vw,38px)] leading-[1.12] tracking-[-0.02em] font-bold text-[#1B4332] mt-3 text-balance">
+              What HospoPilot will do for you
+            </h2>
+            <p className="text-[16px] text-[#3A474E] mt-3 max-w-[48ch] mx-auto">
+              The worries that keep you up at night — handled.
+            </p>
+          </div>
+
+          <div className="mt-9 grid gap-4 md:grid-cols-3">
+            {/* EHO */}
+            <div className="bg-white border border-[#E3E9EC] rounded-2xl p-6">
+              <p className="text-[20px] font-bold text-[#1B4332] leading-[1.2] tracking-[-0.01em]">Dread the unannounced EHO knock?</p>
+              <div className="flex items-start gap-2.5 mt-4">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" className="flex-none mt-0.5" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#E7F4EC" /><path d="M4.5 8.2l2.2 2.2 4.8-5" stroke="#1F8A5B" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <p className="text-[14.5px] text-[#3A474E] leading-[1.5]">Every temp, clean and check — logged, timestamped and inspection-ready. Hand them everything in seconds.</p>
+              </div>
+            </div>
+            {/* Allergens (highlight) */}
+            <div className="bg-[#1B4332] rounded-2xl p-6">
+              <p className="text-[20px] font-bold text-white leading-[1.2] tracking-[-0.01em]">Allergens keeping you up at night?</p>
+              <div className="flex items-start gap-2.5 mt-4">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" className="flex-none mt-0.5" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#2E5E47" /><path d="M4.5 8.2l2.2 2.2 4.8-5" stroke="#9FD6B6" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <p className="text-[14.5px] text-[#DCEEE3] leading-[1.5]">A live allergen matrix on every dish — accurate to your menu, updated instantly.</p>
+              </div>
+            </div>
+            {/* GP */}
+            <div className="bg-white border border-[#E3E9EC] rounded-2xl p-6">
+              <p className="text-[20px] font-bold text-[#1B4332] leading-[1.2] tracking-[-0.01em]">Not sure where you&apos;re losing money?</p>
+              <div className="flex items-start gap-2.5 mt-4">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" className="flex-none mt-0.5" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#E7F4EC" /><path d="M4.5 8.2l2.2 2.2 4.8-5" stroke="#1F8A5B" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <p className="text-[14.5px] text-[#3A474E] leading-[1.5]">Live GP on every plate. We&apos;ll show you exactly where.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-9">
+            <a
+              href="/signup"
+              className="inline-flex items-center justify-center gap-[9px] bg-[#1B4332] text-white font-bold text-[15px] px-7 py-[14px] rounded-lg no-underline hover:bg-[#14342A] transition-colors"
+            >
+              Start your free trial
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* ---------- WHY NOW: OWEN'S LAW ---------- */}
       <section className="border-t border-[#E3E9EC] py-10 md:py-14">
         <div className="mx-auto w-full max-w-[920px] px-6 text-center">
@@ -149,62 +205,6 @@ export default function HospoPilotLanding() {
               <path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
-        </div>
-      </section>
-
-      {/* ---------- HOW IT WORKS (illustrative example) ---------- */}
-      <section className="border-t border-[#E3E9EC] py-10 md:py-14">
-        <div className="mx-auto w-full max-w-[1080px] px-6">
-          <div className="text-center max-w-[680px] mx-auto">
-            <span className="font-['IBM_Plex_Mono'] text-[13px] font-medium tracking-[0.14em] uppercase text-[#2D6A4F]">
-              A walk-through
-            </span>
-            <h2 className="text-[clamp(26px,4vw,38px)] leading-[1.12] tracking-[-0.02em] font-bold text-[#1B4332] mt-3 text-balance">
-              How it works for a place like yours
-            </h2>
-            <p className="text-[14px] text-[#97A1A7] mt-3 italic max-w-[54ch] mx-auto">
-              Here&apos;s an example of how it tends to play out.
-            </p>
-          </div>
-
-          <div className="mt-9 grid gap-4 md:grid-cols-2">
-            <div className="bg-white border border-[#E3E9EC] rounded-2xl p-6">
-              <p className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.08em] uppercase text-[#97A1A7]">01 · They find us</p>
-              <p className="text-[15px] text-[#3A474E] mt-2 leading-[1.55]">
-                A 42-seat café or restaurant — spotless kitchen, great food, back office held together with string. Then a guest reacts to a dish and asks what was in it — and the allergen sheet is three menus out of date. They start the trial that week.
-              </p>
-            </div>
-            <div className="bg-white border border-[#E3E9EC] rounded-2xl p-6">
-              <p className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.08em] uppercase text-[#97A1A7]">02 · First sitting</p>
-              <p className="text-[15px] text-[#3A474E] mt-2 leading-[1.55]">
-                The manager photographs the menu — every dish and all 14 allergens drafted, live on the QR menu the same day. Temp, cleaning and delivery checks move to phones. Costing, switched on.
-              </p>
-            </div>
-            <div className="bg-[#1B4332] rounded-2xl p-6">
-              <p className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.08em] uppercase text-[#9FD6B6]">03 · What they find</p>
-              <p className="text-[15px] text-[#DCEEE3] mt-2 leading-[1.55]">
-                The GP they assumed was <span className="text-white font-bold">68%</span> is really <span className="text-white font-bold">64%</span> — two dishes quietly at <span className="text-white font-bold">55%</span> after a price rise nobody clocked. A re-price and a supplier swap: <span className="text-white font-bold">~£400 a month</span> back.
-              </p>
-            </div>
-            <div className="bg-white border border-[#E3E9EC] rounded-2xl p-6">
-              <p className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.08em] uppercase text-[#97A1A7]">04 · Three months in</p>
-              <p className="text-[15px] text-[#3A474E] mt-2 leading-[1.55]">
-                Records timestamped and complete — an unannounced EHO visit is a non-event. GP visible per dish, so drifts get caught the same day. Five tools became one. They&apos;re going for the <span className="text-[#1B4332] font-bold">5</span> — because now they can prove it.
-              </p>
-            </div>
-          </div>
-
-          <div className="text-center mt-9">
-            <a
-              href="/signup"
-              className="inline-flex items-center justify-center gap-[9px] bg-[#1B4332] text-white font-bold text-[15px] px-7 py-[14px] rounded-lg no-underline hover:bg-[#14342A] transition-colors"
-            >
-              Start your free trial
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
-          </div>
         </div>
       </section>
 
