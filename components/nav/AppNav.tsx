@@ -210,8 +210,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             <NavLink href="/owner/foh-trail" label="FOH Daily Checks" icon={Users2} pathname={pathname} />
           )}
 
-          {/* Trail History — owner, manager, head chef */}
-          {(isOwnerOrManager || isHeadChef) && (
+          {/* Trail History — owner, manager, head chef, FOH */}
+          {(isOwnerOrManager || isHeadChef || isFOH) && (
             <NavLink href="/owner/trail-history" label="Trail History" icon={BookMarked} pathname={pathname} />
           )}
 
@@ -224,15 +224,22 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
           {isKitchenStaff && (<>
             <NavLink href="/owner/cleaning" label="Cleaning" icon={Sparkles} pathname={pathname} />
             <NavLink href="/owner/temperature-logs" label="Temp Logs" icon={Thermometer} pathname={pathname} />
-            <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
           </>)}
+
+          {/* Incidents — owner, manager, head chef, kitchen chef, FOH */}
+          {(isKitchenStaff || isFOH) && (
+            <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
+          )}
 
           {/* Management ops — owner, manager, head chef */}
           {(isOwnerOrManager || isHeadChef) && (
             <NavLink href="/owner/haccp" label="HACCP & Calibration" icon={FlaskConical} pathname={pathname} />
           )}
-          {isOwnerOrManager && (<>
+          {/* EHO Mode — owner, manager, FOH */}
+          {(isOwnerOrManager || isFOH) && (
             <NavLink href="/owner/eho" label="EHO Mode" icon={ShieldCheck} pathname={pathname} />
+          )}
+          {isOwnerOrManager && (<>
             <NavLink href="/owner/kitchen-settings" label="Kitchen Portal" icon={Tablet} pathname={pathname} />
             <NavLink href="/owner/history" label="History" icon={History} pathname={pathname} />
           </>)}
@@ -240,7 +247,10 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
 
         {/* Learning Hub — all roles */}
         <NavSection label="Learning Hub">
-          <NavLink href="/owner/learn" label="Learning Modules" icon={BookOpen} pathname={pathname} />
+          {/* General Learning Modules — not FOH (BOH-focused content) */}
+          {!isFOH && (
+            <NavLink href="/owner/learn" label="Learning Modules" icon={BookOpen} pathname={pathname} />
+          )}
 
           {/* FOH training — owner, manager, head chef, FOH (not pure kitchen chef) */}
           {(isOwnerOrManager || isHeadChef || isFOH) && (
