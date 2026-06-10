@@ -205,8 +205,10 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             />
           )}
 
-          {/* BOH Daily Trail — all roles */}
-          <NavLink href="/owner/trail" label="BOH Daily Trail" icon={ListChecks} pathname={pathname} />
+          {/* BOH Daily Trail — kitchen roles only */}
+          {isKitchenStaff && (
+            <NavLink href="/owner/trail" label="BOH Daily Trail" icon={ListChecks} pathname={pathname} />
+          )}
 
           {/* FOH Daily Trail — foh + management */}
           {(isOwnerOrManager || isFOH) && (
@@ -228,6 +230,11 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             <NavLink href="/owner/cleaning" label="Cleaning" icon={Sparkles} pathname={pathname} />
             <NavLink href="/owner/temperature-logs" label="Cooking Temps" icon={Thermometer} pathname={pathname} />
           </>)}
+
+          {/* Allergen Menu (customer view) — FOH + management */}
+          {(isOwnerOrManager || isFOH) && restaurantSlug && (
+            <NavLink href={`/menu/${restaurantSlug}?from=dashboard`} label="Allergen Menu" icon={UtensilsCrossed} pathname={pathname} />
+          )}
 
           {/* Incidents — owner, manager, head chef, kitchen chef, FOH */}
           {(isKitchenStaff || isFOH) && (

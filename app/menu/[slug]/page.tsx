@@ -5,12 +5,14 @@ import { AllergenBadge } from '@/components/allergen/AllergenBadge'
 import { DishCard } from './DishCard'
 import { MenuTabs } from './MenuTabs'
 import type { Metadata } from 'next'
-import { UtensilsCrossed } from 'lucide-react'
+import { UtensilsCrossed, ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 
 type AllergenKey = (typeof ALLERGENS)[number]['key']
 
 interface Props {
   params: { slug: string }
+  searchParams: { from?: string }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -27,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function PublicMenuPage({ params }: Props) {
+export default async function PublicMenuPage({ params, searchParams }: Props) {
   const supabase = createClient()
 
   const { data: restaurant } = await supabase
@@ -143,6 +145,15 @@ export default async function PublicMenuPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
+      {searchParams.from === 'dashboard' && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5">
+          <div className="max-w-2xl mx-auto">
+            <Link href="/owner" className="inline-flex items-center gap-1 text-sm font-medium text-amber-700 hover:text-amber-900 transition-colors">
+              <ChevronLeft className="h-4 w-4" /> Back to dashboard
+            </Link>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="bg-gray-900 text-white px-6 py-8">
         <div className="max-w-2xl mx-auto">
