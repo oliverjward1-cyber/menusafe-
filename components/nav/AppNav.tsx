@@ -249,27 +249,38 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
 
         {/* Learning Hub — all roles */}
         <NavSection label="Learning Hub">
-          {/* General Learning Modules — not FOH (BOH-focused content) */}
+          {/* Kitchen Training pathway — not FOH */}
           {!isFOH && (
-            <NavLink href="/owner/learn" label="Learning Modules" icon={BookOpen} pathname={pathname} />
+            <CollapsibleNavSection
+              label="Kitchen Training"
+              icon={UtensilsCrossed}
+              pathname={pathname}
+              items={[
+                { href: '/owner/learn', label: 'Food Safety Modules', icon: BookOpen },
+                { href: '/owner/staff-quiz?type=kitchen', label: 'BOH Quiz', icon: UtensilsCrossed },
+              ]}
+            />
           )}
 
-          {/* FOH training — owner, manager, head chef, FOH (not pure kitchen chef) */}
+          {/* FOH Training pathway — owner, manager, head chef, FOH */}
           {(isOwnerOrManager || isHeadChef || isFOH) && (
-            <NavLink href="/owner/learn/foh" label="FOH Training" icon={Users} pathname={pathname} />
+            <CollapsibleNavSection
+              label="FOH Training"
+              icon={Users}
+              pathname={pathname}
+              items={[
+                { href: '/owner/learn/foh', label: 'FOH Modules', icon: Users },
+                { href: '/owner/staff-quiz?type=front_of_house', label: 'FOH Quiz', icon: Users },
+              ]}
+            />
           )}
-          {(isOwnerOrManager || isHeadChef || isFOH) && (
-            <NavLink href="/owner/staff-quiz?type=front_of_house" label="FOH Quiz" icon={Users} pathname={pathname} />
-          )}
-          {/* BOH Quiz — all kitchen staff + management, not FOH */}
-          {!isFOH && (
-            <NavLink href="/owner/staff-quiz?type=kitchen" label="BOH Quiz" icon={UtensilsCrossed} pathname={pathname} />
-          )}
+
           {isOwnerOrManager && (
             <NavLink href="/owner/quiz-questions" label="Quiz Questions" icon={GraduationCap} pathname={pathname} />
           )}
         </NavSection>
       </nav>
+
 
       <div className="p-4 border-t border-gray-700">
         <button
