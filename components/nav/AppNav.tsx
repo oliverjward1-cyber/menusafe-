@@ -173,14 +173,14 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
         {/* Kitchens */}
         <NavSection label="Kitchens">
 
-          {/* Menus — owner, manager, head chef */}
-          {(isOwnerOrManager || isHeadChef) && (
+          {/* Menus — owner, manager, head chef, kitchen chef (read access) */}
+          {(isOwnerOrManager || isHeadChef || role === 'chef') && (
             <CollapsibleNavSection
               label="Menus"
               icon={MenuSquare}
               pathname={pathname}
               items={[
-                { href: '/chef/menus', label: 'Build Menu', icon: MenuSquare },
+                ...(isOwnerOrManager || isHeadChef ? [{ href: '/chef/menus', label: 'Build Menu', icon: MenuSquare }] : []),
                 { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
                 { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
                 ...(isOwnerOrManager ? [{ href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode }] : []),
@@ -188,8 +188,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
             />
           )}
 
-          {/* Kitchen Audit — owner, manager, head chef */}
-          {(isOwnerOrManager || isHeadChef) && (
+          {/* Kitchen Audit — owner, manager, head chef, kitchen chef (run only) */}
+          {(isOwnerOrManager || isHeadChef || role === 'chef') && (
             <CollapsibleNavSection
               label="Kitchen Audit"
               icon={ClipboardCheck}
@@ -209,8 +209,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
             <NavLink href="/owner/foh-trail" label="FOH Daily Checks" icon={Users2} pathname={pathname} />
           )}
 
-          {/* Trail History — owner, manager, head chef */}
-          {(isOwnerOrManager || isHeadChef) && (
+          {/* Trail History — owner, manager, head chef, kitchen chef */}
+          {(isOwnerOrManager || isHeadChef || role === 'chef') && (
             <NavLink href="/owner/trail-history" label="Trail History" icon={BookMarked} pathname={pathname} />
           )}
 
@@ -226,8 +226,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
             <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
           </>)}
 
-          {/* Management ops — owner, manager, head chef */}
-          {(isOwnerOrManager || isHeadChef) && (
+          {/* Management ops — owner, manager, head chef, kitchen chef */}
+          {(isOwnerOrManager || isHeadChef || role === 'chef') && (
             <NavLink href="/owner/haccp" label="HACCP & Calibration" icon={FlaskConical} pathname={pathname} />
           )}
           {isOwnerOrManager && (<>
