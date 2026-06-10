@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 export async function POST(req: NextRequest) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const { restaurantId, completedBy, score, total, status, notes, answers } = await req.json()
 
   if (!restaurantId || !completedBy) {

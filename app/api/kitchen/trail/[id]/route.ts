@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const supabase = createClient()
   const body = await req.json()
   const { status, completed_by, data, notes, flag_reason } = body

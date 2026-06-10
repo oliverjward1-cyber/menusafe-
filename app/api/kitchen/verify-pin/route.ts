@@ -1,7 +1,10 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 export async function POST(request: Request) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const { slug, pin } = await request.json()
   if (!slug || !pin) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
 

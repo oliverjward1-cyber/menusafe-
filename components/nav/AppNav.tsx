@@ -115,10 +115,11 @@ function CollapsibleNavSection({ label, icon: SectionIcon, items, pathname }: {
   )
 }
 
-function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
+function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper }: {
   restaurantName: string
   restaurantSlug: string
   role: Role
+  isDeveloper?: boolean
 }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -127,8 +128,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
 
   const validRoles: Role[] = ['owner', 'manager', 'head_chef', 'chef', 'foh']
   const viewParam = searchParams.get('view') as Role | null
-  // Owners/managers can preview any role; others always see their own role
-  const canPreview = dbRole === 'owner' || dbRole === 'manager'
+  // Owners/managers can preview any role; developers can preview any role on any page
+  const canPreview = dbRole === 'owner' || dbRole === 'manager' || !!isDeveloper
   const role: Role = canPreview && viewParam && validRoles.includes(viewParam) ? viewParam : dbRole
   const isPreviewing = canPreview && viewParam && viewParam !== dbRole
 
@@ -271,7 +272,7 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole }: {
   )
 }
 
-export function AppNav(props: { restaurantName: string; restaurantSlug: string; role: Role }) {
+export function AppNav(props: { restaurantName: string; restaurantSlug: string; role: Role; isDeveloper?: boolean }) {
   return (
     <Suspense fallback={<aside className="w-64 min-h-screen bg-gray-900" />}>
       <AppNavInner {...props} />

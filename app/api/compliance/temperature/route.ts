@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 function isTemperatureBreach(location: string, temp: number): boolean {
   const loc = location.toLowerCase()
@@ -11,6 +12,8 @@ function isTemperatureBreach(location: string, temp: number): boolean {
 }
 
 export async function POST(request: Request) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const body = await request.json()
   const { restaurantId, location, temperature, checkType, recordedBy, notes, correctiveAction, source } = body
 

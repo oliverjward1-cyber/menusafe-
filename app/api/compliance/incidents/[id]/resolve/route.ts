@@ -1,7 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
