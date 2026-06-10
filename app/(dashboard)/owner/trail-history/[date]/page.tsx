@@ -2,6 +2,12 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { ArrowLeft, CheckCircle2, Flag, Clock, Thermometer, ClipboardList, Sparkles, Truck, FileText, FlaskConical } from 'lucide-react'
+import PrintButton from '@/components/ui/PrintButton'
+
+const COOKING_TYPE_LABELS: Record<string, string> = {
+  cooking: 'Cooking',
+  hot_holding: 'Hot holding',
+}
 
 const TYPE_LABEL: Record<string, string> = {
   checklist: 'Checklist',
@@ -149,9 +155,14 @@ export default async function TrailDayPage({ params }: { params: { date: string 
   const rid = profile.restaurant_id
   const dateStr = params.date
 
-  const [{ data: summary }, { data: tasks }] = await Promise.all([
+  const dayStart = `${dateStr}T00:00:00`
+  const dayEnd = `${dateStr}T23:59:59.999`
+
+  const [{ data: summary }, { data: tasks }, { data: cookingTemps }, { data: cleaningLogs }] = await Promise.all([
     supabase.from('ops_trail_summaries').select('*').eq('restaurant_id', rid).eq('trail_date', dateStr).single(),
     supabase.from('ops_task_logs').select('*').eq('restaurant_id', rid).eq('scheduled_date', dateStr).order('sort_order'),
+    supabase.from('temperature_logs').select('*').eq('restaurant_id', rid).in('check_type', ['cooking', 'hot_holding']).gte('logged_at', dayStart).lte('logged_at', dayEnd).order('logged_at'),
+    supabase.from('cleaning_logs').select('*').eq('restaurant_id', rid).gte('completed_at', dayStart).lte('completed_at', dayEnd).order('completed_at'),
   ])
 
   const date = new Date(dateStr + 'T12:00:00')
@@ -159,24 +170,27 @@ export default async function TrailDayPage({ params }: { params: { date: string 
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center gap-3">
-        <Link href="/owner/trail-history" className="text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div>
-          <h1 className="text-xl font-bold text-hospopilot-ink">
-            {date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-          </h1>
-          {summary && (
-            <p className="text-hospopilot-ink/50 text-sm">
-              Submitted by {summary.submitted_by} · {pct}% complete
-              {summary.flagged_tasks > 0 && ` · ${summary.flagged_tasks} flagged`}
-            </p>
-          )}
-          {!summary && (
-            <p className="text-amber-600 text-sm">Trail not submitted — showing partial records</p>
-          )}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Link href="/owner/trail-history" className="text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors no-print">
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <h1 className="text-xl font-bold text-hospopilot-ink">
+              {date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </h1>
+            {summary && (
+              <p className="text-hospopilot-ink/50 text-sm">
+                Submitted by {summary.submitted_by} · {pct}% complete
+                {summary.flagged_tasks > 0 && ` · ${summary.flagged_tasks} flagged`}
+              </p>
+            )}
+            {!summary && (
+              <p className="text-amber-600 text-sm">Trail not submitted — showing partial records</p>
+            )}
+          </div>
         </div>
+        <PrintButton label="Print day" />
       </div>
 
       {summary?.notes && (
@@ -194,6 +208,48 @@ export default async function TrailDayPage({ params }: { params: { date: string 
       <div className="space-y-3">
         {tasks?.map(task => <TaskDetail key={task.id} task={task} />)}
       </div>
+
+      {/* Cooking & hot holding temperature checks */}
+      {cookingTemps && cookingTemps.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="font-semibold text-hospopilot-ink flex items-center gap-2">
+            <Thermometer className="h-4 w-4 text-hospopilot-mid" /> Cooking Temp Checks
+          </h2>
+          <div className="bg-white rounded-2xl border border-black/[0.06] divide-y divide-black/[0.04] overflow-hidden">
+            {cookingTemps.map(log => (
+              <div key={log.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                <div>
+                  <span className="text-hospopilot-ink font-medium">{log.location}</span>
+                  <span className="text-hospopilot-ink/40 ml-2 text-xs">{COOKING_TYPE_LABELS[log.check_type] ?? log.check_type} · {log.recorded_by}</span>
+                </div>
+                <span className="font-mono font-semibold text-hospopilot-ink">{log.temperature}°{log.unit}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Cleaning records */}
+      {cleaningLogs && cleaningLogs.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="font-semibold text-hospopilot-ink flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-hospopilot-mid" /> Cleaning Records
+          </h2>
+          <div className="bg-white rounded-2xl border border-black/[0.06] divide-y divide-black/[0.04] overflow-hidden">
+            {cleaningLogs.map(log => (
+              <div key={log.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                <div>
+                  <span className="text-hospopilot-ink font-medium">{log.task_name}</span>
+                  <span className="text-hospopilot-ink/40 ml-2 text-xs">{log.signed_by}{log.notes ? ` · ${log.notes}` : ''}</span>
+                </div>
+                <span className="text-hospopilot-ink/40 text-xs">
+                  {new Date(log.completed_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
