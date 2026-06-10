@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { HospoPilotLogo } from '@/components/HospoPilotLogo'
+import { SiteFooter } from '@/components/marketing/SiteFooter'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy — HospoPilot',
@@ -12,9 +13,9 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-white">
       <div className="bg-hospopilot-ink text-white px-6 py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-3">
+          <Link href="/" className="inline-block mb-3">
             <HospoPilotLogo onDark />
-          </div>
+          </Link>
           <h1 className="text-2xl font-bold">Privacy &amp; Data Retention Policy</h1>
           <p className="text-gray-400 mt-1 text-sm">Last updated: June 2025</p>
         </div>
@@ -32,7 +33,7 @@ export default function PrivacyPage() {
           </p>
           <p>
             For privacy queries contact us at{' '}
-            <span className="text-green-700 font-medium">[your contact email]</span>.
+            <a href="mailto:support@hospopilot.co.uk" className="text-green-700 font-medium hover:underline">support@hospopilot.co.uk</a>.
           </p>
         </section>
 
@@ -139,7 +140,7 @@ export default function PrivacyPage() {
             <li>Data portability — receive your data in a machine-readable format.</li>
             <li>Lodge a complaint with the ICO (ico.org.uk).</li>
           </ul>
-          <p>To exercise any of these rights, email us at <span className="text-green-700 font-medium">[your contact email]</span>.</p>
+          <p>To exercise any of these rights, email us at <a href="mailto:support@hospopilot.co.uk" className="text-green-700 font-medium hover:underline">support@hospopilot.co.uk</a>.</p>
         </section>
 
         <section className="space-y-3">
@@ -175,6 +176,8 @@ export default function PrivacyPage() {
           <Link href="/" className="text-sm text-green-700 hover:underline">← Back to HospoPilot</Link>
         </div>
       </div>
+
+      <SiteFooter />
     </div>
   )
 }

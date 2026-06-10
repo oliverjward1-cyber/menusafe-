@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { SiteFooter } from '@/components/marketing/SiteFooter'
 
 export const metadata: Metadata = {
   title: 'Our Story — HospoPilot',
@@ -151,6 +152,8 @@ export default function StoryPage() {
           <p className="text-[13.5px] text-[#677077] mt-4">14 days free. No card, no sales call.</p>
         </div>
       </section>
+
+      <SiteFooter />
     </div>
   )
 }

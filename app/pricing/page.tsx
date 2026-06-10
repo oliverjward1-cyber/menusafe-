@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { SiteFooter } from '@/components/marketing/SiteFooter'
 
 export const metadata: Metadata = {
   title: 'Pricing — HospoPilot',
@@ -178,6 +179,8 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
     </div>
   )
 }

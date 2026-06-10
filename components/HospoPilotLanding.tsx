@@ -11,6 +11,7 @@
 // The hero CTA links straight to /signup (the free-trial flow).
 
 import { EhoReadinessScore } from '@/components/marketing/EhoReadinessScore'
+import { SiteFooter } from '@/components/marketing/SiteFooter'
 
 export default function HospoPilotLanding() {
   return (
@@ -249,6 +250,8 @@ export default function HospoPilotLanding() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
     </div>
   )
 }

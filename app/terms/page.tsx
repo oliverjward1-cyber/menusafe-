@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { UtensilsCrossed } from 'lucide-react'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
+import { SiteFooter } from '@/components/marketing/SiteFooter'
 
 export const metadata: Metadata = {
   title: 'Terms of Service — HospoPilot',
@@ -10,12 +11,9 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gray-900 text-white px-6 py-8">
+      <div className="bg-hospopilot-ink text-white px-6 py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-2 mb-2">
-            <UtensilsCrossed className="h-5 w-5 text-green-400" />
-            <span className="text-sm font-medium text-green-400">HospoPilot</span>
-          </div>
+          <Link href="/" className="inline-block mb-3"><HospoPilotLogo onDark /></Link>
           <h1 className="text-2xl font-bold">Terms of Service</h1>
           <p className="text-gray-400 mt-1 text-sm">Last updated: June 2025</p>
         </div>
@@ -134,7 +132,7 @@ export default function TermsPage() {
           <h2 className="text-base font-bold text-gray-900">8. Contact</h2>
           <p>
             If you have any questions about these Terms or our allergen disclaimer, please contact
-            us at <span className="text-green-700 font-medium">[your contact email]</span>.
+            us at <a href="mailto:support@hospopilot.co.uk" className="text-green-700 font-medium hover:underline">support@hospopilot.co.uk</a>.
           </p>
         </section>
 
@@ -142,6 +140,8 @@ export default function TermsPage() {
           <Link href="/" className="text-sm text-green-700 hover:underline">← Back to HospoPilot</Link>
         </div>
       </div>
+
+      <SiteFooter />
     </div>
   )
 }
