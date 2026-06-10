@@ -17,13 +17,13 @@ export default function KitchenAllergensPage() {
         </div>
         <div>
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Kitchen Team</p>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">Kitchen Allergen Management</h1>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Kitchen Allergen Management</h1>
           <p className="text-sm text-gray-500 mt-1">How to handle allergen ingredients, label dishes, and prevent allergic reactions.</p>
         </div>
       </div>
 
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-3 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-3 flex items-center gap-2">
           <Info className="h-4 w-4 text-red-500" /> Why this matters
         </h2>
         <p className="text-sm text-gray-600 leading-relaxed">
@@ -35,7 +35,7 @@ export default function KitchenAllergensPage() {
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4">The 14 Major Allergens</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4">The 14 Major Allergens</h2>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
             ['🌾','Cereals containing gluten','Wheat, rye, barley, oats'],
@@ -56,7 +56,7 @@ export default function KitchenAllergensPage() {
             <div key={name} className="flex gap-2 p-2 rounded-lg bg-gray-50">
               <span className="text-lg">{emoji}</span>
               <div>
-                <p className="font-medium text-mise-ink text-xs">{name}</p>
+                <p className="font-medium text-hospopilot-ink text-xs">{name}</p>
                 <p className="text-gray-500 text-xs">{examples}</p>
               </div>
             </div>
@@ -65,7 +65,7 @@ export default function KitchenAllergensPage() {
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-green-600" /> Safe preparation rules
         </h2>
         <ul className="space-y-3">
@@ -88,7 +88,7 @@ export default function KitchenAllergensPage() {
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
           <XCircle className="h-4 w-4 text-red-500" /> Never do this
         </h2>
         <ul className="space-y-3">
@@ -108,17 +108,17 @@ export default function KitchenAllergensPage() {
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-3">Communication with FOH</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-3">Communication with FOH</h2>
         <ul className="space-y-2 text-sm text-gray-600">
-          <li className="flex gap-2"><span className="text-mise-mid font-bold">→</span> When an allergen-free dish leaves the pass, call it out clearly so FOH knows.</li>
-          <li className="flex gap-2"><span className="text-mise-mid font-bold">→</span> Use a different coloured plate cover or flag to identify allergen-free dishes.</li>
-          <li className="flex gap-2"><span className="text-mise-mid font-bold">→</span> If you cannot safely prepare an allergen-free version, tell FOH immediately so they can inform the customer — never stay silent.</li>
-          <li className="flex gap-2"><span className="text-mise-mid font-bold">→</span> Log any allergen-free orders in the kitchen ticket system or order book for traceability.</li>
+          <li className="flex gap-2"><span className="text-hospopilot-mid font-bold">→</span> When an allergen-free dish leaves the pass, call it out clearly so FOH knows.</li>
+          <li className="flex gap-2"><span className="text-hospopilot-mid font-bold">→</span> Use a different coloured plate cover or flag to identify allergen-free dishes.</li>
+          <li className="flex gap-2"><span className="text-hospopilot-mid font-bold">→</span> If you cannot safely prepare an allergen-free version, tell FOH immediately so they can inform the customer — never stay silent.</li>
+          <li className="flex gap-2"><span className="text-hospopilot-mid font-bold">→</span> Log any allergen-free orders in the kitchen ticket system or order book for traceability.</li>
         </ul>
       </Card>
 
       <div className="flex justify-end">
-        <Link href="/owner/learn" className="text-sm text-mise-mid font-medium hover:underline flex items-center gap-1">
+        <Link href="/owner/learn" className="text-sm text-hospopilot-mid font-medium hover:underline flex items-center gap-1">
           Back to Learning Hub <ChevronLeft className="h-4 w-4 rotate-180" />
         </Link>
       </div>

@@ -24,7 +24,7 @@ export default function PhotoUpload({ onFileSelected, onClear, preview, label = 
 
   return (
     <div>
-      <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">{label}</label>
+      <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">{label}</label>
       {preview ? (
         <div className="relative inline-block">
           <img src={preview} alt="evidence" className="h-32 w-48 object-cover rounded-xl border border-gray-200" />
@@ -48,7 +48,7 @@ export default function PhotoUpload({ onFileSelected, onClear, preview, label = 
             if (file?.type.startsWith('image/')) handleFile(file)
           }}
           className={`flex flex-col items-center justify-center gap-2 h-24 w-48 rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
-            dragging ? 'border-mise-mid bg-mise-mid/5' : 'border-gray-200 hover:border-gray-300 bg-gray-50'
+            dragging ? 'border-hospopilot-mid bg-hospopilot-mid/5' : 'border-gray-200 hover:border-gray-300 bg-gray-50'
           }`}
         >
           <Camera className="h-5 w-5 text-gray-400" />

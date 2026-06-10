@@ -201,12 +201,12 @@ export default function NewIngredientPage() {
         >
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">Add ingredient</h1>
+        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Add ingredient</h1>
       </div>
 
       {/* AI Photo Scan */}
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-1">Scan product with AI</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-1">Scan product with AI</h2>
         <p className="text-sm text-gray-500 mb-4">Take a photo of the front of the pack and/or the ingredients label — AI will fill in the details below.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <PhotoSlot
@@ -234,7 +234,7 @@ export default function NewIngredientPage() {
           type="button"
           onClick={handleScan}
           disabled={(!frontImage && !labelImage) || scanLoading}
-          className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {scanLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
           {scanLoading ? 'Scanning…' : 'Scan with AI'}
@@ -243,7 +243,7 @@ export default function NewIngredientPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
-          <h2 className="text-base font-semibold text-mise-ink mb-4">Basic details</h2>
+          <h2 className="text-base font-semibold text-hospopilot-ink mb-4">Basic details</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2">
               <Input
@@ -303,7 +303,7 @@ export default function NewIngredientPage() {
                   onClick={estimateKcal}
                   disabled={!name.trim() || kcalLoading}
                   title="Estimate with AI"
-                  className="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-mise-mid text-white hover:bg-mise-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-hospopilot-mid text-white hover:bg-hospopilot-deep disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   {kcalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 </button>

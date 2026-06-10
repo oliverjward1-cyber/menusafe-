@@ -264,14 +264,14 @@ export default async function OwnerDashboard() {
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <History className="h-4 w-4 text-mise-mid" />
-            <h2 className="text-sm font-semibold text-mise-ink">This week&apos;s trail</h2>
+            <History className="h-4 w-4 text-hospopilot-mid" />
+            <h2 className="text-sm font-semibold text-hospopilot-ink">This week&apos;s trail</h2>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-mise-ink/40">
+            <span className="text-xs text-hospopilot-ink/40">
               {weekCompletedDays}/{weekTotalDaysSoFar} days fully complete
             </span>
-            <Link href="/owner/trail-history" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Full history →</Link>
+            <Link href="/owner/trail-history" className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">Full history →</Link>
           </div>
         </div>
         <div className="flex items-end gap-2">
@@ -295,8 +295,8 @@ export default async function OwnerDashboard() {
                   <div className={`h-16 w-full rounded-lg ${day.isFuture ? 'bg-gray-50 border-2 border-dashed border-gray-200' : 'bg-gray-100'}`} />
                 )}
               </div>
-              <span className={`text-[11px] font-medium ${day.isToday ? 'text-mise-mid' : 'text-mise-ink/40'}`}>{day.label}</span>
-              {day.isToday && <span className="w-1 h-1 rounded-full bg-mise-mid" />}
+              <span className={`text-[11px] font-medium ${day.isToday ? 'text-hospopilot-mid' : 'text-hospopilot-ink/40'}`}>{day.label}</span>
+              {day.isToday && <span className="w-1 h-1 rounded-full bg-hospopilot-mid" />}
             </div>
           ))}
         </div>
@@ -339,12 +339,12 @@ export default async function OwnerDashboard() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">{restaurant?.name}</h1>
-          <p className="text-sm text-mise-ink/50 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">{restaurant?.name}</h1>
+          <p className="text-sm text-hospopilot-ink/50 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
         </div>
         <Link
           href="/owner/eho"
-          className="flex-shrink-0 inline-flex items-center gap-2 bg-mise-deep text-white rounded-xl px-4 py-2.5 text-sm font-semibold shadow hover:bg-mise-deep/90 transition-colors"
+          className="flex-shrink-0 inline-flex items-center gap-2 bg-hospopilot-deep text-white rounded-xl px-4 py-2.5 text-sm font-semibold shadow hover:bg-hospopilot-deep/90 transition-colors"
         >
           <ShieldCheck className="h-4 w-4" />
           EHO Inspection Mode
@@ -353,20 +353,20 @@ export default async function OwnerDashboard() {
 
       {/* Today's Trail Progress */}
       <Link href="/owner/trail" className="block">
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm px-5 py-4 hover:border-mise-mid/30 transition-colors">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm px-5 py-4 hover:border-hospopilot-mid/30 transition-colors">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <ListChecks className="h-4 w-4 text-mise-mid" />
-              <h2 className="text-sm font-semibold text-mise-ink">Today&apos;s Trail</h2>
+              <ListChecks className="h-4 w-4 text-hospopilot-mid" />
+              <h2 className="text-sm font-semibold text-hospopilot-ink">Today&apos;s Trail</h2>
             </div>
-            <span className={`text-xs font-semibold ${trailPct === 100 ? 'text-green-600' : trailPct > 0 ? 'text-mise-mid' : 'text-mise-ink/30'}`}>
+            <span className={`text-xs font-semibold ${trailPct === 100 ? 'text-green-600' : trailPct > 0 ? 'text-hospopilot-mid' : 'text-hospopilot-ink/30'}`}>
               {trailTotal === 0 ? 'No tasks yet' : `${trailDone}/${trailTotal} complete`}
             </span>
           </div>
           {trailTotal > 0 && (
             <>
               <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden mb-3">
-                <div className="h-full bg-mise-mid rounded-full transition-all" style={{ width: `${trailPct}%` }} />
+                <div className="h-full bg-hospopilot-mid rounded-full transition-all" style={{ width: `${trailPct}%` }} />
               </div>
               <div className="flex items-center gap-4 flex-wrap text-xs">
                 {missedTasks.length > 0 && (
@@ -381,10 +381,10 @@ export default async function OwnerDashboard() {
                   </span>
                 )}
                 {nextTask && (
-                  <span className="text-mise-ink/50">
-                    Next: <span className="font-medium text-mise-ink">{nextTask.title}</span>
+                  <span className="text-hospopilot-ink/50">
+                    Next: <span className="font-medium text-hospopilot-ink">{nextTask.title}</span>
                     {nextTask.scheduled_time && (
-                      <span className="ml-1 text-mise-ink/40">@ {nextTask.scheduled_time.slice(0, 5)}</span>
+                      <span className="ml-1 text-hospopilot-ink/40">@ {nextTask.scheduled_time.slice(0, 5)}</span>
                     )}
                   </span>
                 )}
@@ -397,29 +397,29 @@ export default async function OwnerDashboard() {
             </>
           )}
           {trailTotal === 0 && (
-            <p className="text-xs text-mise-ink/40">Trail tasks will appear here once today&apos;s trail has been loaded.</p>
+            <p className="text-xs text-hospopilot-ink/40">Trail tasks will appear here once today&apos;s trail has been loaded.</p>
           )}
         </div>
       </Link>
 
       {/* Today's delivery spend */}
       <Link href="/owner/trail" className="block">
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm px-5 py-4 flex items-center justify-between hover:border-mise-mid/30 transition-colors">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm px-5 py-4 flex items-center justify-between hover:border-hospopilot-mid/30 transition-colors">
           <div>
-            <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Today&apos;s delivery spend</p>
-            <p className="text-2xl font-display font-bold text-mise-ink">
+            <p className="text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1">Today&apos;s delivery spend</p>
+            <p className="text-2xl font-display font-bold text-hospopilot-ink">
               {todayDeliveries.length === 0 ? '—' : `£${todaySpend.toFixed(2)}`}
             </p>
             {todayDeliveries.length > 0 && (
-              <p className="text-xs text-mise-ink/40 mt-1">
+              <p className="text-xs text-hospopilot-ink/40 mt-1">
                 {todayDeliveries.length} deliver{todayDeliveries.length !== 1 ? 'ies' : 'y'} · {todayDeliveries.map(d => d.supplier).filter(Boolean).join(', ')}
               </p>
             )}
             {todayDeliveries.length === 0 && (
-              <p className="text-xs text-mise-ink/40 mt-1">No deliveries logged today</p>
+              <p className="text-xs text-hospopilot-ink/40 mt-1">No deliveries logged today</p>
             )}
           </div>
-          <div className="flex items-center gap-2 text-mise-ink/20">
+          <div className="flex items-center gap-2 text-hospopilot-ink/20">
             <Truck className="h-6 w-6" />
             <ArrowRight className="h-4 w-4" />
           </div>
@@ -447,14 +447,14 @@ export default async function OwnerDashboard() {
               <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Users className={`h-4 w-4 ${iconColour}`} />
-                  <h2 className="text-sm font-semibold text-mise-ink">{label}</h2>
+                  <h2 className="text-sm font-semibold text-hospopilot-ink">{label}</h2>
                 </div>
-                <Link href={quizUrl} className="text-xs text-mise-mid hover:text-mise-deep font-medium">View →</Link>
+                <Link href={quizUrl} className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">View →</Link>
               </div>
               {total === 0 ? (
                 <div className="px-5 py-6 text-center">
-                  <p className="text-sm text-mise-ink/40">No {label.toLowerCase()} staff trained yet</p>
-                  <Link href={quizUrl} className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+                  <p className="text-sm text-hospopilot-ink/40">No {label.toLowerCase()} staff trained yet</p>
+                  <Link href={quizUrl} className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
                     Share quiz link <ArrowRight className="h-3 w-3" />
                   </Link>
                 </div>
@@ -462,7 +462,7 @@ export default async function OwnerDashboard() {
                 <>
                   <div className="px-5 py-4 border-b border-gray-100">
                     <div className="flex justify-between text-xs mb-1.5">
-                      <span className="text-mise-ink/50 font-medium">{valid.length} of {total} fully trained</span>
+                      <span className="text-hospopilot-ink/50 font-medium">{valid.length} of {total} fully trained</span>
                       <span className={`font-bold ${pct === 100 ? 'text-green-600' : pct >= 70 ? 'text-amber-600' : 'text-red-600'}`}>{pct}%</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -474,7 +474,7 @@ export default async function OwnerDashboard() {
                       {expired.length > 0 && <span className="flex items-center gap-1 text-red-500"><AlertTriangle className="h-3.5 w-3.5" /> {expired.length} expired</span>}
                     </div>
                     {lastAttempt && (
-                      <p className="text-xs text-mise-ink/30 mt-2">Last quiz: {new Date(lastAttempt.completed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                      <p className="text-xs text-hospopilot-ink/30 mt-2">Last quiz: {new Date(lastAttempt.completed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                     )}
                   </div>
                   <div className="divide-y divide-gray-50 max-h-44 overflow-y-auto">
@@ -482,7 +482,7 @@ export default async function OwnerDashboard() {
                       <div key={s.name} className="flex items-center justify-between px-4 py-2.5 bg-red-50/40">
                         <div className="flex items-center gap-2">
                           <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
-                          <p className="text-sm font-medium text-mise-ink">{s.name}</p>
+                          <p className="text-sm font-medium text-hospopilot-ink">{s.name}</p>
                         </div>
                         <p className="text-xs text-red-500 font-medium">Needs retraining</p>
                       </div>
@@ -493,7 +493,7 @@ export default async function OwnerDashboard() {
                         <div key={s.name} className="flex items-center justify-between px-4 py-2.5 bg-amber-50/50">
                           <div className="flex items-center gap-2">
                             <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                            <p className="text-sm font-medium text-mise-ink">{s.name}</p>
+                            <p className="text-sm font-medium text-hospopilot-ink">{s.name}</p>
                           </div>
                           <p className="text-xs text-amber-600 font-medium">{daysLeft}d left</p>
                         </div>
@@ -505,7 +505,7 @@ export default async function OwnerDashboard() {
                           <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
                           <p className="text-sm text-gray-700">{s.name}</p>
                         </div>
-                        <p className="text-xs text-mise-ink/40">Expires {s.expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                        <p className="text-xs text-hospopilot-ink/40">Expires {s.expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
                       </div>
                     ))}
                   </div>
@@ -548,32 +548,32 @@ export default async function OwnerDashboard() {
             <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <ClipboardCheck className="h-4 w-4 text-mise-mid" />
-                  <h2 className="text-sm font-semibold text-mise-ink">Kitchen Audit</h2>
+                  <ClipboardCheck className="h-4 w-4 text-hospopilot-mid" />
+                  <h2 className="text-sm font-semibold text-hospopilot-ink">Kitchen Audit</h2>
                 </div>
-                <Link href="/chef/audit" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Run audit →</Link>
+                <Link href="/chef/audit" className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">Run audit →</Link>
               </div>
               {!lastAudit ? (
                 <div className="text-center py-4">
-                  <p className="text-sm text-mise-ink/40">No audits completed yet</p>
-                  <Link href="/chef/audit/new" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+                  <p className="text-sm text-hospopilot-ink/40">No audits completed yet</p>
+                  <Link href="/chef/audit/new" className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
                     Start first audit <ArrowRight className="h-3 w-3" />
                   </Link>
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Last score</p>
+                    <p className="text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1">Last score</p>
                     <p className={`text-2xl font-bold ${statusColour}`}>{auditScore}%</p>
-                    <p className="text-xs text-mise-ink/40 mt-0.5">by {lastAudit.completed_by}</p>
+                    <p className="text-xs text-hospopilot-ink/40 mt-0.5">by {lastAudit.completed_by}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Completed</p>
-                    <p className="text-sm font-semibold text-mise-ink">{auditDate!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    <p className="text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1">Completed</p>
+                    <p className="text-sm font-semibold text-hospopilot-ink">{auditDate!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-mise-ink/40 uppercase tracking-widest mb-1">Next due</p>
-                    <p className={`text-sm font-semibold ${isOverdue ? 'text-red-600' : isDueSoon ? 'text-amber-600' : 'text-mise-ink'}`}>
+                    <p className="text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1">Next due</p>
+                    <p className={`text-sm font-semibold ${isOverdue ? 'text-red-600' : isDueSoon ? 'text-amber-600' : 'text-hospopilot-ink'}`}>
                       {nextDue!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
                     {isOverdue && <p className="text-xs text-red-500 mt-0.5">Overdue</p>}
@@ -590,16 +590,16 @@ export default async function OwnerDashboard() {
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MenuSquare className="h-4 w-4 text-green-700" />
-              <h2 className="text-sm font-semibold text-mise-ink">Live menus</h2>
+              <h2 className="text-sm font-semibold text-hospopilot-ink">Live menus</h2>
             </div>
-            <Link href="/chef/menus" className="text-xs text-mise-mid hover:text-mise-deep font-medium">Manage →</Link>
+            <Link href="/chef/menus" className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">Manage →</Link>
           </div>
           <div className="divide-y divide-gray-50">
             {allMenus.length === 0 ? (
               <div className="px-5 py-8 text-center">
                 <GlobeLock className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-mise-ink/40">No menus created yet</p>
-                <Link href="/chef/menus/new" className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep mt-2 font-medium">
+                <p className="text-sm text-hospopilot-ink/40">No menus created yet</p>
+                <Link href="/chef/menus/new" className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
                   Create first menu <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -611,8 +611,8 @@ export default async function OwnerDashboard() {
                       ? <Globe className="h-4 w-4 text-green-600 shrink-0" />
                       : <GlobeLock className="h-4 w-4 text-gray-300 shrink-0" />}
                     <div>
-                      <p className="text-sm font-medium text-mise-ink">{menu.name}</p>
-                      <p className="text-xs text-mise-ink/40">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</p>
+                      <p className="text-sm font-medium text-hospopilot-ink">{menu.name}</p>
+                      <p className="text-xs text-hospopilot-ink/40">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</p>
                     </div>
                   </div>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${menu.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>

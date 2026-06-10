@@ -122,15 +122,15 @@ function TaskCard({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className={`font-semibold text-sm ${isDone ? 'text-green-700' : isFlagged ? 'text-amber-700' : 'text-mise-ink'}`}>
+            <p className={`font-semibold text-sm ${isDone ? 'text-green-700' : isFlagged ? 'text-amber-700' : 'text-hospopilot-ink'}`}>
               {task.title}
             </p>
             {task.scheduled_time && (
-              <span className="text-[11px] text-mise-ink/30 font-medium">{fmt(task.scheduled_time)}</span>
+              <span className="text-[11px] text-hospopilot-ink/30 font-medium">{fmt(task.scheduled_time)}</span>
             )}
           </div>
           {task.description && !open && (
-            <p className="text-xs text-mise-ink/40 mt-0.5 truncate">{task.description}</p>
+            <p className="text-xs text-hospopilot-ink/40 mt-0.5 truncate">{task.description}</p>
           )}
           {isDone && (
             <p className="text-xs text-green-600 mt-0.5">✓ Done by {task.completed_by}</p>
@@ -145,9 +145,9 @@ function TaskCard({
           ) : isFlagged ? (
             <Flag className="h-5 w-5 text-amber-500 fill-amber-500" />
           ) : open ? (
-            <ChevronUp className="h-5 w-5 text-mise-ink/20" />
+            <ChevronUp className="h-5 w-5 text-hospopilot-ink/20" />
           ) : (
-            <ChevronDown className="h-5 w-5 text-mise-ink/20" />
+            <ChevronDown className="h-5 w-5 text-hospopilot-ink/20" />
           )}
         </div>
       </button>
@@ -156,7 +156,7 @@ function TaskCard({
       {open && !isComplete && (
         <div className="px-4 pb-4 space-y-4 border-t border-black/[0.04] pt-3">
           {task.description && (
-            <p className="text-xs text-mise-ink/50">{task.description}</p>
+            <p className="text-xs text-hospopilot-ink/50">{task.description}</p>
           )}
 
           {/* Checklist */}
@@ -171,9 +171,9 @@ function TaskCard({
                 >
                   {checks[item.id]
                     ? <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    : <Circle className="h-5 w-5 text-mise-ink/20 flex-shrink-0" />
+                    : <Circle className="h-5 w-5 text-hospopilot-ink/20 flex-shrink-0" />
                   }
-                  <span className={`text-sm ${checks[item.id] ? 'text-green-700' : 'text-mise-ink'}`}>
+                  <span className={`text-sm ${checks[item.id] ? 'text-green-700' : 'text-hospopilot-ink'}`}>
                     {item.label}
                     {item.required && <span className="text-red-400 ml-1">*</span>}
                   </span>
@@ -191,7 +191,7 @@ function TaskCard({
                     value={row.location}
                     onChange={e => setTemps(p => p.map((r, idx) => idx === i ? { ...r, location: e.target.value } : r))}
                     placeholder="Location"
-                    className="flex-1 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+                    className="flex-1 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
                   />
                   <div className="flex items-center gap-1">
                     <input
@@ -200,11 +200,11 @@ function TaskCard({
                       value={row.temperature}
                       onChange={e => setTemps(p => p.map((r, idx) => idx === i ? { ...r, temperature: e.target.value } : r))}
                       placeholder="°C"
-                      className="w-20 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+                      className="w-20 border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
                     />
                     {i > 0 && (
                       <button onClick={() => setTemps(p => p.filter((_, idx) => idx !== i))}
-                        className="text-mise-ink/30 hover:text-red-500">
+                        className="text-hospopilot-ink/30 hover:text-red-500">
                         <Minus className="h-4 w-4" />
                       </button>
                     )}
@@ -213,7 +213,7 @@ function TaskCard({
               ))}
               <button
                 onClick={() => setTemps(p => [...p, { location: '', temperature: '' }])}
-                className="text-xs text-mise-ink/40 hover:text-mise-mid flex items-center gap-1 transition-colors"
+                className="text-xs text-hospopilot-ink/40 hover:text-hospopilot-mid flex items-center gap-1 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" /> Add location
               </button>
@@ -222,7 +222,7 @@ function TaskCard({
 
           {/* Delivery */}
           {task.task_type === 'delivery' && (
-            <p className="text-sm text-mise-ink/50 italic">Add notes below and mark done, or flag if there is a delivery issue.</p>
+            <p className="text-sm text-hospopilot-ink/50 italic">Add notes below and mark done, or flag if there is a delivery issue.</p>
           )}
 
           {/* Notes */}
@@ -231,7 +231,7 @@ function TaskCard({
             onChange={e => setNotes(e.target.value)}
             placeholder="Notes (optional)"
             rows={2}
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
           />
 
           {/* Flag section */}
@@ -252,7 +252,7 @@ function TaskCard({
             <button
               onClick={() => complete('done')}
               disabled={saving || !checklistReady || !tempReady}
-              className="flex-1 bg-mise-deep text-white rounded-xl py-3 font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
+              className="flex-1 bg-hospopilot-deep text-white rounded-xl py-3 font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               Mark done
@@ -324,7 +324,7 @@ export default function DailyTrail() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-mise-ink px-5 py-4">
+      <div className="bg-hospopilot-ink px-5 py-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-white font-semibold">{restaurantName}</p>
@@ -347,7 +347,7 @@ export default function DailyTrail() {
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <div
-                className="h-full bg-mise-mid rounded-full transition-all duration-500"
+                className="h-full bg-hospopilot-mid rounded-full transition-all duration-500"
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -362,12 +362,12 @@ export default function DailyTrail() {
 
         {loading && (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-7 w-7 text-mise-mid animate-spin" />
+            <Loader2 className="h-7 w-7 text-hospopilot-mid animate-spin" />
           </div>
         )}
 
         {!loading && tasks.length === 0 && (
-          <div className="text-center py-12 text-mise-ink/40">
+          <div className="text-center py-12 text-hospopilot-ink/40">
             <ClipboardList className="h-10 w-10 mx-auto mb-3 opacity-30" />
             <p className="text-sm">No tasks scheduled for today.</p>
           </div>

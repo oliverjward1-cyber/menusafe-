@@ -104,14 +104,14 @@ export default async function StaffQuizPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">
             {typeLabel ? `${typeLabel} Quiz` : 'Staff Allergen Quiz'}
           </h1>
-          <p className="text-mise-ink/50 mt-1">
+          <p className="text-hospopilot-ink/50 mt-1">
             {typeLabel ? `Results filtered to ${typeLabel} staff` : 'Manage quizzes and track staff compliance'}
           </p>
           {typeLabel && (
-            <a href="/owner/staff-quiz" className="text-xs text-mise-mid hover:underline mt-0.5 inline-block">
+            <a href="/owner/staff-quiz" className="text-xs text-hospopilot-mid hover:underline mt-0.5 inline-block">
               ← Show all quiz types
             </a>
           )}
@@ -153,12 +153,12 @@ export default async function StaffQuizPage({
           {/* QR codes */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Card>
-              <h2 className="text-base font-semibold text-mise-ink mb-1">Front of House quiz</h2>
+              <h2 className="text-base font-semibold text-hospopilot-ink mb-1">Front of House quiz</h2>
               <p className="text-xs text-gray-500 mb-4">For waitstaff, hosts, and floor team</p>
               <QrCodeDisplay quizUrl={fohUrl} restaurantSlug={restaurant?.slug ?? ''} />
             </Card>
             <Card>
-              <h2 className="text-base font-semibold text-mise-ink mb-1">Kitchen Staff quiz</h2>
+              <h2 className="text-base font-semibold text-hospopilot-ink mb-1">Kitchen Staff quiz</h2>
               <p className="text-xs text-gray-500 mb-4">For chefs, prep staff, and kitchen team</p>
               <QrCodeDisplay quizUrl={kitchenUrl} restaurantSlug={restaurant?.slug ?? ''} />
             </Card>
@@ -166,19 +166,19 @@ export default async function StaffQuizPage({
 
           {/* Stats */}
           <Card>
-            <h2 className="text-base font-semibold text-mise-ink mb-4">Overall results</h2>
+            <h2 className="text-base font-semibold text-hospopilot-ink mb-4">Overall results</h2>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-xs text-mise-ink/50">Total attempts</p>
-                <p className="text-2xl font-display font-semibold text-mise-ink mt-1">{totalAttempts}</p>
+                <p className="text-xs text-hospopilot-ink/50">Total attempts</p>
+                <p className="text-2xl font-display font-semibold text-hospopilot-ink mt-1">{totalAttempts}</p>
               </div>
               <div>
-                <p className="text-xs text-mise-ink/50">Passed</p>
+                <p className="text-xs text-hospopilot-ink/50">Passed</p>
                 <p className="text-2xl font-bold text-green-700 mt-1">{totalPassed}</p>
               </div>
               <div>
-                <p className="text-xs text-mise-ink/50">Pass rate</p>
-                <p className="text-2xl font-display font-semibold text-mise-ink mt-1">
+                <p className="text-xs text-hospopilot-ink/50">Pass rate</p>
+                <p className="text-2xl font-display font-semibold text-hospopilot-ink mt-1">
                   {passRate !== null ? `${passRate}%` : '—'}
                 </p>
               </div>
@@ -188,8 +188,8 @@ export default async function StaffQuizPage({
           {/* Audit trail */}
           <Card padding={false}>
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-base font-semibold text-mise-ink">Audit trail</h2>
-              <p className="text-sm text-mise-ink/50">All quiz attempts</p>
+              <h2 className="text-base font-semibold text-hospopilot-ink">Audit trail</h2>
+              <p className="text-sm text-hospopilot-ink/50">All quiz attempts</p>
             </div>
             {filteredAttempts.length === 0 ? (
               <div className="py-12 text-center text-gray-500 text-sm">
@@ -255,8 +255,8 @@ export default async function StaffQuizPage({
         <div className="space-y-6">
           <Card padding={false}>
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-base font-semibold text-mise-ink">Staff compliance</h2>
-              <p className="text-sm text-mise-ink/50">
+              <h2 className="text-base font-semibold text-hospopilot-ink">Staff compliance</h2>
+              <p className="text-sm text-hospopilot-ink/50">
                 Certificates valid for 6 months from last passed quiz
               </p>
             </div>

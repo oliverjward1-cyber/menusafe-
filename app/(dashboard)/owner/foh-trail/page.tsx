@@ -21,14 +21,14 @@ export default async function FohTrailPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-mise-mid" />
-            <h1 className="text-2xl font-display font-semibold text-mise-ink">FOH Daily Checks</h1>
+            <Users className="h-5 w-5 text-hospopilot-mid" />
+            <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">FOH Daily Checks</h1>
           </div>
-          <p className="text-sm text-mise-ink/50 mt-0.5">{today}</p>
+          <p className="text-sm text-hospopilot-ink/50 mt-0.5">{today}</p>
         </div>
         <Link
           href="/owner/trail"
-          className="text-xs text-gray-500 hover:text-mise-mid border border-gray-200 rounded-lg px-3 py-1.5"
+          className="text-xs text-gray-500 hover:text-hospopilot-mid border border-gray-200 rounded-lg px-3 py-1.5"
         >
           Kitchen Trail →
         </Link>

@@ -149,7 +149,7 @@ export default function UploadCostingPage() {
         <Link href="/chef/ingredients" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
           <ChevronLeft className="h-4 w-4" /> Back
         </Link>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">Upload costing sheet</h1>
+        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Upload costing sheet</h1>
       </div>
 
       {/* Upload area */}
@@ -189,7 +189,7 @@ export default function UploadCostingPage() {
           <div className="p-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">
+                <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">
                   Ingredient name <span className="text-red-400">*</span>
                 </label>
                 <select value={nameCol} onChange={(e) => setNameCol(e.target.value)}
@@ -199,7 +199,7 @@ export default function UploadCostingPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Cost per unit (£)</label>
+                <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Cost per unit (£)</label>
                 <select value={costCol} onChange={(e) => setCostCol(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none">
                   <option value="">— none —</option>
@@ -207,7 +207,7 @@ export default function UploadCostingPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Unit type column</label>
+                <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Unit type column</label>
                 <select value={unitCol} onChange={(e) => setUnitCol(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-600 focus:outline-none">
                   <option value="">— none —</option>
@@ -218,7 +218,7 @@ export default function UploadCostingPage() {
 
             {!unitCol && (
               <div>
-                <label className="block text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest mb-1.5">Default unit (applied to all rows)</label>
+                <label className="block text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1.5">Default unit (applied to all rows)</label>
                 <div className="flex gap-2 flex-wrap">
                   {(['kg', 'g', 'ml', 'litre', 'each'] as const).map((u) => (
                     <button key={u} onClick={() => setDefaultUnit(u)}
@@ -235,7 +235,7 @@ export default function UploadCostingPage() {
           {nameCol && preview.length > 0 && (
             <div className="border-t border-gray-100">
               <div className="px-5 py-3 bg-gray-50">
-                <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">
+                <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest">
                   Preview — first 5 of {totalValid} rows
                 </p>
               </div>
@@ -255,7 +255,7 @@ export default function UploadCostingPage() {
                         <td className="px-4 py-2.5 text-gray-600">
                           {p.costPerUnit > 0 ? `£${p.costPerUnit.toFixed(2)}` : <span className="text-gray-300">—</span>}
                         </td>
-                        <td className="px-4 py-2.5 text-mise-ink/50">{p.unitType}</td>
+                        <td className="px-4 py-2.5 text-hospopilot-ink/50">{p.unitType}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -274,7 +274,7 @@ export default function UploadCostingPage() {
               ? <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
               : <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />}
             <div>
-              <p className="text-sm font-medium text-mise-ink">
+              <p className="text-sm font-medium text-hospopilot-ink">
                 {saved} ingredient{saved !== 1 ? 's' : ''} imported successfully
               </p>
               {errors.length > 0 && (

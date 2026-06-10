@@ -33,7 +33,7 @@ import {
   ChefHat,
   UtensilsCrossed,
 } from 'lucide-react'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 type Role = 'owner' | 'manager' | 'head_chef' | 'chef' | 'foh'
 
@@ -46,9 +46,9 @@ const ROLE_LABELS: Record<Role, string> = {
 }
 
 const ROLE_BADGE: Record<Role, string> = {
-  owner: 'bg-mise-gold/20 text-mise-gold',
+  owner: 'bg-hospopilot-gold/20 text-hospopilot-gold',
   manager: 'bg-purple-500/20 text-purple-300',
-  head_chef: 'bg-mise-mid/30 text-mise-fresh',
+  head_chef: 'bg-hospopilot-mid/30 text-hospopilot-fresh',
   chef: 'bg-blue-500/20 text-blue-300',
   foh: 'bg-amber-500/20 text-amber-300',
 }
@@ -60,7 +60,7 @@ function NavLink({ href, label, icon: Icon, pathname, exact }: {
   return (
     <Link href={href} className={cn(
       'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-      active ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+      active ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
     )}>
       <Icon className="h-4 w-4" />{label}
     </Link>
@@ -103,7 +103,7 @@ function CollapsibleNavSection({ label, icon: SectionIcon, items, pathname }: {
             return (
               <Link key={href} href={href} className={cn(
                 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                active ? 'bg-mise-mid text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                active ? 'bg-hospopilot-mid text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
               )}>
                 <Icon className="h-3.5 w-3.5" />{label}
               </Link>
@@ -152,7 +152,7 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
     <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Brand */}
       <div className="p-4 border-b border-gray-700">
-        <Link href="/owner"><MiseLogo className="mb-2" /></Link>
+        <Link href="/owner"><HospoPilotLogo className="mb-2" /></Link>
         <p className="text-xs text-gray-400 truncate">{restaurantName}</p>
         <span className={cn('inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs', ROLE_BADGE[role])}>
           {isPreviewing ? `Preview: ${ROLE_LABELS[role]}` : ROLE_LABELS[role]}
@@ -191,8 +191,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             />
           )}
 
-          {/* Kitchen Audit — owner, manager, head chef */}
-          {(isOwnerOrManager || isHeadChef) && (
+          {/* Kitchen Audit — owner, manager, head chef, kitchen chef (run only) */}
+          {(isOwnerOrManager || isHeadChef || role === 'chef') && (
             <CollapsibleNavSection
               label="Kitchen Audit"
               icon={ClipboardCheck}
@@ -212,8 +212,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             <NavLink href="/owner/foh-trail" label="FOH Daily Trail" icon={Users2} pathname={pathname} />
           )}
 
-          {/* Trail History — owner, manager, head chef, FOH */}
-          {(isOwnerOrManager || isHeadChef || isFOH) && (
+          {/* Trail History — owner, manager, head chef, kitchen chef, FOH */}
+          {(isOwnerOrManager || isHeadChef || isFOH || role === 'chef') && (
             <NavLink href="/owner/trail-history" label="Trail History" icon={BookMarked} pathname={pathname} />
           )}
 
@@ -233,8 +233,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
           )}
 
-          {/* Management ops — owner, manager, head chef */}
-          {(isOwnerOrManager || isHeadChef) && (
+          {/* Management ops — owner, manager, head chef, kitchen chef */}
+          {isKitchenStaff && (
             <NavLink href="/owner/haccp" label="HACCP & Calibration" icon={FlaskConical} pathname={pathname} />
           )}
           {/* EHO Mode — owner, manager, FOH */}

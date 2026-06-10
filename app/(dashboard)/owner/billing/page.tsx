@@ -107,7 +107,7 @@ export default async function BillingPage({
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold text-mise-ink">Billing</h1>
+          <h1 className="font-display text-3xl font-bold text-hospopilot-ink">Billing</h1>
           <p className="text-gray-500 mt-1">Manage your subscription and view invoices.</p>
         </div>
         <PrintButton label="Print" />
@@ -129,7 +129,7 @@ export default async function BillingPage({
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Current plan</p>
-            <p className="text-xl font-semibold text-mise-ink">
+            <p className="text-xl font-semibold text-hospopilot-ink">
               {PLAN_LABELS[plan] ?? plan}
               {PLAN_PRICES[plan] && <span className="ml-2 text-base font-normal text-gray-500">{PLAN_PRICES[plan]}</span>}
             </p>
@@ -140,10 +140,10 @@ export default async function BillingPage({
         </div>
         <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-500">
           {restaurant?.subscription_ends_at && (
-            <p>Next renewal: <span className="font-medium text-mise-ink">{new Date(restaurant.subscription_ends_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span></p>
+            <p>Next renewal: <span className="font-medium text-hospopilot-ink">{new Date(restaurant.subscription_ends_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span></p>
           )}
           {restaurant?.trial_ends_at && status === 'trialing' && (
-            <p>Trial ends: <span className="font-medium text-mise-ink">{new Date(restaurant.trial_ends_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span></p>
+            <p>Trial ends: <span className="font-medium text-hospopilot-ink">{new Date(restaurant.trial_ends_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span></p>
           )}
         </div>
       </div>
@@ -151,8 +151,8 @@ export default async function BillingPage({
       {/* Invoice history */}
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-          <FileText className="h-4 w-4 text-mise-mid" />
-          <h2 className="font-semibold text-mise-ink">Invoice history</h2>
+          <FileText className="h-4 w-4 text-hospopilot-mid" />
+          <h2 className="font-semibold text-hospopilot-ink">Invoice history</h2>
         </div>
 
         {invoices.length === 0 ? (
@@ -175,7 +175,7 @@ export default async function BillingPage({
               return (
                 <div key={inv.id} className="grid grid-cols-2 sm:grid-cols-4 gap-4 px-5 py-3.5 items-center">
                   <div>
-                    <p className="text-sm font-medium text-mise-ink">{inv.number ?? inv.id.slice(-8).toUpperCase()}</p>
+                    <p className="text-sm font-medium text-hospopilot-ink">{inv.number ?? inv.id.slice(-8).toUpperCase()}</p>
                     <p className="text-xs text-gray-400 mt-0.5">
                       {new Date(inv.date * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
@@ -185,7 +185,7 @@ export default async function BillingPage({
                     {' – '}
                     {new Date(inv.periodEnd * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </div>
-                  <div className="text-sm font-semibold text-mise-ink">
+                  <div className="text-sm font-semibold text-hospopilot-ink">
                     {formatAmount(inv.amount, inv.currency)}
                   </div>
                   <div className="flex items-center justify-between gap-2">
@@ -197,7 +197,7 @@ export default async function BillingPage({
                         href={inv.pdf}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep font-medium no-print"
+                        className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium no-print"
                       >
                         <Download className="h-3.5 w-3.5" /> PDF
                       </a>
@@ -212,7 +212,7 @@ export default async function BillingPage({
 
       {/* Change plan */}
       <div className="no-print">
-        <h2 className="font-display text-xl font-semibold text-mise-ink mb-4">Change plan</h2>
+        <h2 className="font-display text-xl font-semibold text-hospopilot-ink mb-4">Change plan</h2>
         <PlanSelector currentPlan={plan === 'core' ? null : plan} />
       </div>
     </div>

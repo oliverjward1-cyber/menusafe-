@@ -1,12 +1,12 @@
-/* mise admin — sample data (placeholder; safe to replace with live data later) */
+/* HospoPilot admin — sample data (placeholder; safe to replace with live data later) */
 (function () {
   "use strict";
 
   // Plans are placeholders until pricing is finalised — names/prices editable in the Subscriptions screen.
   var PLANS = {
-    core:  { id: "core",  name: "mise Core",       price: 49,  blurb: "Allergens, menus & QR for a single site." },
-    plus:  { id: "plus",  name: "mise Plus",       price: 79,  blurb: "Adds recipe costing, GP% and staff training." },
-    multi: { id: "multi", name: "mise Multi-site", price: 129, blurb: "Everything in Plus across up to 5 venues." }
+    core:  { id: "core",  name: "HospoPilot Core",       price: 49,  blurb: "Allergens, menus & QR for a single site." },
+    plus:  { id: "plus",  name: "HospoPilot Plus",       price: 79,  blurb: "Adds recipe costing, GP% and staff training." },
+    multi: { id: "multi", name: "HospoPilot Multi-site", price: 129, blurb: "Everything in Plus across up to 5 venues." }
   };
 
   function d(s) { return s; } // dates as ISO strings
@@ -106,10 +106,10 @@
     { t: "1d",  who: "Drift Coffee Co.",what: "started a free trial",            kind: "trial" },
     { t: "2d",  who: "Forage & Co.",    what: "payment failed (£49)",            kind: "bad" },
     { t: "3d",  who: "Pier 7 Seafood",  what: "paused their subscription",       kind: "warn" },
-    { t: "4d",  who: "Cinnamon Lane",   what: "upgraded to mise Plus",           kind: "good" }
+    { t: "4d",  who: "Cinnamon Lane",   what: "upgraded to HospoPilot Plus",           kind: "good" }
   ];
 
-  window.MISE_DATA = {
+  window.HOSPOPILOT_DATA = {
     PLANS: PLANS,
     CUSTOMERS: CUSTOMERS,
     INVOICES: INVOICES,

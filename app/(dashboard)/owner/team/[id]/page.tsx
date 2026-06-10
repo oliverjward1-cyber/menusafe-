@@ -53,20 +53,20 @@ export default async function StaffDetailPage({ params }: { params: { id: string
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center gap-3">
-        <Link href="/owner/team" className="text-sm text-gray-500 hover:text-mise-ink flex items-center gap-1">
+        <Link href="/owner/team" className="text-sm text-gray-500 hover:text-hospopilot-ink flex items-center gap-1">
           <ArrowLeft className="h-4 w-4" /> Team
         </Link>
       </div>
 
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-full bg-mise-mid/10 flex items-center justify-center shrink-0">
-            <span className="text-xl font-semibold text-mise-mid">
+          <div className="h-14 w-14 rounded-full bg-hospopilot-mid/10 flex items-center justify-center shrink-0">
+            <span className="text-xl font-semibold text-hospopilot-mid">
               {(member.full_name ?? '?')[0].toUpperCase()}
             </span>
           </div>
           <div>
-            <h1 className="text-2xl font-display font-semibold text-mise-ink">
+            <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">
               {member.full_name ?? 'Unknown'}
               {isSelf && <span className="ml-2 text-sm font-sans font-normal text-gray-400">(you)</span>}
             </h1>
@@ -95,13 +95,13 @@ export default async function StaffDetailPage({ params }: { params: { id: string
       {quizAttempts && quizAttempts.length > 0 && (
         <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
-            <h2 className="text-sm font-semibold text-mise-ink">Training history</h2>
+            <h2 className="text-sm font-semibold text-hospopilot-ink">Training history</h2>
           </div>
           <div className="divide-y divide-gray-50">
             {quizAttempts.map(a => (
               <div key={a.id} className="flex items-center justify-between px-5 py-3">
                 <div>
-                  <p className="text-sm font-medium text-mise-ink">{a.assessment_type ?? 'Allergen Quiz'}</p>
+                  <p className="text-sm font-medium text-hospopilot-ink">{a.assessment_type ?? 'Allergen Quiz'}</p>
                   <p className="text-xs text-gray-400 mt-0.5">
                     {new Date(a.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </p>

@@ -79,7 +79,7 @@ export default function CorrectiveActions({ initial }: { initial: Action[] }) {
   return (
     <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-semibold text-mise-ink flex items-center gap-2">
+        <h2 className="text-base font-semibold text-hospopilot-ink flex items-center gap-2">
           <Clock className="h-4 w-4 text-amber-500" />
           Corrective Actions
           {open.length > 0 && (
@@ -90,21 +90,21 @@ export default function CorrectiveActions({ initial }: { initial: Action[] }) {
         </h2>
         <button
           onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-1 text-xs text-mise-ink/60 hover:text-mise-ink transition-colors"
+          className="flex items-center gap-1 text-xs text-hospopilot-ink/60 hover:text-hospopilot-ink transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> Add
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={createAction} className="mb-4 p-4 bg-mise-cream rounded-xl space-y-3">
+        <form onSubmit={createAction} className="mb-4 p-4 bg-hospopilot-cream rounded-xl space-y-3">
           <input
             type="text"
             placeholder="Action title *"
             value={newTitle}
             onChange={e => setNewTitle(e.target.value)}
             required
-            className="w-full text-sm rounded-lg border border-black/10 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-mise-green/30"
+            className="w-full text-sm rounded-lg border border-black/10 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-green/30"
           />
           <div className="flex gap-2">
             <input
@@ -112,27 +112,27 @@ export default function CorrectiveActions({ initial }: { initial: Action[] }) {
               placeholder="Assigned to"
               value={newAssignedTo}
               onChange={e => setNewAssignedTo(e.target.value)}
-              className="flex-1 text-sm rounded-lg border border-black/10 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-mise-green/30"
+              className="flex-1 text-sm rounded-lg border border-black/10 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-green/30"
             />
             <input
               type="date"
               value={newDueDate}
               onChange={e => setNewDueDate(e.target.value)}
-              className="text-sm rounded-lg border border-black/10 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-mise-green/30"
+              className="text-sm rounded-lg border border-black/10 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-green/30"
             />
           </div>
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={saving}
-              className="text-sm bg-mise-green text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50"
+              className="text-sm bg-hospopilot-green text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Add action'}
             </button>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="text-sm text-mise-ink/50 px-4 py-2 rounded-lg"
+              className="text-sm text-hospopilot-ink/50 px-4 py-2 rounded-lg"
             >
               Cancel
             </button>
@@ -141,7 +141,7 @@ export default function CorrectiveActions({ initial }: { initial: Action[] }) {
       )}
 
       {open.length === 0 && !showForm && (
-        <p className="text-sm text-mise-ink/40 py-2">No open corrective actions.</p>
+        <p className="text-sm text-hospopilot-ink/40 py-2">No open corrective actions.</p>
       )}
 
       <div className="space-y-2">
@@ -197,7 +197,7 @@ export default function CorrectiveActions({ initial }: { initial: Action[] }) {
         <div className="mt-3">
           <button
             onClick={() => setShowDone(v => !v)}
-            className="flex items-center gap-1 text-xs text-mise-ink/40 hover:text-mise-ink/60 transition-colors"
+            className="flex items-center gap-1 text-xs text-hospopilot-ink/40 hover:text-hospopilot-ink/60 transition-colors"
           >
             {showDone ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
             {done.length} completed
@@ -208,7 +208,7 @@ export default function CorrectiveActions({ initial }: { initial: Action[] }) {
                 <div key={action.id} className="rounded-xl border border-black/[0.06] p-3 opacity-50">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
-                    <p className="text-sm line-through text-mise-ink/60">{action.title}</p>
+                    <p className="text-sm line-through text-hospopilot-ink/60">{action.title}</p>
                   </div>
                 </div>
               ))}

@@ -16,12 +16,12 @@ export default function FridgeTempsPage() {
         </div>
         <div>
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Kitchen Team</p>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">Fridge & Storage Temperatures</h1>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Fridge & Storage Temperatures</h1>
           <p className="text-sm text-gray-500 mt-1">Keeping food at the right temperature to slow bacterial growth and maintain safety.</p>
         </div>
       </div>
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4">Temperature targets</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4">Temperature targets</h2>
         <div className="space-y-3">
           {[
             { label: 'Chiller / fridge', temp: '1°C – 4°C', colour: 'bg-blue-50 border-blue-200 text-blue-800', note: 'Ideally 1–4°C. UK law requires chilled food to be kept at or below 8°C, but best practice is under 5°C.' },
@@ -40,7 +40,7 @@ export default function FridgeTempsPage() {
         </div>
       </Card>
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4">Fridge storage order</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4">Fridge storage order</h2>
         <p className="text-sm text-gray-500 mb-3">Always store food in this order from top to bottom:</p>
         <div className="space-y-2">
           {[
@@ -49,14 +49,14 @@ export default function FridgeTempsPage() {
             ['Bottom shelf', 'Raw poultry, raw minced meat, raw fish and seafood (highest risk — always covered)'],
           ].map(([shelf, items]) => (
             <div key={shelf as string} className="flex gap-3 p-3 rounded-lg bg-gray-50 text-sm">
-              <span className="font-semibold text-mise-ink w-28 shrink-0">{shelf}</span>
+              <span className="font-semibold text-hospopilot-ink w-28 shrink-0">{shelf}</span>
               <span className="text-gray-600">{items}</span>
             </div>
           ))}
         </div>
       </Card>
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-green-600" /> Good storage habits
         </h2>
         <ul className="space-y-3">
@@ -78,7 +78,7 @@ export default function FridgeTempsPage() {
         </ul>
       </Card>
       <div className="flex justify-end">
-        <Link href="/owner/learn" className="text-sm text-mise-mid font-medium hover:underline flex items-center gap-1">
+        <Link href="/owner/learn" className="text-sm text-hospopilot-mid font-medium hover:underline flex items-center gap-1">
           Back to Learning Hub <ChevronLeft className="h-4 w-4 rotate-180" />
         </Link>
       </div>

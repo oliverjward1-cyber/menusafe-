@@ -31,7 +31,7 @@ import {
   ChevronDown,
   ChevronRight,
 } from 'lucide-react'
-import { MiseLogo } from '@/components/MiseLogo'
+import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
 function NavSection({ label, items, pathname }: { label: string; items: { href: string; label: string; icon: any }[]; pathname: string }) {
   return (
@@ -40,7 +40,7 @@ function NavSection({ label, items, pathname }: { label: string; items: { href: 
       {items.map(({ href, label, icon: Icon }) => {
         const active = pathname.startsWith(href)
         return (
-          <Link key={href} href={href} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', active ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
+          <Link key={href} href={href} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', active ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
             <Icon className="h-4 w-4" />{label}
           </Link>
         )
@@ -81,7 +81,7 @@ function CollapsibleNavSection({ label, icon: SectionIcon, items, pathname }: {
                 href={href}
                 className={cn(
                   'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                  active ? 'bg-mise-mid text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                  active ? 'bg-hospopilot-mid text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                 )}
               >
                 <Icon className="h-3.5 w-3.5" />{label}
@@ -109,9 +109,9 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
   return (
     <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
       <div className="p-4 border-b border-gray-700">
-        <Link href="/owner"><MiseLogo className="mb-2" /></Link>
+        <Link href="/owner"><HospoPilotLogo className="mb-2" onDark /></Link>
         <p className="text-xs text-gray-400 truncate">{restaurantName}</p>
-        <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs bg-mise-gold/20 text-mise-gold">
+        <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs bg-hospopilot-gold/20 text-hospopilot-gold">
           Owner
         </span>
       </div>
@@ -119,7 +119,7 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
       <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
         {/* Dashboard */}
         <div>
-          <Link href="/owner" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', dashboardActive ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
+          <Link href="/owner" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', dashboardActive ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}>
             <LayoutDashboard className="h-4 w-4" /> Dashboard
           </Link>
         </div>
@@ -151,17 +151,17 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
               { href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList },
             ]}
           />
-          <Link href="/owner/trail" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname === '/owner/trail' ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ListChecks className="h-4 w-4" /> Daily Trail</Link>
-          <Link href="/owner/trail-history" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/trail-history') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><BookMarked className="h-4 w-4" /> Trail History</Link>
-          <Link href="/owner/trail-settings" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/trail-settings') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ClipboardList className="h-4 w-4" /> Trail Settings</Link>
-          <Link href="/owner/deliveries" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/deliveries') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Truck className="h-4 w-4" /> Deliveries</Link>
-          <Link href="/owner/cleaning" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/cleaning') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Sparkles className="h-4 w-4" /> Cleaning</Link>
-          <Link href="/owner/temperature-logs" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/temperature-logs') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Thermometer className="h-4 w-4" /> Temp Logs</Link>
-          <Link href="/owner/incidents" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/incidents') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><AlertOctagon className="h-4 w-4" /> Incidents</Link>
-          <Link href="/owner/haccp" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/haccp') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><FlaskConical className="h-4 w-4" /> HACCP & Calibration</Link>
-          <Link href="/owner/eho" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/eho') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ShieldCheck className="h-4 w-4" /> EHO Mode</Link>
-          <Link href="/owner/kitchen-settings" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/kitchen-settings') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Tablet className="h-4 w-4" /> Kitchen Portal</Link>
-          <Link href="/owner/history" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/history') ? 'bg-mise-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><History className="h-4 w-4" /> History</Link>
+          <Link href="/owner/trail" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname === '/owner/trail' ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ListChecks className="h-4 w-4" /> Daily Trail</Link>
+          <Link href="/owner/trail-history" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/trail-history') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><BookMarked className="h-4 w-4" /> Trail History</Link>
+          <Link href="/owner/trail-settings" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/trail-settings') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ClipboardList className="h-4 w-4" /> Trail Settings</Link>
+          <Link href="/owner/deliveries" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/deliveries') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Truck className="h-4 w-4" /> Deliveries</Link>
+          <Link href="/owner/cleaning" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/cleaning') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Sparkles className="h-4 w-4" /> Cleaning</Link>
+          <Link href="/owner/temperature-logs" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/temperature-logs') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Thermometer className="h-4 w-4" /> Temp Logs</Link>
+          <Link href="/owner/incidents" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/incidents') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><AlertOctagon className="h-4 w-4" /> Incidents</Link>
+          <Link href="/owner/haccp" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/haccp') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><FlaskConical className="h-4 w-4" /> HACCP & Calibration</Link>
+          <Link href="/owner/eho" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/eho') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ShieldCheck className="h-4 w-4" /> EHO Mode</Link>
+          <Link href="/owner/kitchen-settings" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/kitchen-settings') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Tablet className="h-4 w-4" /> Kitchen Portal</Link>
+          <Link href="/owner/history" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/history') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><History className="h-4 w-4" /> History</Link>
         </div>
 
         <NavSection label="Learning Hub" pathname={pathname} items={[

@@ -35,8 +35,8 @@ export default async function IngredientsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">Ingredients</h1>
-          <p className="text-mise-ink/50 mt-1">
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Ingredients</h1>
+          <p className="text-hospopilot-ink/50 mt-1">
             {ingredients?.length ?? 0} ingredient{ingredients?.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -44,21 +44,21 @@ export default async function IngredientsPage() {
           {(ingredients?.length ?? 0) > 0 && <CategoriseButton />}
           <Link
             href="/chef/ingredients/scan"
-            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+            className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep transition-colors"
           >
             <Camera className="h-4 w-4" />
             Scan invoice
           </Link>
           <Link
             href="/chef/ingredients/upload"
-            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+            className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep transition-colors"
           >
             <Upload className="h-4 w-4" />
             Upload sheet
           </Link>
           <Link
             href="/chef/ingredients/new"
-            className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep transition-colors"
+            className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add ingredient
@@ -87,7 +87,7 @@ export default async function IngredientsPage() {
                   <span className="ml-auto text-xs text-gray-400">{items.length} item{items.length !== 1 ? 's' : ''}</span>
                 </div>
                 {items.length === 0 ? (
-                  <p className="px-5 py-4 text-sm text-mise-ink/30 italic">No {label.toLowerCase()} ingredients</p>
+                  <p className="px-5 py-4 text-sm text-hospopilot-ink/30 italic">No {label.toLowerCase()} ingredients</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
@@ -105,7 +105,7 @@ export default async function IngredientsPage() {
                           return (
                             <tr key={ing.id} className="hover:bg-gray-50 transition-colors cursor-pointer group">
                               <td className="px-5 py-3 font-medium text-gray-900">
-                                <Link href={`/chef/ingredients/${ing.id}/edit`} className="hover:text-mise-mid transition-colors">{ing.name}</Link>
+                                <Link href={`/chef/ingredients/${ing.id}/edit`} className="hover:text-hospopilot-mid transition-colors">{ing.name}</Link>
                               </td>
                               <td className="px-4 py-3 text-gray-600">
                                 <Link href={`/chef/ingredients/${ing.id}/edit`} className="block">{formatCurrency(ing.cost_per_unit)}</Link>

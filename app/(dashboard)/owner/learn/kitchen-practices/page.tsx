@@ -16,12 +16,12 @@ export default function KitchenPracticesPage() {
         </div>
         <div>
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Kitchen Team</p>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">General Kitchen Practices</h1>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">General Kitchen Practices</h1>
           <p className="text-sm text-gray-500 mt-1">The everyday habits that keep your kitchen safe, legal, and running well.</p>
         </div>
       </div>
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-green-600" /> Personal hygiene
         </h2>
         <ul className="space-y-3">
@@ -42,17 +42,17 @@ export default function KitchenPracticesPage() {
         </ul>
       </Card>
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4">FIFO — Stock rotation</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4">FIFO — Stock rotation</h2>
         <p className="text-sm text-gray-600 leading-relaxed mb-3">FIFO stands for <strong>First In, First Out</strong>. It means the oldest stock is always used first.</p>
         <ul className="space-y-2 text-sm text-gray-600">
-          <li className="flex gap-2"><span className="text-mise-mid font-bold">→</span> When new deliveries arrive, move older stock to the front.</li>
-          <li className="flex gap-2"><span className="text-mise-mid font-bold">→</span> Label all food with the delivery date and use-by date.</li>
-          <li className="flex gap-2"><span className="text-mise-mid font-bold">→</span> Check use-by dates daily and remove anything expired immediately.</li>
-          <li className="flex gap-2"><span className="text-mise-mid font-bold">→</span> Never mix old and new stock in the same container without labelling.</li>
+          <li className="flex gap-2"><span className="text-hospopilot-mid font-bold">→</span> When new deliveries arrive, move older stock to the front.</li>
+          <li className="flex gap-2"><span className="text-hospopilot-mid font-bold">→</span> Label all food with the delivery date and use-by date.</li>
+          <li className="flex gap-2"><span className="text-hospopilot-mid font-bold">→</span> Check use-by dates daily and remove anything expired immediately.</li>
+          <li className="flex gap-2"><span className="text-hospopilot-mid font-bold">→</span> Never mix old and new stock in the same container without labelling.</li>
         </ul>
       </Card>
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4">Cleaning schedule</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4">Cleaning schedule</h2>
         <div className="space-y-2 text-sm">
           {[
             ['As you go', 'Wipe down surfaces, clean spills immediately, sanitise boards between tasks'],
@@ -62,14 +62,14 @@ export default function KitchenPracticesPage() {
             ['Monthly', 'Clean behind and under all equipment; check for pest activity'],
           ].map(([when, what]) => (
             <div key={when as string} className="flex gap-3 p-3 rounded-lg bg-gray-50">
-              <span className="font-semibold text-mise-ink w-28 shrink-0">{when}</span>
+              <span className="font-semibold text-hospopilot-ink w-28 shrink-0">{when}</span>
               <span className="text-gray-600">{what}</span>
             </div>
           ))}
         </div>
       </Card>
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4">Waste management</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4">Waste management</h2>
         <ul className="space-y-3">
           {[
             'Empty food waste bins regularly — never let them overflow.',
@@ -86,7 +86,7 @@ export default function KitchenPracticesPage() {
         </ul>
       </Card>
       <div className="flex justify-end">
-        <Link href="/owner/learn" className="text-sm text-mise-mid font-medium hover:underline flex items-center gap-1">
+        <Link href="/owner/learn" className="text-sm text-hospopilot-mid font-medium hover:underline flex items-center gap-1">
           Back to Learning Hub <ChevronLeft className="h-4 w-4 rotate-180" />
         </Link>
       </div>

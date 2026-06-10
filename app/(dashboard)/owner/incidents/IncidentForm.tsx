@@ -69,16 +69,16 @@ export default function IncidentForm({ restaurantId, reportedBy }: { restaurantI
     <form onSubmit={submit} className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Type</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Type</label>
           <select value={type} onChange={e => setType(e.target.value)}
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30">
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30">
             {TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Severity</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Severity</label>
           <select value={severity} onChange={e => setSeverity(e.target.value)}
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30">
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30">
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
@@ -86,38 +86,38 @@ export default function IncidentForm({ restaurantId, reportedBy }: { restaurantI
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Reported by</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Reported by</label>
           <input value={reporter} onChange={e => setReporter(e.target.value)} required
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Incident title</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Incident title</label>
         <input value={title} onChange={e => setTitle(e.target.value)} required
           placeholder="e.g. Customer reported nut allergy reaction"
-          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Description</label>
+        <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Description</label>
         <textarea value={description} onChange={e => setDescription(e.target.value)} required rows={3}
           placeholder="Describe what happened, when, and where…"
-          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30 resize-none" />
+          className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30 resize-none" />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Person affected (optional)</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Person affected (optional)</label>
           <input value={affectedPerson} onChange={e => setAffectedPerson(e.target.value)}
             placeholder="Name or description"
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-mise-ink/50 uppercase tracking-widest mb-1.5">Immediate action taken (optional)</label>
+          <label className="block text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-widest mb-1.5">Immediate action taken (optional)</label>
           <input value={actionTaken} onChange={e => setActionTaken(e.target.value)}
             placeholder="e.g. Called 999, removed from service"
-            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+            className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
         </div>
       </div>
 

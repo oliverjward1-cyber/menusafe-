@@ -46,9 +46,9 @@ function TaskDetail({ task }: { task: any }) {
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <p className="font-semibold text-mise-ink text-sm">{task.title}</p>
+            <p className="font-semibold text-hospopilot-ink text-sm">{task.title}</p>
             {task.scheduled_time && (
-              <span className="text-[11px] text-mise-ink/30">{fmt(task.scheduled_time)}</span>
+              <span className="text-[11px] text-hospopilot-ink/30">{fmt(task.scheduled_time)}</span>
             )}
           </div>
           <div className="flex items-center gap-2 mt-0.5">
@@ -56,7 +56,7 @@ function TaskDetail({ task }: { task: any }) {
             {isFlagged && <span className="text-xs text-amber-600">⚑ Flagged by {task.completed_by}</span>}
             {isPending && <span className="text-xs text-gray-400">Not completed</span>}
             {task.completed_at && (
-              <span className="text-xs text-mise-ink/30">
+              <span className="text-xs text-hospopilot-ink/30">
                 · {new Date(task.completed_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
               </span>
             )}
@@ -78,7 +78,7 @@ function TaskDetail({ task }: { task: any }) {
             const outOfRange = isCold ? temp > -18 : temp > 8
             return (
               <div key={i} className="flex items-center justify-between px-3 py-2.5">
-                <span className="text-sm text-mise-ink">{r.location}</span>
+                <span className="text-sm text-hospopilot-ink">{r.location}</span>
                 <span className={`text-sm font-mono font-semibold ${outOfRange ? 'text-red-600' : 'text-green-600'}`}>
                   {r.temperature}°C {outOfRange ? '⚠' : '✓'}
                 </span>
@@ -96,7 +96,7 @@ function TaskDetail({ task }: { task: any }) {
               {val
                 ? <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
                 : <Clock className="h-4 w-4 text-gray-300 flex-shrink-0" />}
-              <span className={val ? 'text-mise-ink' : 'text-mise-ink/40 line-through'}>{key}</span>
+              <span className={val ? 'text-hospopilot-ink' : 'text-hospopilot-ink/40 line-through'}>{key}</span>
             </div>
           ))}
         </div>
@@ -110,7 +110,7 @@ function TaskDetail({ task }: { task: any }) {
             { label: 'Boiling point', value: data.boiling_point, pass: data.boiling_point >= 99 && data.boiling_point <= 101, unit: '°C (99 to 101)' },
           ].map(r => (
             <div key={r.label} className="flex items-center justify-between px-3 py-2.5">
-              <span className="text-sm text-mise-ink">{r.label} <span className="text-xs text-mise-ink/40">{r.unit}</span></span>
+              <span className="text-sm text-hospopilot-ink">{r.label} <span className="text-xs text-hospopilot-ink/40">{r.unit}</span></span>
               <span className={`text-sm font-mono font-semibold ${r.pass ? 'text-green-600' : 'text-red-600'}`}>
                 {r.value}°C {r.pass ? '✓' : '⚠'}
               </span>
@@ -131,7 +131,7 @@ function TaskDetail({ task }: { task: any }) {
 
       {/* Notes */}
       {task.notes && (
-        <p className="text-xs text-mise-ink/50 italic">{task.notes}</p>
+        <p className="text-xs text-hospopilot-ink/50 italic">{task.notes}</p>
       )}
     </div>
   )
@@ -160,15 +160,15 @@ export default async function TrailDayPage({ params }: { params: { date: string 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/owner/trail-history" className="text-mise-ink/40 hover:text-mise-ink transition-colors">
+        <Link href="/owner/trail-history" className="text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-mise-ink">
+          <h1 className="text-xl font-bold text-hospopilot-ink">
             {date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </h1>
           {summary && (
-            <p className="text-mise-ink/50 text-sm">
+            <p className="text-hospopilot-ink/50 text-sm">
               Submitted by {summary.submitted_by} · {pct}% complete
               {summary.flagged_tasks > 0 && ` · ${summary.flagged_tasks} flagged`}
             </p>
@@ -180,13 +180,13 @@ export default async function TrailDayPage({ params }: { params: { date: string 
       </div>
 
       {summary?.notes && (
-        <div className="bg-gray-50 border border-black/[0.06] rounded-2xl px-4 py-3 text-sm text-mise-ink/60 italic">
+        <div className="bg-gray-50 border border-black/[0.06] rounded-2xl px-4 py-3 text-sm text-hospopilot-ink/60 italic">
           {summary.notes}
         </div>
       )}
 
       {(!tasks || tasks.length === 0) && (
-        <div className="text-center py-12 text-mise-ink/40">
+        <div className="text-center py-12 text-hospopilot-ink/40">
           <p className="text-sm">No task records found for this day.</p>
         </div>
       )}

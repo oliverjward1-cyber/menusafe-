@@ -21,7 +21,7 @@ const config: Config = {
           800: '#166534',
           900: '#14532d',
         },
-        mise: {
+        hospopilot: {
           'deep':   '#1B4332',
           'mid':    '#2D6A4F',
           'fresh':  '#52B788',

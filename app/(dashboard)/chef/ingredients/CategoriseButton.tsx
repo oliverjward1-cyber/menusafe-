@@ -34,7 +34,7 @@ export function CategoriseButton() {
       <button
         onClick={handleCategorise}
         disabled={loading || done}
-        className="inline-flex items-center gap-2 bg-mise-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mise-deep disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
         {done ? 'Sorted!' : loading ? 'Sorting…' : 'AI sort by storage'}

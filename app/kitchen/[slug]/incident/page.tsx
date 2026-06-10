@@ -58,9 +58,9 @@ export default function StaffIncident() {
   if (done) return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 text-center">
       <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
-      <h2 className="text-xl font-semibold text-mise-ink">Incident reported</h2>
-      <p className="text-mise-ink/50 text-sm mt-1">Your manager has been notified</p>
-      <button onClick={() => router.push(`/kitchen/${slug}/tasks`)} className="mt-6 bg-mise-deep text-white rounded-xl px-6 py-3 font-semibold text-sm">Back to tasks</button>
+      <h2 className="text-xl font-semibold text-hospopilot-ink">Incident reported</h2>
+      <p className="text-hospopilot-ink/50 text-sm mt-1">Your manager has been notified</p>
+      <button onClick={() => router.push(`/kitchen/${slug}/tasks`)} className="mt-6 bg-hospopilot-deep text-white rounded-xl px-6 py-3 font-semibold text-sm">Back to tasks</button>
     </div>
   )
 
@@ -77,11 +77,11 @@ export default function StaffIncident() {
       <div className="px-4 py-5 max-w-lg mx-auto space-y-4">
         {/* Type */}
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <label className="text-xs font-semibold text-mise-ink/50 uppercase tracking-wide">Incident type</label>
+          <label className="text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-wide">Incident type</label>
           <div className="grid grid-cols-2 gap-2 mt-2">
             {TYPES.map(t => (
               <button key={t.value} onClick={() => setType(t.value)}
-                className={`py-2.5 px-3 rounded-xl text-sm font-medium text-left transition-colors ${type === t.value ? 'bg-mise-deep text-white' : 'bg-gray-50 text-mise-ink/70 border border-black/[0.06]'}`}>
+                className={`py-2.5 px-3 rounded-xl text-sm font-medium text-left transition-colors ${type === t.value ? 'bg-hospopilot-deep text-white' : 'bg-gray-50 text-hospopilot-ink/70 border border-black/[0.06]'}`}>
                 {t.label}
               </button>
             ))}
@@ -90,11 +90,11 @@ export default function StaffIncident() {
 
         {/* Severity */}
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <label className="text-xs font-semibold text-mise-ink/50 uppercase tracking-wide">Severity</label>
+          <label className="text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-wide">Severity</label>
           <div className="flex gap-2 mt-2">
             {SEVERITIES.map(s => (
               <button key={s.value} onClick={() => setSeverity(s.value)}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${severity === s.value ? `${s.colour} text-white` : 'bg-gray-50 text-mise-ink/50 border border-black/[0.06]'}`}>
+                className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${severity === s.value ? `${s.colour} text-white` : 'bg-gray-50 text-hospopilot-ink/50 border border-black/[0.06]'}`}>
                 {s.label}
               </button>
             ))}
@@ -104,26 +104,26 @@ export default function StaffIncident() {
         {/* Details */}
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm space-y-3">
           <div>
-            <label className="text-xs font-semibold text-mise-ink/50 uppercase tracking-wide">What happened? *</label>
+            <label className="text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-wide">What happened? *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Brief title"
-              className="mt-1 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+              className="mt-1 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
           </div>
           <div>
-            <label className="text-xs font-semibold text-mise-ink/50 uppercase tracking-wide">Full description *</label>
+            <label className="text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-wide">Full description *</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe exactly what happened"
               rows={4}
-              className="mt-1 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30 resize-none" />
+              className="mt-1 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30 resize-none" />
           </div>
           <div>
-            <label className="text-xs font-semibold text-mise-ink/50 uppercase tracking-wide">Person affected (if any)</label>
+            <label className="text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-wide">Person affected (if any)</label>
             <input value={affectedPerson} onChange={e => setAffectedPerson(e.target.value)} placeholder="Name or 'customer'"
-              className="mt-1 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30" />
+              className="mt-1 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30" />
           </div>
           <div>
-            <label className="text-xs font-semibold text-mise-ink/50 uppercase tracking-wide">Action taken</label>
+            <label className="text-xs font-semibold text-hospopilot-ink/50 uppercase tracking-wide">Action taken</label>
             <textarea value={actionTaken} onChange={e => setActionTaken(e.target.value)} placeholder="What did you do immediately?"
               rows={2}
-              className="mt-1 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30 resize-none" />
+              className="mt-1 w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-sm text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30 resize-none" />
           </div>
         </div>
 

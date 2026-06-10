@@ -36,7 +36,7 @@ export default function StaffLearnModule() {
 
   if (!mod) return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-mise-ink/40">Module not found</p>
+      <p className="text-hospopilot-ink/40">Module not found</p>
     </div>
   )
 
@@ -76,12 +76,12 @@ export default function StaffLearnModule() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className={`${mod.colour} px-5 py-4 flex items-center gap-3`}>
-        <button onClick={() => router.back()} className="text-mise-ink/30 hover:text-mise-ink"><ArrowLeft className="h-5 w-5" /></button>
+        <button onClick={() => router.back()} className="text-hospopilot-ink/30 hover:text-hospopilot-ink"><ArrowLeft className="h-5 w-5" /></button>
         <div className="flex items-center gap-3">
           <span className="text-3xl">{mod.emoji}</span>
           <div>
-            <p className="font-bold text-mise-ink">{mod.name}</p>
-            <p className="text-mise-ink/50 text-xs">{mod.tagline}</p>
+            <p className="font-bold text-hospopilot-ink">{mod.name}</p>
+            <p className="text-hospopilot-ink/50 text-xs">{mod.tagline}</p>
           </div>
         </div>
       </div>
@@ -96,17 +96,17 @@ export default function StaffLearnModule() {
 
         {/* What is it */}
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <h3 className="font-semibold text-mise-ink mb-2">What is it?</h3>
-          <p className="text-sm text-mise-ink/70 leading-relaxed">{mod.whatIsIt}</p>
+          <h3 className="font-semibold text-hospopilot-ink mb-2">What is it?</h3>
+          <p className="text-sm text-hospopilot-ink/70 leading-relaxed">{mod.whatIsIt}</p>
         </div>
 
         {/* Hidden in */}
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <h3 className="font-semibold text-mise-ink mb-2">Where it hides</h3>
+          <h3 className="font-semibold text-hospopilot-ink mb-2">Where it hides</h3>
           <ul className="space-y-1">
             {mod.hiddenIn.map((h, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-mise-ink/70">
-                <span className="text-mise-mid mt-0.5 flex-shrink-0">•</span>{h}
+              <li key={i} className="flex items-start gap-2 text-sm text-hospopilot-ink/70">
+                <span className="text-hospopilot-mid mt-0.5 flex-shrink-0">•</span>{h}
               </li>
             ))}
           </ul>
@@ -144,19 +144,19 @@ export default function StaffLearnModule() {
 
         {/* Quiz */}
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm space-y-5">
-          <h3 className="font-bold text-mise-ink">Quick quiz</h3>
+          <h3 className="font-bold text-hospopilot-ink">Quick quiz</h3>
           {mod.quiz.map((q, qi) => (
             <div key={qi}>
-              <p className="text-sm font-semibold text-mise-ink mb-2">{qi + 1}. {q.q}</p>
+              <p className="text-sm font-semibold text-hospopilot-ink mb-2">{qi + 1}. {q.q}</p>
               <div className="space-y-2">
                 {q.options.map((opt, ai) => {
                   const selected = answers[qi] === ai
-                  let cls = 'border border-black/[0.08] bg-gray-50 text-mise-ink/70'
+                  let cls = 'border border-black/[0.08] bg-gray-50 text-hospopilot-ink/70'
                   if (submitted) {
                     if (ai === q.answer) cls = 'border-green-400 bg-green-50 text-green-800 font-medium'
                     else if (selected && ai !== q.answer) cls = 'border-red-300 bg-red-50 text-red-700 line-through'
                   } else if (selected) {
-                    cls = 'border-mise-mid bg-mise-mid/10 text-mise-ink font-medium'
+                    cls = 'border-hospopilot-mid bg-hospopilot-mid/10 text-hospopilot-ink font-medium'
                   }
                   return (
                     <button key={ai} onClick={() => selectAnswer(qi, ai)}
@@ -176,7 +176,7 @@ export default function StaffLearnModule() {
 
           {!submitted && (
             <button onClick={submitQuiz} disabled={answers.some(a => a === null)}
-              className="w-full bg-mise-deep text-white rounded-xl py-3 font-bold text-sm disabled:opacity-40">
+              className="w-full bg-hospopilot-deep text-white rounded-xl py-3 font-bold text-sm disabled:opacity-40">
               Submit answers
             </button>
           )}
@@ -187,7 +187,7 @@ export default function StaffLearnModule() {
               <p className={`text-sm font-semibold mt-0.5 ${passed ? 'text-green-600' : 'text-red-600'}`}>
                 {passed ? '✓ Passed!' : 'Not quite — try again'}
               </p>
-              <p className="text-xs text-mise-ink/40 mt-1">{correctCount}/{mod.quiz.length} correct · Pass mark 67%</p>
+              <p className="text-xs text-hospopilot-ink/40 mt-1">{correctCount}/{mod.quiz.length} correct · Pass mark 67%</p>
               <div className="flex gap-2 mt-3">
                 {!passed && (
                   <button onClick={retake}
@@ -197,13 +197,13 @@ export default function StaffLearnModule() {
                 )}
                 {nextMod && (
                   <button onClick={() => router.push(`/kitchen/${slug}/learn/${nextMod.slug}`)}
-                    className={`flex-1 flex items-center justify-center gap-1.5 bg-mise-deep text-white rounded-xl py-2.5 text-sm font-semibold`}>
+                    className={`flex-1 flex items-center justify-center gap-1.5 bg-hospopilot-deep text-white rounded-xl py-2.5 text-sm font-semibold`}>
                     Next: {nextMod.name} <ChevronRight className="h-4 w-4" />
                   </button>
                 )}
                 {!nextMod && passed && (
                   <button onClick={() => router.push(`/kitchen/${slug}/learn`)}
-                    className="flex-1 bg-mise-deep text-white rounded-xl py-2.5 text-sm font-semibold">
+                    className="flex-1 bg-hospopilot-deep text-white rounded-xl py-2.5 text-sm font-semibold">
                     Back to modules
                   </button>
                 )}

@@ -67,13 +67,13 @@ export default function PlansPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
       <div className="flex items-center gap-3">
-        <Link href="/owner/billing" className="text-sm text-gray-500 hover:text-mise-ink flex items-center gap-1">
+        <Link href="/owner/billing" className="text-sm text-gray-500 hover:text-hospopilot-ink flex items-center gap-1">
           <ArrowLeft className="h-4 w-4" /> Back to Billing
         </Link>
       </div>
 
       <div>
-        <h1 className="font-display text-3xl font-bold text-mise-ink">Compare plans</h1>
+        <h1 className="font-display text-3xl font-bold text-hospopilot-ink">Compare plans</h1>
         <p className="text-gray-500 mt-2">Everything you need to stay compliant, run a safe kitchen, and protect your business.</p>
       </div>
 
@@ -82,23 +82,23 @@ export default function PlansPage() {
         <div className="rounded-2xl border-2 border-gray-200 p-6 space-y-3">
           <div>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Compliance</p>
-            <p className="font-display text-3xl font-bold text-mise-ink">£79<span className="text-lg font-normal text-gray-400">/mo</span></p>
+            <p className="font-display text-3xl font-bold text-hospopilot-ink">£79<span className="text-lg font-normal text-gray-400">/mo</span></p>
           </div>
           <p className="text-sm text-gray-500">The complete EHO and allergen compliance toolkit. Everything you need to pass an inspection and protect your customers.</p>
-          <Link href="/owner/billing" className="inline-flex items-center gap-1 text-sm font-semibold text-mise-mid hover:text-mise-deep">
+          <Link href="/owner/billing" className="inline-flex items-center gap-1 text-sm font-semibold text-hospopilot-mid hover:text-hospopilot-deep">
             Get started →
           </Link>
         </div>
-        <div className="rounded-2xl border-2 border-mise-mid bg-mise-mid/5 p-6 space-y-3 relative">
+        <div className="rounded-2xl border-2 border-hospopilot-mid bg-hospopilot-mid/5 p-6 space-y-3 relative">
           <div className="absolute top-4 right-4">
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-mise-gold text-white">Most popular</span>
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-hospopilot-gold text-white">Most popular</span>
           </div>
           <div>
-            <p className="text-xs font-semibold text-mise-mid uppercase tracking-widest mb-1">Compliance + Kitchen</p>
-            <p className="font-display text-3xl font-bold text-mise-ink">£129<span className="text-lg font-normal text-gray-400">/mo</span></p>
+            <p className="text-xs font-semibold text-hospopilot-mid uppercase tracking-widest mb-1">Compliance + Kitchen</p>
+            <p className="font-display text-3xl font-bold text-hospopilot-ink">£129<span className="text-lg font-normal text-gray-400">/mo</span></p>
           </div>
           <p className="text-sm text-gray-500">Everything in Compliance, plus a full recipe and menu management suite — so your kitchen runs as efficiently as it runs safely.</p>
-          <Link href="/owner/billing" className="inline-flex items-center gap-1 text-sm font-semibold text-mise-mid hover:text-mise-deep">
+          <Link href="/owner/billing" className="inline-flex items-center gap-1 text-sm font-semibold text-hospopilot-mid hover:text-hospopilot-deep">
             Get started →
           </Link>
         </div>
@@ -109,8 +109,8 @@ export default function PlansPage() {
         {/* Sticky column headers */}
         <div className="grid grid-cols-[1fr_80px_80px] gap-2 px-5 py-3 bg-gray-50 border-b border-gray-200 sticky top-0">
           <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Feature</span>
-          <span className="text-xs font-semibold text-mise-ink text-center uppercase tracking-widest">Compliance</span>
-          <span className="text-xs font-semibold text-mise-mid text-center uppercase tracking-widest">+ Kitchen</span>
+          <span className="text-xs font-semibold text-hospopilot-ink text-center uppercase tracking-widest">Compliance</span>
+          <span className="text-xs font-semibold text-hospopilot-mid text-center uppercase tracking-widest">+ Kitchen</span>
         </div>
 
         {FEATURES.map((section) => (
@@ -123,7 +123,7 @@ export default function PlansPage() {
             {section.items.map((item) => (
               <div key={item.label} className="grid grid-cols-[1fr_80px_80px] gap-2 items-center px-5 py-3 border-b border-gray-50 last:border-0">
                 <div>
-                  <p className="text-sm text-mise-ink">{item.label}</p>
+                  <p className="text-sm text-hospopilot-ink">{item.label}</p>
                   {item.note && <p className="text-xs text-gray-400 mt-0.5">{item.note}</p>}
                 </div>
                 <div className="flex justify-center">
@@ -144,16 +144,16 @@ export default function PlansPage() {
 
       {/* Additional sites callout */}
       <div className="rounded-2xl border border-dashed border-gray-300 p-6 space-y-2">
-        <p className="font-semibold text-mise-ink">Running multiple sites?</p>
+        <p className="font-semibold text-hospopilot-ink">Running multiple sites?</p>
         <p className="text-sm text-gray-500">Add extra restaurant locations to either plan for <strong>+£50/mo per site</strong>. Each site gets its own compliance dashboard, team, menus and history — all managed from one account.</p>
-        <Link href="/owner/billing" className="inline-flex items-center gap-1 text-sm font-semibold text-mise-mid hover:text-mise-deep mt-1">
+        <Link href="/owner/billing" className="inline-flex items-center gap-1 text-sm font-semibold text-hospopilot-mid hover:text-hospopilot-deep mt-1">
           Set up additional sites →
         </Link>
       </div>
 
       <div className="pb-4">
         <Link href="/owner/billing">
-          <button className="w-full sm:w-auto bg-mise-mid text-white font-semibold rounded-xl px-8 py-3 hover:bg-mise-deep transition-colors">
+          <button className="w-full sm:w-auto bg-hospopilot-mid text-white font-semibold rounded-xl px-8 py-3 hover:bg-hospopilot-deep transition-colors">
             Choose a plan
           </button>
         </Link>

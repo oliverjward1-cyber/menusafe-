@@ -33,9 +33,9 @@ export function DeleteMenuButton({ menuId, menuName }: { menuId: string; menuNam
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
             <div className="space-y-1">
-              <h2 className="text-lg font-semibold text-mise-ink">Delete menu?</h2>
+              <h2 className="text-lg font-semibold text-hospopilot-ink">Delete menu?</h2>
               <p className="text-sm text-gray-500">
-                <span className="font-medium text-mise-ink">{menuName}</span> will be permanently deleted, including all its dishes. This cannot be undone.
+                <span className="font-medium text-hospopilot-ink">{menuName}</span> will be permanently deleted, including all its dishes. This cannot be undone.
               </p>
             </div>
             <div className="flex gap-3 justify-end pt-2">

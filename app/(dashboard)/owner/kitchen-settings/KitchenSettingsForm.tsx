@@ -45,8 +45,8 @@ export default function KitchenSettingsForm({
       {/* PIN setting */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm space-y-4">
         <div>
-          <h2 className="font-semibold text-mise-ink">Staff PIN</h2>
-          <p className="text-sm text-mise-ink/50 mt-0.5">A 4-digit PIN your staff enter to access the kitchen portal. Share this verbally — don't write it on the wall!</p>
+          <h2 className="font-semibold text-hospopilot-ink">Staff PIN</h2>
+          <p className="text-sm text-hospopilot-ink/50 mt-0.5">A 4-digit PIN your staff enter to access the kitchen portal. Share this verbally — don't write it on the wall!</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative flex-1 max-w-[160px]">
@@ -57,14 +57,14 @@ export default function KitchenSettingsForm({
               placeholder="e.g. 1234"
               maxLength={4}
               inputMode="numeric"
-              className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-lg font-mono tracking-widest text-mise-ink bg-white focus:outline-none focus:ring-2 focus:ring-mise-mid/30 pr-10"
+              className="w-full border border-black/[0.08] rounded-xl px-3 py-2.5 text-lg font-mono tracking-widest text-hospopilot-ink bg-white focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30 pr-10"
             />
-            <button onClick={() => setShowPin(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-mise-ink/30 hover:text-mise-ink/60">
+            <button onClick={() => setShowPin(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-hospopilot-ink/30 hover:text-hospopilot-ink/60">
               {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
           <button onClick={savePin} disabled={saving || pin.length !== 4 || !/^\d{4}$/.test(pin)}
-            className="bg-mise-deep text-white rounded-xl px-4 py-2.5 text-sm font-semibold disabled:opacity-40 flex items-center gap-2">
+            className="bg-hospopilot-deep text-white rounded-xl px-4 py-2.5 text-sm font-semibold disabled:opacity-40 flex items-center gap-2">
             {saved ? <><CheckCircle2 className="h-4 w-4" /> Saved!</> : saving ? 'Saving…' : 'Save PIN'}
           </button>
         </div>
@@ -76,17 +76,17 @@ export default function KitchenSettingsForm({
       {/* Kitchen URL */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm space-y-4">
         <div>
-          <h2 className="font-semibold text-mise-ink">Kitchen portal link</h2>
-          <p className="text-sm text-mise-ink/50 mt-0.5">Staff open this on a tablet or phone in the kitchen. Bookmark it or print the QR code below.</p>
+          <h2 className="font-semibold text-hospopilot-ink">Kitchen portal link</h2>
+          <p className="text-sm text-hospopilot-ink/50 mt-0.5">Staff open this on a tablet or phone in the kitchen. Bookmark it or print the QR code below.</p>
         </div>
         <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2.5 border border-black/[0.06]">
-          <p className="flex-1 text-sm text-mise-ink/70 truncate font-mono">/kitchen/{restaurantSlug}</p>
-          <button onClick={copyUrl} className="flex-shrink-0 flex items-center gap-1 text-xs text-mise-mid font-semibold">
+          <p className="flex-1 text-sm text-hospopilot-ink/70 truncate font-mono">/kitchen/{restaurantSlug}</p>
+          <button onClick={copyUrl} className="flex-shrink-0 flex items-center gap-1 text-xs text-hospopilot-mid font-semibold">
             <Copy className="h-3.5 w-3.5" />
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
-        <div className="bg-mise-ink rounded-2xl p-5 flex flex-col items-center gap-3">
+        <div className="bg-hospopilot-ink rounded-2xl p-5 flex flex-col items-center gap-3">
           {/* Simple QR placeholder — uses Google Charts API */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -100,7 +100,7 @@ export default function KitchenSettingsForm({
           <a
             href={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(typeof window !== 'undefined' ? `${window.location.origin}/kitchen/${restaurantSlug}` : '')}&format=png`}
             download="kitchen-qr.png"
-            className="text-mise-mid text-xs font-semibold"
+            className="text-hospopilot-mid text-xs font-semibold"
           >
             Download QR code
           </a>

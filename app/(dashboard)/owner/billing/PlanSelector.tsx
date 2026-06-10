@@ -62,18 +62,18 @@ export default function PlanSelector({ currentPlan }: { currentPlan: string | nu
             onClick={() => setPlan(p.key)}
             className={cn(
               'text-left p-4 rounded-xl border-2 transition-colors space-y-3',
-              plan === p.key ? 'border-mise-mid bg-mise-mid/5' : 'border-gray-200 hover:border-gray-300'
+              plan === p.key ? 'border-hospopilot-mid bg-hospopilot-mid/5' : 'border-gray-200 hover:border-gray-300'
             )}
           >
             <div>
-              <p className="font-display text-lg font-semibold text-mise-ink">{p.name}</p>
-              <p className="text-2xl font-bold text-mise-mid mt-1">{p.price}</p>
+              <p className="font-display text-lg font-semibold text-hospopilot-ink">{p.name}</p>
+              <p className="text-2xl font-bold text-hospopilot-mid mt-1">{p.price}</p>
               <p className="text-sm text-gray-500 mt-2">{p.description}</p>
             </div>
             <ul className="space-y-1">
               {p.highlights.map(h => (
                 <li key={h} className="text-xs text-gray-500 flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-mise-mid shrink-0" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-hospopilot-mid shrink-0" />
                   {h}
                 </li>
               ))}
@@ -81,7 +81,7 @@ export default function PlanSelector({ currentPlan }: { currentPlan: string | nu
             <Link
               href="/owner/billing/plans"
               onClick={e => e.stopPropagation()}
-              className="inline-block text-xs font-semibold text-mise-mid hover:text-mise-deep underline underline-offset-2"
+              className="inline-block text-xs font-semibold text-hospopilot-mid hover:text-hospopilot-deep underline underline-offset-2"
             >
               See full feature list →
             </Link>
@@ -90,7 +90,7 @@ export default function PlanSelector({ currentPlan }: { currentPlan: string | nu
       </div>
 
       <div className="flex items-center gap-3">
-        <label htmlFor="additionalSites" className="text-sm font-medium text-mise-ink">
+        <label htmlFor="additionalSites" className="text-sm font-medium text-hospopilot-ink">
           Additional sites <span className="text-gray-400 font-normal">(+£50/mo each)</span>
         </label>
         <input

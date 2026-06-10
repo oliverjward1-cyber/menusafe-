@@ -47,15 +47,15 @@ export default async function TemperatureLogsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/owner" className="text-mise-ink/40 hover:text-mise-ink transition-colors">
+          <Link href="/owner" className="text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-display font-semibold text-mise-ink flex items-center gap-2">
-              <Thermometer className="h-6 w-6 text-mise-mid" />
+            <h1 className="text-2xl font-display font-semibold text-hospopilot-ink flex items-center gap-2">
+              <Thermometer className="h-6 w-6 text-hospopilot-mid" />
               Temperature Log
             </h1>
-            <p className="text-sm text-mise-ink/50 mt-0.5">Record fridge, freezer and hot-hold temperatures</p>
+            <p className="text-sm text-hospopilot-ink/50 mt-0.5">Record fridge, freezer and hot-hold temperatures</p>
           </div>
         </div>
         <PrintButton label="Print log" />
@@ -63,8 +63,8 @@ export default async function TemperatureLogsPage() {
 
       {/* Log new reading */}
       <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
-          <Plus className="h-4 w-4 text-mise-mid" /> Record temperature check
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
+          <Plus className="h-4 w-4 text-hospopilot-mid" /> Record temperature check
         </h2>
         <TempLogForm restaurantId={rid} staffName={user.email ?? ''} />
       </div>
@@ -72,35 +72,35 @@ export default async function TemperatureLogsPage() {
       {/* History */}
       <div className="space-y-4">
         {Object.keys(byDate).length === 0 && (
-          <div className="text-center py-12 text-mise-ink/40 text-sm">
+          <div className="text-center py-12 text-hospopilot-ink/40 text-sm">
             No temperature checks yet. Record your first one above.
           </div>
         )}
         {Object.entries(byDate).map(([date, entries]) => (
           <div key={date} className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
-            <div className="px-5 py-3 border-b border-black/[0.04] bg-mise-cream/30">
-              <p className="text-sm font-semibold text-mise-ink/60">{date}</p>
+            <div className="px-5 py-3 border-b border-black/[0.04] bg-hospopilot-cream/30">
+              <p className="text-sm font-semibold text-hospopilot-ink/60">{date}</p>
             </div>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-black/[0.04]">
-                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Location</th>
-                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Temp</th>
-                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Check</th>
-                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">By</th>
-                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-mise-ink/40 uppercase tracking-widest">Time</th>
+                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Location</th>
+                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Temp</th>
+                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Check</th>
+                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">By</th>
+                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Time</th>
                 </tr>
               </thead>
               <tbody>
                 {entries.map(log => (
-                  <tr key={log.id} className="border-b border-black/[0.04] last:border-0 hover:bg-mise-cream/20">
-                    <td className="px-5 py-3 font-medium text-mise-ink">{log.location}</td>
+                  <tr key={log.id} className="border-b border-black/[0.04] last:border-0 hover:bg-hospopilot-cream/20">
+                    <td className="px-5 py-3 font-medium text-hospopilot-ink">{log.location}</td>
                     <td className={`px-5 py-3 font-bold font-mono ${tempColor(log.temperature, log.location)}`}>
                       {log.temperature}°{log.unit}
                     </td>
-                    <td className="px-5 py-3 text-mise-ink/60 capitalize">{log.check_type}</td>
-                    <td className="px-5 py-3 text-mise-ink/60">{log.recorded_by}</td>
-                    <td className="px-5 py-3 text-mise-ink/40">
+                    <td className="px-5 py-3 text-hospopilot-ink/60 capitalize">{log.check_type}</td>
+                    <td className="px-5 py-3 text-hospopilot-ink/60">{log.recorded_by}</td>
+                    <td className="px-5 py-3 text-hospopilot-ink/40">
                       {new Date(log.logged_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                     </td>
                   </tr>

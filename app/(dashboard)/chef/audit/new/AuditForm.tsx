@@ -121,14 +121,14 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
           value={staffName}
           onChange={e => setStaffName(e.target.value)}
           placeholder="e.g. James Smith"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-hospopilot-gold focus:border-transparent"
         />
       </div>
 
       {/* Progress bar */}
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-mise-ink/50">{answered} of {total} answered</span>
+          <span className="text-xs font-medium text-hospopilot-ink/50">{answered} of {total} answered</span>
           {fails > 0 && (
             <span className="text-xs font-medium text-red-600 flex items-center gap-1">
               <AlertTriangle className="h-3.5 w-3.5" /> {fails} fail{fails !== 1 ? 's' : ''}
@@ -151,7 +151,7 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
         return (
           <div key={cat} className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
             <div className="px-5 pt-4 pb-2 border-b border-gray-100">
-              <h2 className="text-sm font-semibold text-mise-ink">{cat}</h2>
+              <h2 className="text-sm font-semibold text-hospopilot-ink">{cat}</h2>
               <p className="text-xs text-gray-400 mt-0.5">
                 {catAnswered} of {catQuestions.length} answered
                 {catFails > 0 && <span className="text-red-500 ml-2">· {catFails} fail{catFails !== 1 ? 's' : ''}</span>}
@@ -163,7 +163,7 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
                 return (
                   <div key={q.key} className="border-b border-gray-100 last:border-0 py-4">
                     {/* Question text */}
-                    <p className="text-sm font-medium text-mise-ink mb-3 leading-snug">{q.label}</p>
+                    <p className="text-sm font-medium text-hospopilot-ink mb-3 leading-snug">{q.label}</p>
 
                     {/* Full-width stacked answer buttons */}
                     <div className="space-y-2 mb-3">
@@ -176,7 +176,7 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
                               ? opt === 'pass' ? 'bg-green-600 border-green-600 text-white'
                                 : opt === 'fail' ? 'bg-red-600 border-red-600 text-white'
                                 : 'bg-gray-500 border-gray-500 text-white'
-                              : 'bg-white border-gray-300 text-gray-700 hover:border-mise-gold hover:bg-mise-gold/5'
+                              : 'bg-white border-gray-300 text-gray-700 hover:border-hospopilot-gold hover:bg-hospopilot-gold/5'
                           }`}
                         >
                           {opt === 'pass' ? 'Yes' : opt === 'fail' ? 'No' : 'N/A'}
@@ -212,7 +212,7 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
                         onChange={e => setAnswer(q.key, 'notes', e.target.value)}
                         placeholder={a.answer === 'fail' ? 'Describe the issue…' : 'Add a comment…'}
                         rows={2}
-                        className="mt-2 w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent resize-none"
+                        className="mt-2 w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-hospopilot-gold focus:border-transparent resize-none"
                       />
                     )}
 
@@ -236,7 +236,7 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
           onChange={e => setOverallNotes(e.target.value)}
           placeholder="Any additional observations or actions required…"
           rows={3}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-mise-gold focus:border-transparent resize-none"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-hospopilot-gold focus:border-transparent resize-none"
         />
       </div>
 
@@ -249,7 +249,7 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
       <button
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full py-3 bg-mise-gold hover:bg-yellow-600 text-white text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        className="w-full py-3 bg-hospopilot-gold hover:bg-yellow-600 text-white text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
       >
         {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Submitting audit…</> : 'Submit audit'}
       </button>

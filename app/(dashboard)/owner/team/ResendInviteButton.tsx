@@ -40,7 +40,7 @@ export function ResendInviteButton({ email }: { email: string }) {
       <button
         onClick={handleResend}
         disabled={loading}
-        className="inline-flex items-center gap-1.5 text-xs font-medium text-mise-mid hover:text-mise-deep disabled:opacity-50 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-hospopilot-mid hover:text-hospopilot-deep disabled:opacity-50 transition-colors"
       >
         {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
         Resend

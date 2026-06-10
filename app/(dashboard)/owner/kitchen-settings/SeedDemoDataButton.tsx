@@ -32,8 +32,8 @@ export default function SeedDemoDataButton() {
   return (
     <div className="rounded-xl border border-dashed border-gray-300 p-5 space-y-3">
       <div className="flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-mise-gold" />
-        <p className="font-semibold text-mise-ink">Fill with demo data</p>
+        <Sparkles className="h-4 w-4 text-hospopilot-gold" />
+        <p className="font-semibold text-hospopilot-ink">Fill with demo data</p>
       </div>
       <p className="text-sm text-gray-500">
         Populate this restaurant with 15 demo staff members and three weeks of audits, temperature checks,
@@ -42,7 +42,7 @@ export default function SeedDemoDataButton() {
       <Button onClick={handleSeed} loading={loading} variant="outline" size="sm">
         Seed demo data
       </Button>
-      {result && <p className="text-sm text-mise-mid">{result}</p>}
+      {result && <p className="text-sm text-hospopilot-mid">{result}</p>}
     </div>
   )
 }

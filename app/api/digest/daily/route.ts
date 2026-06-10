@@ -173,14 +173,14 @@ export async function GET(request: Request) {
       : ''
 
     await getResend().emails.send({
-      from: 'mise <digest@mise.kitchen>',
+      from: 'HospoPilot <support@hospopilot.co.uk>',
       to: ownerEmail,
       subject: `${emoji} ${restaurant.name} — ${dayLabel} compliance digest`,
       html: `
         <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; color: #1a1a1a;">
 
           <div style="display: flex; align-items: center; margin-bottom: 24px;">
-            <span style="font-size: 22px; font-weight: 700; color: #1a1a1a;">mise</span>
+            <span style="font-size: 22px; font-weight: 700; color: #1a1a1a;">HospoPilot</span>
             <span style="margin-left: 8px; font-size: 14px; color: #6b7280;">daily digest</span>
           </div>
 
@@ -238,15 +238,15 @@ export async function GET(request: Request) {
 
           <!-- CTA -->
           <div style="margin-top: 28px; text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mise.kitchen'}/owner"
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.hospopilot.co.uk'}/owner"
                style="display: inline-block; background: #2D6A4F; color: white; padding: 12px 28px;
                       border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
-              Open mise dashboard →
+              Open HospoPilot dashboard →
             </a>
           </div>
 
           <p style="color: #9ca3af; font-size: 12px; margin-top: 28px; text-align: center;">
-            mise food safety · Daily digest · <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mise.kitchen'}/owner/settings" style="color: #9ca3af;">Manage notifications</a>
+            HospoPilot food safety · Daily digest · <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.hospopilot.co.uk'}/owner/settings" style="color: #9ca3af;">Manage notifications</a>
           </p>
         </div>
       `,

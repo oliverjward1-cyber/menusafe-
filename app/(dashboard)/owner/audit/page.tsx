@@ -53,30 +53,30 @@ export default async function OwnerAuditPage() {
         <div>
           <div className="flex items-center gap-2">
             <ClipboardCheck className="h-5 w-5 text-green-700" />
-            <h1 className="text-2xl font-display font-semibold text-mise-ink">Kitchen Audits</h1>
+            <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Kitchen Audits</h1>
           </div>
-          <p className="text-sm text-mise-ink/50 mt-0.5">EHO-readiness compliance record</p>
+          <p className="text-sm text-hospopilot-ink/50 mt-0.5">EHO-readiness compliance record</p>
         </div>
       </div>
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Total audits</p>
-          <p className="text-3xl font-display font-semibold text-mise-ink mt-1">{allAudits.length}</p>
+          <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Total audits</p>
+          <p className="text-3xl font-display font-semibold text-hospopilot-ink mt-1">{allAudits.length}</p>
         </div>
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Avg score (last 4)</p>
+          <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Avg score (last 4)</p>
           <p className={`text-3xl font-bold mt-1 ${avgPct == null ? 'text-gray-300' : avgPct >= 90 ? 'text-green-700' : avgPct >= 70 ? 'text-amber-600' : 'text-red-600'}`}>
             {avgPct != null ? `${avgPct}%` : '—'}
           </p>
         </div>
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Failed audits</p>
+          <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Failed audits</p>
           <p className={`text-3xl font-bold mt-1 ${redCount > 0 ? 'text-red-600' : 'text-gray-300'}`}>{redCount}</p>
         </div>
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <p className="text-xs font-sans font-semibold text-mise-ink/40 uppercase tracking-widest">Days since last</p>
+          <p className="text-xs font-sans font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Days since last</p>
           <p className={`text-3xl font-bold mt-1 ${daysSinceLast == null ? 'text-gray-300' : daysSinceLast > 7 ? 'text-amber-600' : 'text-green-700'}`}>
             {daysSinceLast != null ? daysSinceLast : '—'}
           </p>
@@ -89,14 +89,14 @@ export default async function OwnerAuditPage() {
       {/* Audit list */}
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-mise-ink/40" />
-          <h2 className="text-sm font-semibold text-mise-ink">Audit history</h2>
+          <TrendingUp className="h-4 w-4 text-hospopilot-ink/40" />
+          <h2 className="text-sm font-semibold text-hospopilot-ink">Audit history</h2>
         </div>
 
         {allAudits.length === 0 ? (
           <div className="py-16 text-center">
             <ClipboardCheck className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-mise-ink/50">No audits yet</p>
+            <p className="text-sm font-medium text-hospopilot-ink/50">No audits yet</p>
             <p className="text-xs text-gray-400 mt-1">Ask kitchen staff to complete the weekly audit from their dashboard</p>
           </div>
         ) : (
@@ -115,17 +115,17 @@ export default async function OwnerAuditPage() {
                       {pct}%
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-mise-ink">{audit.completed_by}</p>
+                      <p className="text-sm font-medium text-hospopilot-ink">{audit.completed_by}</p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {new Date(audit.completed_at).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                         {' · '}{audit.score}/{audit.total} passed
                       </p>
-                      {audit.notes && <p className="text-xs text-mise-ink/50 mt-1 truncate max-w-xs">{audit.notes}</p>}
+                      {audit.notes && <p className="text-xs text-hospopilot-ink/50 mt-1 truncate max-w-xs">{audit.notes}</p>}
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <StatusBadge status={audit.status} />
-                    <ChevronRight className="h-4 w-4 text-mise-ink/20" />
+                    <ChevronRight className="h-4 w-4 text-hospopilot-ink/20" />
                   </div>
                 </Link>
               )

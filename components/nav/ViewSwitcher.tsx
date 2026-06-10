@@ -32,8 +32,8 @@ function ViewSwitcherInner({ menuUrl, extra }: { menuUrl: string; extra?: React.
           onClick={() => switchView(value)}
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-sans transition-colors ${
             currentView === value
-              ? 'bg-mise-ink text-white'
-              : 'text-mise-ink/50 hover:text-mise-ink hover:bg-black/5'
+              ? 'bg-hospopilot-ink text-white'
+              : 'text-hospopilot-ink/50 hover:text-hospopilot-ink hover:bg-black/5'
           }`}
         >
           <Icon className="h-3 w-3" />
@@ -44,11 +44,11 @@ function ViewSwitcherInner({ menuUrl, extra }: { menuUrl: string; extra?: React.
         href={menuUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-sans text-mise-ink/50 hover:text-mise-ink hover:bg-black/5 transition-colors ml-1"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-sans text-hospopilot-ink/50 hover:text-hospopilot-ink hover:bg-black/5 transition-colors ml-1"
       >
         <Users className="h-3 w-3" />
         Customer view
-        <span className="text-xs text-mise-gold">↗</span>
+        <span className="text-xs text-hospopilot-gold">↗</span>
       </a>
     </div>
     {extra && <div className="flex items-center">{extra}</div>}

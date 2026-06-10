@@ -17,20 +17,20 @@ export default function CrossContaminationPage() {
         </div>
         <div>
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Kitchen Team</p>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">Cross Contamination</h1>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Cross Contamination</h1>
           <p className="text-sm text-gray-500 mt-1">How harmful bacteria and allergens transfer between food, surfaces, and people.</p>
         </div>
       </div>
 
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-3">What is cross contamination?</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-3">What is cross contamination?</h2>
         <p className="text-sm text-gray-600 leading-relaxed">
           Cross contamination is when harmful bacteria or allergens are transferred — directly or indirectly — to food that should be safe to eat. It is one of the most common causes of food poisoning and allergic reactions in commercial kitchens. It can happen in seconds and is often invisible.
         </p>
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-amber-500" /> The four types
         </h2>
         <div className="space-y-4">
@@ -49,7 +49,7 @@ export default function CrossContaminationPage() {
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-green-600" /> Prevention rules
         </h2>
         <ul className="space-y-3">
@@ -72,7 +72,7 @@ export default function CrossContaminationPage() {
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
           <XCircle className="h-4 w-4 text-red-500" /> Never do this
         </h2>
         <ul className="space-y-3">
@@ -92,7 +92,7 @@ export default function CrossContaminationPage() {
       </Card>
 
       <div className="flex justify-end">
-        <Link href="/owner/learn" className="text-sm text-mise-mid font-medium hover:underline flex items-center gap-1">
+        <Link href="/owner/learn" className="text-sm text-hospopilot-mid font-medium hover:underline flex items-center gap-1">
           Back to Learning Hub <ChevronLeft className="h-4 w-4 rotate-180" />
         </Link>
       </div>
