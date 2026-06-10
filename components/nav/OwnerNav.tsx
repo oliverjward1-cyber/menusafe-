@@ -25,7 +25,6 @@ import {
   ShieldCheck,
   AlertOctagon,
   Tablet,
-  FlaskConical,
   CreditCard,
   History,
   ChevronDown,
@@ -158,7 +157,6 @@ export function OwnerNav({ restaurantName, restaurantSlug }: { restaurantName: s
           <Link href="/owner/cleaning" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/cleaning') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Sparkles className="h-4 w-4" /> Cleaning</Link>
           <Link href="/owner/temperature-logs" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/temperature-logs') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Thermometer className="h-4 w-4" /> Temp Logs</Link>
           <Link href="/owner/incidents" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/incidents') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><AlertOctagon className="h-4 w-4" /> Incidents</Link>
-          <Link href="/owner/haccp" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/haccp') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><FlaskConical className="h-4 w-4" /> HACCP & Calibration</Link>
           <Link href="/owner/eho" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/eho') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><ShieldCheck className="h-4 w-4" /> EHO Mode</Link>
           <Link href="/owner/kitchen-settings" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/kitchen-settings') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><Tablet className="h-4 w-4" /> Kitchen Portal</Link>
           <Link href="/owner/history" className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors', pathname.startsWith('/owner/history') ? 'bg-hospopilot-mid text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white')}><History className="h-4 w-4" /> History</Link>
