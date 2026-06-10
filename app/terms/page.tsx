@@ -26,7 +26,7 @@ export default function TermsPage() {
           <p>
             HospoPilot is a software-as-a-service (SaaS) platform that helps restaurant operators
             manage ingredient libraries, recipe costing, allergen information, and staff training.
-            HospoPilot is operated by [Your Company Name] (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;).
+            HospoPilot is operated by HospoPilot Ltd (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;).
           </p>
           <p>
             By using HospoPilot you agree to these Terms. If you are using HospoPilot on behalf of a

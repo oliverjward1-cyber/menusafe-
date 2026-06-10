@@ -47,7 +47,7 @@ export function SiteFooter() {
 
         {/* bottom bar — registered company number + address to be added here */}
         <div className="mt-10 pt-6 border-t border-[#E3E9EC] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <p className="text-[12.5px] text-[#97A1A7]">© 2026 HospoPilot. All rights reserved.</p>
+          <p className="text-[12.5px] text-[#97A1A7]">© 2026 HospoPilot Ltd. All rights reserved.</p>
           <p className="text-[12.5px] text-[#97A1A7]">UK · support@hospopilot.co.uk</p>
         </div>
       </div>

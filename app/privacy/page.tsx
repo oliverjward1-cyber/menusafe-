@@ -26,7 +26,7 @@ export default function PrivacyPage() {
         <section className="space-y-3">
           <h2 className="text-base font-bold text-gray-900">1. Who we are</h2>
           <p>
-            HospoPilot is a kitchen management SaaS platform operated by [Your Company Name]
+            HospoPilot is a kitchen management SaaS platform operated by HospoPilot Ltd
             (&quot;HospoPilot&quot;, &quot;we&quot;, &quot;us&quot;). This policy explains what data we collect,
             how we use it, and how long we keep it. We are committed to complying with the
             UK GDPR and the Data Protection Act 2018.
