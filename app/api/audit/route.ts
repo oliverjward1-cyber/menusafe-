@@ -6,7 +6,7 @@ import { blockIfImpersonating } from '@/lib/dev/guard'
 export async function POST(req: NextRequest) {
   const blocked = await blockIfImpersonating()
   if (blocked) return blocked
-  const { restaurantId, completedBy, score, total, status, notes, answers } = await req.json()
+  const { restaurantId, completedBy, score, total, status, notes, answers, auditType } = await req.json()
 
   if (!restaurantId || !completedBy) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
   const { data: audit, error: auditErr } = await adminSupabase
     .from('kitchen_audits')
-    .insert({ restaurant_id: restaurantId, completed_by: completedBy, score, total, status, notes: notes || null })
+    .insert({ restaurant_id: restaurantId, completed_by: completedBy, score, total, status, notes: notes || null, audit_type: auditType || 'general' })
     .select('id').single()
 
   if (auditErr || !audit) {

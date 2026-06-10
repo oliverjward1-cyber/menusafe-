@@ -16,7 +16,7 @@ interface AnswerState {
 
 const DEFAULT_STATE: AnswerState = { answer: null, notes: null, photoFile: null, photoPreview: null, uploading: false }
 
-export function AuditForm({ restaurantId, questions }: { restaurantId: string; questions: { key: string; label: string; category: string; requiresPhotoOnFail?: boolean }[] }) {
+export function AuditForm({ restaurantId, questions, auditType }: { restaurantId: string; questions: { key: string; label: string; category: string; requiresPhotoOnFail?: boolean }[]; auditType: string }) {
   const router = useRouter()
   const supabaseRef = useRef(createClient())
   const supabase = supabaseRef.current
@@ -103,6 +103,7 @@ export function AuditForm({ restaurantId, questions }: { restaurantId: string; q
         status,
         notes: overallNotes.trim() || null,
         answers: answerRows,
+        auditType,
       }),
     })
 
