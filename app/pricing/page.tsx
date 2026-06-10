@@ -166,7 +166,7 @@ export default function PricingPage() {
             <div className="flex-1">
               <h3 className="text-[19px] font-bold text-[#1B4332]">Running a group?</h3>
               <p className="text-[14.5px] text-[#677077] mt-1 leading-snug">
-                One dashboard across all your venues, from <b className="text-[#1B4332]">£50 per site / month</b>. We&apos;ll set you up.
+                EHO Compliance — or Compliance + Profit — across all your venues, from <b className="text-[#1B4332]">£50 per site / month</b>. We&apos;ll tailor it to your group.
               </p>
             </div>
             <a
