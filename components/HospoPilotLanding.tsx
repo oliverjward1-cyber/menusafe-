@@ -47,7 +47,7 @@ export default function HospoPilotLanding() {
       </header>
 
       {/* ---------- HERO ---------- */}
-      <main className="py-7 md:py-9 lg:pb-16">
+      <main className="py-7 md:py-9 lg:pb-10">
         <div className="mx-auto w-full max-w-[1180px] px-6">
           {/* Hero copy + email capture — centered, full width */}
           <div className="max-w-[900px] mx-auto text-center">
@@ -107,8 +107,52 @@ export default function HospoPilotLanding() {
         </div>
       </main>
 
+      {/* ---------- WHY NOW: OWEN'S LAW ---------- */}
+      <section className="border-t border-[#E3E9EC] py-10 md:py-14">
+        <div className="mx-auto w-full max-w-[920px] px-6 text-center">
+          <span className="font-['IBM_Plex_Mono'] text-[13px] font-medium tracking-[0.14em] uppercase text-[#2D6A4F]">
+            Why now
+          </span>
+          <h2 className="text-[clamp(26px,4vw,40px)] leading-[1.12] tracking-[-0.02em] font-bold text-[#1B4332] mt-4 text-balance">
+            The FSA already expects this. The law is catching up.
+          </h2>
+          <p className="text-[clamp(16px,2.4vw,18px)] leading-[1.6] text-[#3A474E] mt-5 max-w-[62ch] mx-auto">
+            Since 2025, FSA guidance has been clear: every menu should carry written allergen information, and your team should actively ask about allergies. Owen&apos;s Law — backed by the FSA — is the move to make it a legal requirement. The restaurants that get ahead of it won&apos;t feel a thing when it lands.
+          </p>
+
+          {/* trajectory */}
+          <div className="mt-9 grid sm:grid-cols-3 gap-3 text-left max-w-[760px] mx-auto">
+            <div className="bg-white border border-[#E3E9EC] rounded-xl p-5">
+              <p className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.06em] uppercase text-[#97A1A7]">2025</p>
+              <p className="text-[14.5px] text-[#3A474E] mt-1.5 leading-snug">FSA guidance: written allergen info on every menu, and staff actively asking.</p>
+            </div>
+            <div className="bg-white border border-[#E3E9EC] rounded-xl p-5">
+              <p className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.06em] uppercase text-[#97A1A7]">Next</p>
+              <p className="text-[14.5px] text-[#3A474E] mt-1.5 leading-snug">Government reviews making written allergen menus a legal requirement.</p>
+            </div>
+            <div className="bg-white border-[1.5px] border-[#1B4332] rounded-xl p-5">
+              <p className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.06em] uppercase text-[#1F8A5B]">With HospoPilot</p>
+              <p className="text-[14.5px] text-[#1B4332] font-semibold mt-1.5 leading-snug">You&apos;re already there — guidance met, law-ready.</p>
+            </div>
+          </div>
+
+          <p className="text-[15px] text-[#677077] mt-8 max-w-[62ch] mx-auto leading-[1.6]">
+            HospoPilot builds your allergen matrix from your recipes, keeps it accurate on your menu, and trains your team to have the conversation.
+          </p>
+          <a
+            href="/signup"
+            className="mt-6 inline-flex items-center justify-center gap-[9px] bg-[#1B4332] text-white font-bold text-[15px] px-7 py-[14px] rounded-lg no-underline hover:bg-[#14342A] transition-colors"
+          >
+            Get ahead of it — start free
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </section>
+
       {/* ---------- OUR STORY (teaser) ---------- */}
-      <section className="border-t border-[#E3E9EC] py-[56px] md:py-[80px]">
+      <section className="border-t border-[#E3E9EC] py-10 md:py-14">
         <div className="mx-auto w-full max-w-[1080px] px-6">
           <div className="bg-white border border-[#E3E9EC] rounded-2xl shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.18)] overflow-hidden grid md:grid-cols-[0.85fr_1.15fr]">
             {/* Photo */}
