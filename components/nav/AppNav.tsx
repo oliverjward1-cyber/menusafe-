@@ -232,9 +232,11 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
               <NavLink href={`/menu/${restaurantSlug}?from=dashboard`} label="Allergen Menu" icon={UtensilsCrossed} pathname={pathname} />
             )}
             <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
-            <NavLink href="/owner/eho" label="EHO Mode" icon={ShieldCheck} pathname={pathname} />
           </NavSection>
         )}
+
+        {/* EHO Mode — all roles, in case management isn't on site during an inspection */}
+        <NavLink href="/owner/eho" label="EHO Mode" icon={ShieldCheck} pathname={pathname} />
 
         {/* Management */}
         {isOwnerOrManager && (
