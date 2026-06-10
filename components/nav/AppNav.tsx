@@ -159,8 +159,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
       </div>
 
       <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
-        {/* Dashboard — not kitchen chef */}
-        {role !== 'chef' && (
+        {/* Dashboard — owner, manager, head chef only */}
+        {(isOwnerOrManager || isHeadChef) && (
           <NavLink href="/owner" label="Dashboard" icon={LayoutDashboard} pathname={pathname} exact />
         )}
 
@@ -213,8 +213,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             <NavLink href="/owner/foh-trail" label="FOH Daily Trail" icon={Users2} pathname={pathname} />
           )}
 
-          {/* Trail History — owner, manager, head chef, FOH */}
-          {(isOwnerOrManager || isHeadChef || isFOH) && (
+          {/* Trail History — owner, manager, head chef */}
+          {(isOwnerOrManager || isHeadChef) && (
             <NavLink href="/owner/trail-history" label="Trail History" icon={BookMarked} pathname={pathname} />
           )}
 
