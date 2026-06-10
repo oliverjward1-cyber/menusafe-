@@ -172,11 +172,11 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
           </NavSection>
         )}
 
-        {/* Kitchens */}
-        <NavSection label="Kitchens">
+        {/* Kitchen */}
+        {(isOwnerOrManager || isHeadChef || role === 'chef') && (
+          <NavSection label="Kitchen">
 
-          {/* Menus — owner, manager, head chef (build), kitchen chef (view & print) */}
-          {(isOwnerOrManager || isHeadChef || role === 'chef') && (
+            {/* Menus — owner, manager, head chef (build), kitchen chef (view & print) */}
             <CollapsibleNavSection
               label="Menus"
               icon={MenuSquare}
@@ -190,10 +190,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
                 ...(isOwnerOrManager ? [{ href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode }] : []),
               ]}
             />
-          )}
 
-          {/* Kitchen Audit — owner, manager, head chef, kitchen chef (run only) */}
-          {(isOwnerOrManager || isHeadChef || role === 'chef') && (
+            {/* Kitchen Audit — owner, manager, head chef, kitchen chef (run only) */}
             <CollapsibleNavSection
               label="Kitchen Audit"
               icon={ClipboardCheck}
@@ -203,52 +201,48 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
                 ...(isOwnerOrManager ? [{ href: '/owner/audit-questions', label: 'Audit Questions', icon: ClipboardList }] : []),
               ]}
             />
-          )}
 
-          {/* BOH Daily Trail — kitchen roles only */}
-          {isKitchenStaff && (
+            {/* BOH Daily Trail */}
             <NavLink href="/owner/trail" label="BOH Daily Trail" icon={ListChecks} pathname={pathname} />
-          )}
 
-          {/* FOH Daily Trail — foh + management */}
-          {(isOwnerOrManager || isFOH) && (
-            <NavLink href="/owner/foh-trail" label="FOH Daily Trail" icon={Users2} pathname={pathname} />
-          )}
+            {/* Trail History — owner, manager, head chef */}
+            {(isOwnerOrManager || isHeadChef) && (
+              <NavLink href="/owner/trail-history" label="Trail History" icon={BookMarked} pathname={pathname} />
+            )}
 
-          {/* Trail History — owner, manager, head chef */}
-          {(isOwnerOrManager || isHeadChef) && (
-            <NavLink href="/owner/trail-history" label="Trail History" icon={BookMarked} pathname={pathname} />
-          )}
+            {/* Trail Settings — owner, manager */}
+            {isOwnerOrManager && (
+              <NavLink href="/owner/trail-settings" label="Trail Settings" icon={ClipboardList} pathname={pathname} />
+            )}
 
-          {/* Trail Settings — owner, manager */}
-          {isOwnerOrManager && (
-            <NavLink href="/owner/trail-settings" label="Trail Settings" icon={ClipboardList} pathname={pathname} />
-          )}
-
-          {/* Operations — owner, manager, head chef, kitchen chef */}
-          {isKitchenStaff && (<>
+            {/* Operations */}
             <NavLink href="/owner/cleaning" label="Cleaning" icon={Sparkles} pathname={pathname} />
             <NavLink href="/owner/temperature-logs" label="Cooking Temps" icon={Thermometer} pathname={pathname} />
-          </>)}
 
-          {/* Allergen Menu (customer view) — FOH + management */}
-          {(isOwnerOrManager || isFOH) && restaurantSlug && (
-            <NavLink href={`/menu/${restaurantSlug}?from=dashboard`} label="Allergen Menu" icon={UtensilsCrossed} pathname={pathname} />
-          )}
-
-          {/* Incidents — owner, manager, head chef, kitchen chef, FOH */}
-          {(isKitchenStaff || isFOH) && (
+            {/* Incidents */}
             <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
-          )}
-          {/* EHO Mode — owner, manager, FOH */}
-          {(isOwnerOrManager || isFOH) && (
+          </NavSection>
+        )}
+
+        {/* Front of House */}
+        {(isOwnerOrManager || isFOH) && (
+          <NavSection label="Front of House">
+            <NavLink href="/owner/foh-trail" label="FOH Daily Trail" icon={Users2} pathname={pathname} />
+            {restaurantSlug && (
+              <NavLink href={`/menu/${restaurantSlug}?from=dashboard`} label="Allergen Menu" icon={UtensilsCrossed} pathname={pathname} />
+            )}
+            <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
             <NavLink href="/owner/eho" label="EHO Mode" icon={ShieldCheck} pathname={pathname} />
-          )}
-          {isOwnerOrManager && (<>
+          </NavSection>
+        )}
+
+        {/* Management */}
+        {isOwnerOrManager && (
+          <NavSection label="Management">
             <NavLink href="/owner/kitchen-settings" label="Kitchen Portal" icon={Tablet} pathname={pathname} />
             <NavLink href="/owner/history" label="History" icon={History} pathname={pathname} />
-          </>)}
-        </NavSection>
+          </NavSection>
+        )}
 
         {/* Learning Hub — all roles */}
         <NavSection label="Learning Hub">
