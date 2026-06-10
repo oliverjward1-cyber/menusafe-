@@ -34,9 +34,15 @@ export default function HospoPilotLanding() {
               Hospo<b className="text-[#2D6A4F]">Pilot</b>
             </span>
           </a>
-          <a href="/signup" className="inline-flex items-center text-[14.5px] font-bold text-white bg-[#1B4332] px-[18px] py-[10px] rounded-lg no-underline whitespace-nowrap leading-none hover:bg-[#14342A] transition-colors">
-            Start free
-          </a>
+          <div className="flex items-center gap-5 sm:gap-7">
+            <nav className="flex items-center gap-5 sm:gap-6 text-[14.5px] font-semibold text-[#677077]">
+              <a href="/story" className="hidden sm:inline no-underline hover:text-[#1B4332] transition-colors">Our story</a>
+              <a href="/pricing" className="no-underline hover:text-[#1B4332] transition-colors">Pricing</a>
+            </nav>
+            <a href="/signup" className="inline-flex items-center text-[14.5px] font-bold text-white bg-[#1B4332] px-[18px] py-[10px] rounded-lg no-underline whitespace-nowrap leading-none hover:bg-[#14342A] transition-colors">
+              Start free
+            </a>
+          </div>
         </div>
       </header>
 
