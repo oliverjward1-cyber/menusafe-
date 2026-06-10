@@ -5,6 +5,7 @@ import { ALLERGENS } from '@/lib/constants/allergens'
 import { AllergenBadge } from '@/components/allergen/AllergenBadge'
 import { DishCard } from '@/app/menu/[slug]/DishCard'
 import { ChevronLeft, Eye } from 'lucide-react'
+import PrintButton from './PrintButton'
 
 type AllergenKey = (typeof ALLERGENS)[number]['key']
 interface Props { params: { id: string } }
@@ -75,7 +76,7 @@ export default async function MenuPreviewPage({ params }: Props) {
   return (
     <div className="space-y-4">
       {/* Preview banner */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+      <div className="print:hidden bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Eye className="h-4 w-4 text-amber-600 shrink-0" />
           <div>
@@ -83,10 +84,13 @@ export default async function MenuPreviewPage({ params }: Props) {
             <p className="text-xs text-amber-700">This is exactly what customers will see. {!menu.is_published && 'This menu is not yet published.'}</p>
           </div>
         </div>
-        <Link href={`/chef/menus/${params.id}`}
-          className="shrink-0 text-xs font-medium text-amber-700 border border-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-100 transition-colors flex items-center gap-1">
-          <ChevronLeft className="h-3 w-3" /> Back to editor
-        </Link>
+        <div className="flex items-center gap-2">
+          <PrintButton />
+          <Link href={`/chef/menus/${params.id}`}
+            className="shrink-0 text-xs font-medium text-amber-700 border border-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-100 transition-colors flex items-center gap-1">
+            <ChevronLeft className="h-3 w-3" /> Back to editor
+          </Link>
+        </div>
       </div>
 
       {/* Customer-facing view */}

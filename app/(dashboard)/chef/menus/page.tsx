@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
-import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye, Clock, ExternalLink } from 'lucide-react'
+import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye, Clock, ExternalLink, Printer } from 'lucide-react'
 import { PublishToggle } from './PublishToggle'
 import { DuplicateMenuButton } from './DuplicateMenuButton'
 import { DeleteMenuButton } from './DeleteMenuButton'
@@ -20,10 +20,11 @@ export default async function MenusPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: profile } = user
-    ? await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
+    ? await supabase.from('profiles').select('restaurant_id, role').eq('id', user.id).single()
     : { data: null }
 
   const rid = profile?.restaurant_id ?? cookies().get('msafe_rid')?.value
+  const canEdit = ['owner', 'manager', 'head_chef'].includes(profile?.role ?? '')
 
   const { data: restaurant } = rid
     ? await supabase.from('restaurants').select('slug').eq('id', rid).single()
@@ -46,12 +47,14 @@ export default async function MenusPage() {
           <h1 className="text-2xl font-display font-semibold text-mise-ink">Menus</h1>
           <p className="text-mise-ink/50 mt-1">{menus?.length ?? 0} menu{menus?.length !== 1 ? 's' : ''}</p>
         </div>
-        <Link
-          href="/chef/menus/new"
-          className="inline-flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
-        >
-          <Plus className="h-4 w-4" /> Create menu
-        </Link>
+        {canEdit && (
+          <Link
+            href="/chef/menus/new"
+            className="inline-flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" /> Create menu
+          </Link>
+        )}
       </div>
 
       {menuUrl && (
@@ -135,12 +138,14 @@ export default async function MenusPage() {
                         )}
                       </div>
                     </div>
-                    <Link
-                      href={`/chef/menus/${menu.id}`}
-                      className="shrink-0 inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      <Pencil className="h-3.5 w-3.5" /> Edit
-                    </Link>
+                    {canEdit && (
+                      <Link
+                        href={`/chef/menus/${menu.id}`}
+                        className="shrink-0 inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        <Pencil className="h-3.5 w-3.5" /> Edit
+                      </Link>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Link
@@ -149,9 +154,17 @@ export default async function MenusPage() {
                     >
                       <Eye className="h-3.5 w-3.5" /> Preview
                     </Link>
-                    <DuplicateMenuButton menuId={menu.id} />
-                    <PublishToggle menuId={menu.id} isPublished={menu.is_published} />
-                    <DeleteMenuButton menuId={menu.id} menuName={menu.name} />
+                    <Link
+                      href={`/chef/menus/${menu.id}/preview`}
+                      className="inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      <Printer className="h-3.5 w-3.5" /> Print
+                    </Link>
+                    {canEdit && (<>
+                      <DuplicateMenuButton menuId={menu.id} />
+                      <PublishToggle menuId={menu.id} isPublished={menu.is_published} />
+                      <DeleteMenuButton menuId={menu.id} menuName={menu.name} />
+                    </>)}
                   </div>
                 </div>
               </Card>

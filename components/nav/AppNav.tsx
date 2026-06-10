@@ -174,14 +174,16 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
         {/* Kitchens */}
         <NavSection label="Kitchens">
 
-          {/* Menus — owner, manager, head chef */}
-          {(isOwnerOrManager || isHeadChef) && (
+          {/* Menus — owner, manager, head chef (build), kitchen chef (view & print) */}
+          {(isOwnerOrManager || isHeadChef || role === 'chef') && (
             <CollapsibleNavSection
               label="Menus"
               icon={MenuSquare}
               pathname={pathname}
               items={[
-                { href: '/chef/menus', label: 'Build Menu', icon: MenuSquare },
+                (isOwnerOrManager || isHeadChef)
+                  ? { href: '/chef/menus', label: 'Build Menu', icon: MenuSquare }
+                  : { href: '/chef/menus', label: 'View & Print Menus', icon: MenuSquare },
                 { href: '/chef/recipes', label: 'Recipes', icon: BookOpen },
                 { href: '/chef/ingredients', label: 'Ingredients', icon: Package },
                 ...(isOwnerOrManager ? [{ href: '/owner/qr-menu', label: 'QR Menu', icon: QrCode }] : []),
@@ -202,10 +204,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             />
           )}
 
-          {/* BOH Daily Trail — owner, manager, head chef, kitchen chef */}
-          {isKitchenStaff && (
-            <NavLink href="/owner/trail" label="BOH Daily Trail" icon={ListChecks} pathname={pathname} />
-          )}
+          {/* BOH Daily Trail — all roles */}
+          <NavLink href="/owner/trail" label="BOH Daily Trail" icon={ListChecks} pathname={pathname} />
 
           {/* FOH Daily Trail — foh + management */}
           {(isOwnerOrManager || isFOH) && (
