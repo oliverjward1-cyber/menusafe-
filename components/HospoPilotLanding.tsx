@@ -27,13 +27,7 @@ export default function HospoPilotLanding() {
               Hospo<b className="text-[#2D6A4F]">Pilot</b>
             </span>
           </a>
-          <nav className="hidden lg:flex items-center gap-7">
-            <a href="/allergens" className="text-[14.5px] font-semibold text-[#677077] no-underline hover:text-[#1B4332] transition-colors">Allergens</a>
-            <a href="/costing" className="text-[14.5px] font-semibold text-[#677077] no-underline hover:text-[#1B4332] transition-colors">Costing</a>
-            <a href="/compliance" className="text-[14.5px] font-semibold text-[#677077] no-underline hover:text-[#1B4332] transition-colors">Compliance</a>
-            <a href="/pricing" className="text-[14.5px] font-semibold text-[#677077] no-underline hover:text-[#1B4332] transition-colors">Pricing</a>
-          </nav>
-          <a href="#capture" className="hidden lg:inline-flex items-center text-[14.5px] font-bold text-white bg-[#1B4332] px-[18px] py-[10px] rounded-lg no-underline whitespace-nowrap leading-none">
+          <a href="/signup" className="inline-flex items-center text-[14.5px] font-bold text-white bg-[#1B4332] px-[18px] py-[10px] rounded-lg no-underline whitespace-nowrap leading-none hover:bg-[#14342A] transition-colors">
             Start free
           </a>
         </div>
