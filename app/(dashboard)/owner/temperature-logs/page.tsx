@@ -1,9 +1,14 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { ArrowLeft, Thermometer, Plus } from 'lucide-react'
+import { ArrowLeft, Thermometer, Plus, Info } from 'lucide-react'
 import TempLogForm from './TempLogForm'
 import PrintButton from '@/components/ui/PrintButton'
+
+const CHECK_TYPE_LABELS: Record<string, string> = {
+  cooking: 'Cooking',
+  hot_holding: 'Hot holding',
+}
 
 export default async function TemperatureLogsPage() {
   const supabase = createClient()
@@ -18,6 +23,7 @@ export default async function TemperatureLogsPage() {
     .from('temperature_logs')
     .select('*')
     .eq('restaurant_id', rid)
+    .in('check_type', ['cooking', 'hot_holding'])
     .order('logged_at', { ascending: false })
     .limit(100)
 
@@ -31,16 +37,12 @@ export default async function TemperatureLogsPage() {
     byDate[d].push(log)
   }
 
-  function tempColor(temp: number, location: string) {
-    const loc = location.toLowerCase()
-    if (loc.includes('freezer') || loc.includes('frozen')) {
-      return temp <= -18 ? 'text-green-700' : temp <= -15 ? 'text-amber-600' : 'text-red-600'
-    }
-    if (loc.includes('hot') || loc.includes('hold')) {
+  function tempColor(temp: number, checkType: string) {
+    if (checkType === 'hot_holding') {
       return temp >= 63 ? 'text-green-700' : temp >= 60 ? 'text-amber-600' : 'text-red-600'
     }
-    // Fridge / chilled default: ≤5°C safe
-    return temp <= 5 ? 'text-green-700' : temp <= 8 ? 'text-amber-600' : 'text-red-600'
+    // Cooking: core temp should reach 75°C (or 70°C held for 2 mins)
+    return temp >= 75 ? 'text-green-700' : temp >= 70 ? 'text-amber-600' : 'text-red-600'
   }
 
   return (
@@ -53,12 +55,39 @@ export default async function TemperatureLogsPage() {
           <div>
             <h1 className="text-2xl font-display font-semibold text-hospopilot-ink flex items-center gap-2">
               <Thermometer className="h-6 w-6 text-hospopilot-mid" />
-              Temperature Log
+              Cooking Temp Checks
             </h1>
-            <p className="text-sm text-hospopilot-ink/50 mt-0.5">Record fridge, freezer and hot-hold temperatures</p>
+            <p className="text-sm text-hospopilot-ink/50 mt-0.5">Record cooking and hot-holding temperatures</p>
           </div>
         </div>
         <PrintButton label="Print log" />
+      </div>
+
+      {/* Guides */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
+        <div className="bg-hospopilot-cream/40 border border-hospopilot-mid/20 rounded-2xl p-4">
+          <p className="text-sm font-semibold text-hospopilot-ink flex items-center gap-2 mb-2">
+            <Info className="h-4 w-4 text-hospopilot-mid" /> Cooking — what to look for
+          </p>
+          <ul className="text-xs text-hospopilot-ink/60 space-y-1 list-disc pl-4">
+            <li>Cook food to a core temperature of <strong>75°C</strong> or above</li>
+            <li>Or hold at <strong>70°C for 2 minutes</strong> as an alternative</li>
+            <li>Check the thickest part of the food, away from bone</li>
+            <li>Below 70°C — return to cook and re-check before serving</li>
+          </ul>
+        </div>
+
+        <div className="bg-hospopilot-cream/40 border border-hospopilot-mid/20 rounded-2xl p-4">
+          <p className="text-sm font-semibold text-hospopilot-ink flex items-center gap-2 mb-2">
+            <Info className="h-4 w-4 text-hospopilot-mid" /> Hot holding — what to look for
+          </p>
+          <ul className="text-xs text-hospopilot-ink/60 space-y-1 list-disc pl-4">
+            <li>Food held for service must stay at <strong>63°C or above</strong></li>
+            <li>Check bain maries, hot cabinets and pass shelves regularly</li>
+            <li>Below 63°C — reheat to 75°C or discard after 2 hours</li>
+            <li>Don&apos;t hold food for more than 2 hours below 63°C</li>
+          </ul>
+        </div>
       </div>
 
       {/* Log new reading */}
@@ -84,9 +113,9 @@ export default async function TemperatureLogsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-black/[0.04]">
-                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Location</th>
+                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Type</th>
+                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Item</th>
                   <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Temp</th>
-                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Check</th>
                   <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">By</th>
                   <th className="text-left px-5 py-2.5 text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest">Time</th>
                 </tr>
@@ -94,11 +123,11 @@ export default async function TemperatureLogsPage() {
               <tbody>
                 {entries.map(log => (
                   <tr key={log.id} className="border-b border-black/[0.04] last:border-0 hover:bg-hospopilot-cream/20">
+                    <td className="px-5 py-3 text-hospopilot-ink/60">{CHECK_TYPE_LABELS[log.check_type] ?? log.check_type}</td>
                     <td className="px-5 py-3 font-medium text-hospopilot-ink">{log.location}</td>
-                    <td className={`px-5 py-3 font-bold font-mono ${tempColor(log.temperature, log.location)}`}>
+                    <td className={`px-5 py-3 font-bold font-mono ${tempColor(log.temperature, log.check_type)}`}>
                       {log.temperature}°{log.unit}
                     </td>
-                    <td className="px-5 py-3 text-hospopilot-ink/60 capitalize">{log.check_type}</td>
                     <td className="px-5 py-3 text-hospopilot-ink/60">{log.recorded_by}</td>
                     <td className="px-5 py-3 text-hospopilot-ink/40">
                       {new Date(log.logged_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}

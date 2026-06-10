@@ -225,7 +225,7 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
           {/* Operations — owner, manager, head chef, kitchen chef */}
           {isKitchenStaff && (<>
             <NavLink href="/owner/cleaning" label="Cleaning" icon={Sparkles} pathname={pathname} />
-            <NavLink href="/owner/temperature-logs" label="Temp Logs" icon={Thermometer} pathname={pathname} />
+            <NavLink href="/owner/temperature-logs" label="Cooking Temps" icon={Thermometer} pathname={pathname} />
           </>)}
 
           {/* Incidents — owner, manager, head chef, kitchen chef, FOH */}

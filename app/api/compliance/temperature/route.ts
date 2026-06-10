@@ -3,12 +3,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { blockIfImpersonating } from '@/lib/dev/guard'
 
-function isTemperatureBreach(location: string, temp: number): boolean {
-  const loc = location.toLowerCase()
-  if (loc.includes('freezer')) return temp > -15
-  if (loc.includes('hot') || loc.includes('hold')) return temp < 60
-  // Default fridge/chilled
-  return temp > 8
+function isTemperatureBreach(checkType: string, temp: number): boolean {
+  if (checkType === 'hot_holding') return temp < 60
+  if (checkType === 'cooking') return temp < 70
+  return false
 }
 
 export async function POST(request: Request) {
@@ -45,7 +43,7 @@ export async function POST(request: Request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Auto-create corrective action if temperature is out of safe range
-  const isBreach = isTemperatureBreach(location, temperature)
+  const isBreach = isTemperatureBreach(checkType, temperature)
   if (isBreach) {
     try {
       const due = new Date()
