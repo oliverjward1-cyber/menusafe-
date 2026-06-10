@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 async function getRestaurantId(supabase: any, userId: string) {
   const { data } = await supabase.from('profiles').select('restaurant_id, role').eq('id', userId).single()
@@ -24,6 +25,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })

@@ -11,7 +11,7 @@ const ROLE_TABS = [
   { label: 'FOH', value: 'foh', icon: UserCheck },
 ]
 
-function ViewSwitcherInner({ menuUrl }: { menuUrl: string }) {
+function ViewSwitcherInner({ menuUrl, extra }: { menuUrl: string; extra?: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -24,7 +24,8 @@ function ViewSwitcherInner({ menuUrl }: { menuUrl: string }) {
   }
 
   return (
-    <div className="bg-white border-b border-black/[0.06] px-4 flex items-center gap-1 h-10 shrink-0">
+    <div className="bg-white border-b border-black/[0.06] px-4 flex items-center justify-between gap-1 h-10 shrink-0">
+    <div className="flex items-center gap-1">
       {ROLE_TABS.map(({ label, value, icon: Icon }) => (
         <button
           key={value}
@@ -50,13 +51,15 @@ function ViewSwitcherInner({ menuUrl }: { menuUrl: string }) {
         <span className="text-xs text-mise-gold">↗</span>
       </a>
     </div>
+    {extra && <div className="flex items-center">{extra}</div>}
+    </div>
   )
 }
 
-export function ViewSwitcher({ menuUrl }: { menuUrl: string }) {
+export function ViewSwitcher({ menuUrl, extra }: { menuUrl: string; extra?: React.ReactNode }) {
   return (
     <Suspense fallback={<div className="h-10 shrink-0 bg-white border-b border-black/[0.06]" />}>
-      <ViewSwitcherInner menuUrl={menuUrl} />
+      <ViewSwitcherInner menuUrl={menuUrl} extra={extra} />
     </Suspense>
   )
 }

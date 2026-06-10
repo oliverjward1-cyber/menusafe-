@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 async function getRestaurantId() {
   const supabase = createClient()
@@ -26,6 +27,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const rid = await getRestaurantId()
   if (!rid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
