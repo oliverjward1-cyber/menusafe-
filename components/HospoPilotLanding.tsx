@@ -105,11 +105,13 @@ export default function HospoPilotLanding() {
       <section className="border-t border-[#E3E9EC] py-[56px] md:py-[80px]">
         <div className="mx-auto w-full max-w-[1080px] px-6">
           <div className="bg-white border border-[#E3E9EC] rounded-2xl shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.18)] overflow-hidden grid md:grid-cols-[0.85fr_1.15fr]">
-            {/* Photo — placeholder until the final edited image is supplied */}
-            <div className="bg-gradient-to-br from-[#EAF1ED] to-[#E7F4EC] min-h-[240px] md:min-h-full flex items-center justify-center">
-              <span className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.06em] uppercase text-[#9FB3A8]">
-                Drew &amp; Oliver — photo coming
-              </span>
+            {/* Photo */}
+            <div className="min-h-[260px] md:min-h-full">
+              <img
+                src="/founders.jpg"
+                alt="Drew and Oliver, co-founders of HospoPilot"
+                className="w-full h-full object-cover object-center min-h-[260px]"
+              />
             </div>
 
             {/* Text */}

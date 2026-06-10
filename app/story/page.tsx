@@ -60,18 +60,25 @@ export default function StoryPage() {
         </div>
       </section>
 
-      {/* PHOTO — placeholder until the final edited image is supplied (swap for <img src="/founders.jpg" />) */}
+      {/* PHOTO */}
       <div className="mx-auto w-full max-w-[760px] px-6 mt-10">
-        <div className="aspect-[16/10] w-full rounded-2xl border border-[#E3E9EC] bg-gradient-to-br from-[#EAF1ED] to-[#E7F4EC] flex items-center justify-center">
-          <span className="font-['IBM_Plex_Mono'] text-[12px] tracking-[0.06em] uppercase text-[#9FB3A8]">
-            Drew &amp; Oliver — photo coming
-          </span>
-        </div>
+        <img
+          src="/founders.jpg"
+          alt="Drew and Oliver, co-founders of HospoPilot"
+          className="w-full max-w-[460px] mx-auto rounded-2xl border border-[#E3E9EC] shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.18)]"
+        />
       </div>
 
       {/* ARTICLE */}
       <article className="mx-auto w-full max-w-[680px] px-6 py-12 md:py-16 space-y-5 text-[17px] leading-[1.65] text-[#3A474E]">
-        <p>{`Drew spent years running front of house. GM positions across multiple sites — including Oliver's. Oliver ran Harbour Kitchen as owner and head chef. The kind of place where he was in the kitchen at 6am and still there at midnight, and the entire menu lived in his head.`}</p>
+        <p>{`Drew has spent his whole career in hospitality — and not just at home. Front of house and general manager across multiple sites (including Oliver's), but further afield too: working in kitchens and venues around the world, with a spell making cheese on Bruny Island, off the coast of Tasmania. Oliver ran Harbour Kitchen as owner and head chef — the kind of place where he was in at 6am, still there at midnight, and the entire menu lived in his head.`}</p>
+
+        <figure className="my-8 max-w-[360px] mx-auto">
+          <img src="/drew-cheese.jpg" alt="Drew making cheese on Bruny Island, Tasmania" className="w-full rounded-xl border border-[#E3E9EC] grayscale" />
+          <figcaption className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.04em] uppercase text-[#9FB3A8] text-center mt-2.5">
+            Drew, making cheese on Bruny Island
+          </figcaption>
+        </figure>
         <p>{`Between them, they've done nearly every job hospitality throws at you. And like anyone serious about their restaurant, they cared. Standards were high. The kitchen was clean. The team knew their stuff.`}</p>
         <p className="text-[#141A1E] font-semibold">{`But allergen records? GP margins? Staff training sign-offs? That was a different story.`}</p>
 
@@ -79,6 +86,13 @@ export default function StoryPage() {
         <p>{`You know the feeling. Unannounced. The inspector at the door. Your ring binder somewhere under a stack of invoices and a delivery note from last Tuesday.`}</p>
         <p>{`Your kitchen is clean. Your team are trained. But in that moment, none of it counts if your paperwork doesn't back it up.`}</p>
         <p>{`We felt that more than once. The stomach drop. The scramble. The relief — and then the quiet resolution: we need to sort this.`}</p>
+
+        <figure className="my-8 max-w-[440px] mx-auto">
+          <img src="/oliver-kitchen.jpg" alt="Oliver working the kitchen pass at Harbour Kitchen" className="w-full rounded-xl border border-[#E3E9EC]" />
+          <figcaption className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.04em] uppercase text-[#9FB3A8] text-center mt-2.5">
+            Oliver on the pass
+          </figcaption>
+        </figure>
 
         <h2 className="text-[26px] font-bold text-[#1B4332] pt-6">Five apps and still falling through the gaps</h2>
         <p>{`We tried to fix it the way most operators do. With software. One app for delivery checks. Another for staff onboarding and allergen training. A spreadsheet for GP. Something else for the menu. Change an ingredient price and you're doing the maths by hand.`}</p>
