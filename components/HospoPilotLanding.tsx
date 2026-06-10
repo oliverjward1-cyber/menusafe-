@@ -14,7 +14,14 @@ import { EhoReadinessScore } from '@/components/marketing/EhoReadinessScore'
 
 export default function HospoPilotLanding() {
   return (
-    <div className="min-h-screen bg-[#F8FAFB] text-[#3A474E] font-['Hanken_Grotesk'] antialiased">
+    <div
+      className="min-h-screen bg-[#F8FAFB] text-[#3A474E] font-['Hanken_Grotesk'] antialiased"
+      style={{
+        backgroundImage:
+          'radial-gradient(#E2E8EC 1px, transparent 1px), linear-gradient(to right, #ECF0F2 1px, transparent 1px), linear-gradient(to bottom, #ECF0F2 1px, transparent 1px)',
+        backgroundSize: '22px 22px, 88px 88px, 88px 88px',
+      }}
+    >
       {/* ---------- NAV ---------- */}
       <header className="sticky top-0 z-40 bg-[#F8FAFB]/[.86] backdrop-blur-md border-b border-[#E3E9EC]">
         <div className="mx-auto w-full max-w-[1180px] px-6 flex items-center justify-between h-[66px]">
