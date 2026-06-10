@@ -117,7 +117,7 @@ export default function HospoPilotLanding() {
             The FSA already expects this. The law is catching up.
           </h2>
           <p className="text-[clamp(16px,2.4vw,18px)] leading-[1.6] text-[#3A474E] mt-5 max-w-[62ch] mx-auto">
-            Since 2025, FSA guidance has been clear: every menu should carry written allergen information, and your team should actively ask about allergies. Owen&apos;s Law — backed by the FSA — is the move to make it a legal requirement. The restaurants that get ahead of it won&apos;t feel a thing when it lands.
+            Allergen rules keep tightening. Natasha&apos;s Law already made full ingredient labelling mandatory on the food you pre-pack to sell. Now the FSA&apos;s 2025 guidance says every menu should carry written allergen information, with staff actively asking — and Owen&apos;s Law is set to make that a legal requirement too. The restaurants that get ahead of it won&apos;t feel a thing when it lands.
           </p>
 
           {/* trajectory */}
