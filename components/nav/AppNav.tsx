@@ -25,7 +25,6 @@ import {
   ShieldCheck,
   AlertOctagon,
   Tablet,
-  FlaskConical,
   CreditCard,
   History,
   ChevronDown,
@@ -233,11 +232,6 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
           {/* Incidents — owner, manager, head chef, kitchen chef, FOH */}
           {(isKitchenStaff || isFOH) && (
             <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
-          )}
-
-          {/* Management ops — owner, manager, head chef, kitchen chef */}
-          {isKitchenStaff && (
-            <NavLink href="/owner/haccp" label="HACCP & Calibration" icon={FlaskConical} pathname={pathname} />
           )}
           {/* EHO Mode — owner, manager, FOH */}
           {(isOwnerOrManager || isFOH) && (
