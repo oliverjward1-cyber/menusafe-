@@ -100,6 +100,47 @@ export default function HospoPilotLanding() {
           </div>
         </div>
       </main>
+
+      {/* ---------- OUR STORY (teaser) ---------- */}
+      <section className="border-t border-[#E3E9EC] py-[56px] md:py-[80px]">
+        <div className="mx-auto w-full max-w-[1080px] px-6">
+          <div className="bg-white border border-[#E3E9EC] rounded-2xl shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.18)] overflow-hidden grid md:grid-cols-[0.85fr_1.15fr]">
+            {/* Photo — placeholder until the final edited image is supplied */}
+            <div className="bg-gradient-to-br from-[#EAF1ED] to-[#E7F4EC] min-h-[240px] md:min-h-full flex items-center justify-center">
+              <span className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.06em] uppercase text-[#9FB3A8]">
+                Drew &amp; Oliver — photo coming
+              </span>
+            </div>
+
+            {/* Text */}
+            <div className="p-8 md:p-10">
+              <span className="font-['IBM_Plex_Mono'] text-[12.5px] font-medium tracking-[0.14em] uppercase text-[#2D6A4F]">
+                Built by operators
+              </span>
+              <h2 className="text-[clamp(24px,3.4vw,32px)] leading-[1.12] tracking-[-0.02em] font-bold text-[#1B4332] mt-3 text-balance">
+                {`We didn't read about this problem. We lived it.`}
+              </h2>
+              <p className="text-[#3A474E] text-[16px] leading-[1.6] mt-4">
+                {`Drew ran front of house across multiple sites. Oliver ran Harbour Kitchen as owner and head chef. Between them they've done nearly every job hospitality throws at you — and lived the EHO scramble that made them build HospoPilot.`}
+              </p>
+
+              <blockquote className="mt-5 border-l-[3px] border-[#52B788] pl-4">
+                <p className="text-[#1B4332] text-[16px] leading-[1.5] font-semibold italic">
+                  {`"If we could stop worrying about whether our records were up to date — we could focus entirely on the customer and the food."`}
+                </p>
+              </blockquote>
+
+              <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <span className="font-bold text-[#1B4332] text-[15px]">Drew &amp; Oliver</span>
+                <span className="font-['IBM_Plex_Mono'] text-[11.5px] tracking-[0.04em] uppercase text-[#677077]">Co-Founders</span>
+                <a href="/story" className="ml-auto text-[14.5px] font-bold text-[#2D6A4F] hover:text-[#1B4332] no-underline border-b-[1.5px] border-[#2D6A4F]/30 pb-px hover:border-[#2D6A4F] transition-colors">
+                  Read our full story →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
