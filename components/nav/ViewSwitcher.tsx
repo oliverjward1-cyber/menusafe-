@@ -25,12 +25,12 @@ function ViewSwitcherInner({ menuUrl, extra }: { menuUrl: string; extra?: React.
 
   return (
     <div className="bg-white border-b border-black/[0.06] px-4 flex items-center justify-between gap-1 h-10 shrink-0">
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
       {ROLE_TABS.map(({ label, value, icon: Icon }) => (
         <button
           key={value}
           onClick={() => switchView(value)}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-sans transition-colors ${
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-sans transition-colors shrink-0 ${
             currentView === value
               ? 'bg-hospopilot-ink text-white'
               : 'text-hospopilot-ink/50 hover:text-hospopilot-ink hover:bg-black/5'
@@ -44,14 +44,14 @@ function ViewSwitcherInner({ menuUrl, extra }: { menuUrl: string; extra?: React.
         href={menuUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-sans text-hospopilot-ink/50 hover:text-hospopilot-ink hover:bg-black/5 transition-colors ml-1"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-sans text-hospopilot-ink/50 hover:text-hospopilot-ink hover:bg-black/5 transition-colors ml-1 shrink-0"
       >
         <Users className="h-3 w-3" />
         Customer view
         <span className="text-xs text-hospopilot-gold">↗</span>
       </a>
     </div>
-    {extra && <div className="flex items-center">{extra}</div>}
+    {extra && <div className="flex items-center shrink-0">{extra}</div>}
     </div>
   )
 }
