@@ -143,29 +143,66 @@ export default async function HistoryPage({
         ))}
       </div>
 
-      <div className="rounded-xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
-        {filtered.length === 0 && (
+      {filtered.length === 0 ? (
+        <div className="rounded-xl border border-gray-200 overflow-hidden">
           <p className="px-5 py-8 text-center text-sm text-gray-400">No records found.</p>
-        )}
-        {filtered.map((entry) => {
-          const meta = TYPE_META[entry.type]
-          const Icon = meta.icon
-          return (
-            <div key={entry.id} className="flex items-center gap-4 px-5 py-3.5">
-              <span className={`inline-flex items-center justify-center h-9 w-9 rounded-lg shrink-0 ${meta.color}`}>
-                <Icon className="h-4 w-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-hospopilot-ink truncate">{entry.title}</p>
-                <p className="text-xs text-gray-500 truncate">{meta.label} · {entry.detail}{entry.by ? ` · ${entry.by}` : ''}</p>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {groupByDay(filtered).map(([dayKey, dayEntries]) => (
+            <div key={dayKey}>
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                {formatDayHeading(dayKey)}
+              </h2>
+              <div className="rounded-xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
+                {dayEntries.map((entry) => {
+                  const meta = TYPE_META[entry.type]
+                  const Icon = meta.icon
+                  return (
+                    <div key={entry.id} className="flex items-center gap-4 px-5 py-3.5">
+                      <span className={`inline-flex items-center justify-center h-9 w-9 rounded-lg shrink-0 ${meta.color}`}>
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-hospopilot-ink truncate">{entry.title}</p>
+                        <p className="text-xs text-gray-500 truncate">{meta.label} · {entry.detail}{entry.by ? ` · ${entry.by}` : ''}</p>
+                      </div>
+                      <p className="text-xs text-gray-400 shrink-0">
+                        {new Date(entry.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  )
+                })}
               </div>
-              <p className="text-xs text-gray-400 shrink-0">
-                {new Date(entry.at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-              </p>
             </div>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
+}
+
+function groupByDay(entries: HistoryEntry[]): [string, HistoryEntry[]][] {
+  const groups = new Map<string, HistoryEntry[]>()
+  for (const entry of entries) {
+    const key = entry.at.slice(0, 10) // YYYY-MM-DD
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key)!.push(entry)
+  }
+  return Array.from(groups.entries())
+}
+
+function formatDayHeading(dayKey: string): string {
+  const date = new Date(dayKey + 'T12:00:00')
+  const today = new Date()
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+
+  const isSameDay = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+
+  if (isSameDay(date, today)) return 'Today'
+  if (isSameDay(date, yesterday)) return 'Yesterday'
+
+  return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 }

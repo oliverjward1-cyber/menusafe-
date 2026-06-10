@@ -163,6 +163,11 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
           <NavLink href="/owner" label="Dashboard" icon={LayoutDashboard} pathname={pathname} exact />
         )}
 
+        {/* History — owner/manager only */}
+        {isOwnerOrManager && (
+          <NavLink href="/owner/history" label="History" icon={History} pathname={pathname} />
+        )}
+
         {/* People — owner/manager only */}
         {isOwnerOrManager && (
           <NavSection label="People">
@@ -236,13 +241,6 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
 
         {/* EHO Mode — all roles, in case management isn't on site during an inspection */}
         <NavLink href="/owner/eho" label="EHO Mode" icon={ShieldCheck} pathname={pathname} />
-
-        {/* Management */}
-        {isOwnerOrManager && (
-          <NavSection label="Management">
-            <NavLink href="/owner/history" label="History" icon={History} pathname={pathname} />
-          </NavSection>
-        )}
 
         {/* Learning Hub — all roles */}
         <NavSection label="Learning Hub">
