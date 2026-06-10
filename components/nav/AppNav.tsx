@@ -24,7 +24,6 @@ import {
   Truck,
   ShieldCheck,
   AlertOctagon,
-  Tablet,
   CreditCard,
   History,
   ChevronDown,
@@ -241,7 +240,6 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
         {/* Management */}
         {isOwnerOrManager && (
           <NavSection label="Management">
-            <NavLink href="/owner/kitchen-settings" label="Kitchen Portal" icon={Tablet} pathname={pathname} />
             <NavLink href="/owner/history" label="History" icon={History} pathname={pathname} />
           </NavSection>
         )}
