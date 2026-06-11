@@ -123,7 +123,7 @@ export default function HospoPilotLanding() {
           <div className="mt-9 flex flex-col md:flex-row items-stretch gap-0">
             {/* Step 1 */}
             <div className="flex-1 bg-white border border-[#E3E9EC] rounded-2xl p-6 md:p-7">
-              <p className="text-[19px] font-bold text-[#1B4332] leading-[1.25] tracking-[-0.01em]">Want to pass your EHO inspection?</p>
+              <p className="text-[19px] font-bold text-[#1B4332] leading-[1.25] tracking-[-0.01em]">EHO inspection due?</p>
             </div>
 
             {/* Arrow 1→2 */}
