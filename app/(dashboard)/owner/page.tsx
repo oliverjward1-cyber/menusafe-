@@ -4,8 +4,9 @@ import { formatPercent, calcGpPercent } from '@/lib/utils'
 import Link from 'next/link'
 import {
   AlertTriangle, Globe, GlobeLock,
-  Users, Clock, CheckCircle2, ArrowRight, MenuSquare, ClipboardCheck, ShieldCheck, AlertOctagon, Truck, ListChecks, History,
+  Users, Clock, CheckCircle2, ArrowRight, ChevronRight, MenuSquare, ClipboardCheck, ShieldCheck, Truck, ListChecks, History,
 } from 'lucide-react'
+import { WeekStrip } from '@/components/dashboard/WeekStrip'
 
 function addMonths(date: Date, months: number): Date {
   const d = new Date(date)
@@ -179,11 +180,36 @@ export default async function OwnerDashboard() {
   if (expiredStaff.length > 0)
     complianceIssues.push({ label: `${expiredStaff.length} staff member${expiredStaff.length !== 1 ? 's' : ''} with expired training`, severity: 'warning' })
   if (openIncidents.filter(i => i.severity !== 'critical' && i.severity !== 'high').length > 0)
-    complianceIssues.push({ label: `${openIncidents.length - criticalIncidents.length} open incident${openIncidents.length - criticalIncidents.length !== 1 ? 's' : ''} require resolution`, severity: 'warning' })
+    complianceIssues.push({ label: `${openIncidents.length - criticalIncidents.length} open incident${openIncidents.length - criticalIncidents.length !== 1 ? 's require' : ' requires'} resolution`, severity: 'warning' })
   const criticalCount = complianceIssues.filter(i => i.severity === 'critical').length
   const complianceScore = complianceIssues.length === 0 ? 100
     : Math.max(0, 100 - criticalCount * 25 - (complianceIssues.length - criticalCount) * 10)
   const complianceStatus = complianceScore === 100 ? 'compliant' : criticalCount > 0 ? 'critical' : 'needs-attention'
+
+  // Action queue — the same conditions as the compliance issues, phrased as actions with destinations
+  type QueueAction = { label: string; href: string; severity: 'critical' | 'warning' }
+  const actionQueue: QueueAction[] = []
+  if (criticalIncidents.length > 0)
+    actionQueue.push({ label: `Resolve ${criticalIncidents.length} critical incident${criticalIncidents.length !== 1 ? 's' : ''}`, href: '/owner/incidents', severity: 'critical' })
+  if (amOverdue)
+    actionQueue.push({ label: 'Log AM temperatures — overdue', href: '/owner/temperature-logs', severity: 'critical' })
+  if (pmOverdue)
+    actionQueue.push({ label: 'Log PM temperatures — overdue', href: '/owner/temperature-logs', severity: 'critical' })
+  if (trailTotal > 0 && missedTasks.length > 0)
+    actionQueue.push({ label: `Complete ${missedTasks.length} overdue trail task${missedTasks.length !== 1 ? 's' : ''}`, href: '/owner/trail', severity: 'warning' })
+  if (expiredStaff.length > 0)
+    actionQueue.push({ label: `Retrain ${expiredStaff.length} staff member${expiredStaff.length !== 1 ? 's' : ''} — training expired`, href: '/owner/staff-quiz?tab=compliance', severity: 'warning' })
+  const minorIncidents = openIncidents.length - criticalIncidents.length
+  if (minorIncidents > 0)
+    actionQueue.push({ label: `Resolve ${minorIncidents} open incident${minorIncidents !== 1 ? 's' : ''}`, href: '/owner/incidents', severity: 'warning' })
+
+  // Score ring — band colours: >=85 green, 60–84 amber, <60 deep warm red
+  const ringColour = complianceScore >= 85 ? '#2D6A4F' : complianceScore >= 60 ? '#D97706' : '#9B3B2E'
+  const ringIsRed = complianceScore < 60
+  const RING_R = 52
+  const RING_CIRC = 2 * Math.PI * RING_R
+
+  const todayLabel = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   function calcFoodCost(recipe: NonNullable<typeof recipesRes.data>[number]): number {
     if (!recipe?.recipe_ingredients) return 0
@@ -222,47 +248,85 @@ export default async function OwnerDashboard() {
   return (
     <div className="space-y-6">
 
-      {/* Daily Compliance Bar */}
-      <div className={`rounded-2xl border p-5 ${
-        complianceStatus === 'compliant' ? 'bg-green-50 border-green-200' :
-        complianceStatus === 'critical' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'
-      }`}>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className={`h-4 w-4 ${complianceStatus === 'compliant' ? 'text-green-600' : complianceStatus === 'critical' ? 'text-red-600' : 'text-amber-600'}`} />
-            <p className={`text-sm font-semibold ${complianceStatus === 'compliant' ? 'text-green-700' : complianceStatus === 'critical' ? 'text-red-700' : 'text-amber-700'}`}>
-              {complianceStatus === 'compliant' ? 'Fully compliant today' : complianceStatus === 'critical' ? 'Compliance action required' : 'Areas need attention'}
-            </p>
-          </div>
-          <span className={`text-lg font-bold ${complianceStatus === 'compliant' ? 'text-green-700' : complianceStatus === 'critical' ? 'text-red-700' : 'text-amber-700'}`}>
-            {complianceScore}%
-          </span>
+      {/* Page header */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-display font-semibold text-hospopilot-ink">{restaurant?.name}</h1>
+          <p className="text-sm text-hospopilot-ink/50 mt-1">{todayLabel}</p>
         </div>
-        <div className="h-2.5 bg-white/60 rounded-full overflow-hidden mb-3">
-          <div
-            className={`h-full rounded-full transition-all ${complianceStatus === 'compliant' ? 'bg-green-500' : complianceStatus === 'critical' ? 'bg-red-500' : 'bg-amber-500'}`}
-            style={{ width: `${complianceScore}%` }}
-          />
-        </div>
-        {complianceIssues.length > 0 ? (
-          <ul className="space-y-1">
-            {complianceIssues.map((issue, i) => (
-              <li key={i} className={`flex items-center gap-2 text-xs font-medium ${issue.severity === 'critical' ? 'text-red-700' : 'text-amber-700'}`}>
-                {issue.severity === 'critical'
-                  ? <AlertOctagon className="h-3.5 w-3.5 shrink-0" />
-                  : <AlertTriangle className="h-3.5 w-3.5 shrink-0" />}
-                {issue.label}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-xs text-green-600">All compliance checks passed — great work!</p>
-        )}
+        <Link
+          href="/owner/eho"
+          className="shrink-0 inline-flex min-h-[44px] items-center gap-2 bg-hospopilot-deep text-white rounded-full px-5 py-2.5 text-sm font-semibold shadow hover:bg-hospopilot-deep/90 transition-colors"
+        >
+          <ShieldCheck className="h-4 w-4" />
+          EHO Inspection Mode
+        </Link>
       </div>
 
-      {/* Weekly Trail Overview */}
+      {/* Compliance hero */}
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-6">
+        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+          {/* Score ring */}
+          <div className="relative h-36 w-36 md:h-44 md:w-44 shrink-0">
+            <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+              <circle cx="60" cy="60" r={RING_R} fill="none" stroke="#ECE9DF" strokeWidth="10" />
+              <circle
+                cx="60" cy="60" r={RING_R} fill="none"
+                stroke={ringColour} strokeWidth="10" strokeLinecap="round"
+                strokeDasharray={RING_CIRC}
+                strokeDashoffset={RING_CIRC * (1 - complianceScore / 100)}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-4xl md:text-5xl font-display font-bold text-hospopilot-ink leading-none">
+                {complianceScore}<span className="text-xl md:text-2xl">%</span>
+              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-hospopilot-ink/40 mt-1.5">Compliance</span>
+            </div>
+          </div>
+
+          {/* Action queue */}
+          <div className="flex-1 w-full min-w-0">
+            {actionQueue.length === 0 ? (
+              <div className="flex items-center gap-3 py-4">
+                <CheckCircle2 className="h-6 w-6 text-hospopilot-mid shrink-0" />
+                <p className="text-base font-medium text-hospopilot-ink">All checks complete. You&apos;re inspection-ready.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Link
+                  href={actionQueue[0].href}
+                  className={`flex min-h-[44px] items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-white transition-colors ${
+                    actionQueue[0].severity === 'critical' && !ringIsRed
+                      ? 'bg-hospopilot-red hover:bg-hospopilot-red/90'
+                      : 'bg-hospopilot-deep hover:bg-hospopilot-deep/90'
+                  }`}
+                >
+                  {actionQueue[0].label}
+                  <ArrowRight className="h-4 w-4 shrink-0" />
+                </Link>
+                {actionQueue.length > 1 && (
+                  <ul className="divide-y divide-black/[0.04]">
+                    {actionQueue.slice(1).map((action, i) => (
+                      <li key={i}>
+                        <Link href={action.href} className="group flex min-h-[44px] items-center gap-3 py-2.5">
+                          <span className={`h-2 w-2 rounded-full shrink-0 ${action.severity === 'critical' ? 'bg-orange-500' : 'bg-amber-400'}`} />
+                          <span className="flex-1 text-sm text-hospopilot-ink">{action.label}</span>
+                          <ChevronRight className="h-4 w-4 text-hospopilot-ink/30 group-hover:text-hospopilot-ink/60 shrink-0" />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* This week's trail */}
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <History className="h-4 w-4 text-hospopilot-mid" />
             <h2 className="text-sm font-semibold text-hospopilot-ink">This week&apos;s trail</h2>
@@ -274,200 +338,130 @@ export default async function OwnerDashboard() {
             <Link href="/owner/trail-history" className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">Full history →</Link>
           </div>
         </div>
-        <div className="flex items-end gap-2">
-          {weekDays.map(day => (
-            <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5">
-              <div className="w-full relative">
-                {!day.isFuture && day.total > 0 ? (
-                  <div className="relative h-16 flex flex-col justify-end">
-                    <div className="w-full bg-gray-100 rounded-lg overflow-hidden h-full flex flex-col justify-end">
-                      <div
-                        className={`w-full rounded-lg transition-all ${day.pct === 100 ? 'bg-green-400' : (day.pct ?? 0) >= 50 ? 'bg-amber-400' : 'bg-red-400'}`}
-                        style={{ height: `${Math.max(day.pct ?? 0, 8)}%` }}
-                      />
-                    </div>
-                    <span className={`absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] font-bold whitespace-nowrap
-                      ${day.pct === 100 ? 'text-green-600' : (day.pct ?? 0) >= 50 ? 'text-amber-600' : 'text-red-500'}`}>
-                      {day.pct}%
+        <WeekStrip days={weekDays} />
+      </div>
+
+      {/* Supporting grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* Today's trail */}
+        <Link href="/owner/trail" className="block h-full">
+          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4 h-full hover:border-hospopilot-mid/30 transition-colors">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <ListChecks className="h-4 w-4 text-hospopilot-mid" />
+                <h2 className="text-sm font-semibold text-hospopilot-ink">Today&apos;s trail</h2>
+              </div>
+              {trailTotal > 0 && (
+                <span className={`text-xs font-semibold ${trailPct === 100 ? 'text-hospopilot-mid' : 'text-hospopilot-ink/50'}`}>
+                  {trailDone}/{trailTotal} complete
+                </span>
+              )}
+            </div>
+            {trailTotal > 0 && (
+              <>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
+                  <div className="h-full bg-hospopilot-mid rounded-full transition-all" style={{ width: `${trailPct}%` }} />
+                </div>
+                <div className="flex items-center gap-4 flex-wrap text-xs">
+                  {missedTasks.length > 0 && (
+                    <span className="flex items-center gap-1 text-amber-600 font-semibold">
+                      <AlertTriangle className="h-3.5 w-3.5" />
+                      {missedTasks.length} task{missedTasks.length !== 1 ? 's' : ''} overdue
                     </span>
-                  </div>
-                ) : (
-                  <div className={`h-16 w-full rounded-lg ${day.isFuture ? 'bg-gray-50 border-2 border-dashed border-gray-200' : 'bg-gray-100'}`} />
-                )}
-              </div>
-              <span className={`text-[11px] font-medium ${day.isToday ? 'text-hospopilot-mid' : 'text-hospopilot-ink/40'}`}>{day.label}</span>
-              {day.isToday && <span className="w-1 h-1 rounded-full bg-hospopilot-mid" />}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Open incidents alert */}
-      {openIncidents.length > 0 && (
-        <Link href="/owner/incidents" className="block">
-          <div className={`border rounded-2xl px-5 py-4 flex items-start gap-3 hover:opacity-90 transition-opacity ${
-            criticalIncidents.length > 0 ? 'bg-red-50 border-red-300' : 'bg-orange-50 border-orange-200'
-          }`}>
-            <AlertOctagon className={`h-5 w-5 flex-shrink-0 mt-0.5 ${criticalIncidents.length > 0 ? 'text-red-600' : 'text-orange-500'}`} />
-            <div>
-              <p className={`text-sm font-semibold ${criticalIncidents.length > 0 ? 'text-red-700' : 'text-orange-700'}`}>
-                {criticalIncidents.length > 0 ? 'Critical incident requires attention' : 'Open incidents require resolution'}
-              </p>
-              <p className={`text-sm mt-0.5 ${criticalIncidents.length > 0 ? 'text-red-600' : 'text-orange-600'}`}>
-                {openIncidents.length} open incident{openIncidents.length !== 1 ? 's' : ''} — tap to view
-              </p>
-            </div>
+                  )}
+                  {trailFlagged > 0 && (
+                    <span className="flex items-center gap-1 text-amber-600 font-medium">
+                      ⚑ {trailFlagged} flagged
+                    </span>
+                  )}
+                  {nextTask && (
+                    <span className="text-hospopilot-ink/50">
+                      Next: <span className="font-medium text-hospopilot-ink">{nextTask.title}</span>
+                      {nextTask.scheduled_time && (
+                        <span className="ml-1 text-hospopilot-ink/40">@ {nextTask.scheduled_time.slice(0, 5)}</span>
+                      )}
+                    </span>
+                  )}
+                  {trailPct === 100 && (
+                    <span className="flex items-center gap-1 text-hospopilot-mid font-semibold">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> All tasks complete
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
+            {trailTotal === 0 && (
+              <span className="inline-flex items-center gap-1 text-sm font-medium text-hospopilot-mid">
+                Start today&apos;s trail <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            )}
           </div>
         </Link>
-      )}
 
-      {/* Temperature check overdue alert */}
-      {tempAlerts.length > 0 && (
-        <Link href="/owner/temperature-logs" className="block">
-          <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-start gap-3 hover:bg-red-100 transition-colors">
-            <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-semibold text-red-700">Temperature check overdue</p>
-              <p className="text-sm text-red-600 mt-0.5">
-                {tempAlerts.join(' · ')} — tap to log now
-              </p>
-            </div>
-          </div>
-        </Link>
-      )}
-
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">{restaurant?.name}</h1>
-          <p className="text-sm text-hospopilot-ink/50 mt-0.5">Owner dashboard · Target GP: {targetGp}%</p>
-        </div>
-        <Link
-          href="/owner/eho"
-          className="flex-shrink-0 inline-flex items-center gap-2 bg-hospopilot-deep text-white rounded-xl px-4 py-2.5 text-sm font-semibold shadow hover:bg-hospopilot-deep/90 transition-colors"
-        >
-          <ShieldCheck className="h-4 w-4" />
-          EHO Inspection Mode
-        </Link>
-      </div>
-
-      {/* Today's Trail Progress */}
-      <Link href="/owner/trail" className="block">
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm px-5 py-4 hover:border-hospopilot-mid/30 transition-colors">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <ListChecks className="h-4 w-4 text-hospopilot-mid" />
-              <h2 className="text-sm font-semibold text-hospopilot-ink">Today&apos;s Trail</h2>
-            </div>
-            <span className={`text-xs font-semibold ${trailPct === 100 ? 'text-green-600' : trailPct > 0 ? 'text-hospopilot-mid' : 'text-hospopilot-ink/30'}`}>
-              {trailTotal === 0 ? 'No tasks yet' : `${trailDone}/${trailTotal} complete`}
-            </span>
-          </div>
-          {trailTotal > 0 && (
-            <>
-              <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden mb-3">
-                <div className="h-full bg-hospopilot-mid rounded-full transition-all" style={{ width: `${trailPct}%` }} />
+        {/* Delivery spend */}
+        <Link href="/owner/trail" className="block h-full">
+          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4 h-full hover:border-hospopilot-mid/30 transition-colors">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Truck className="h-4 w-4 text-hospopilot-mid" />
+                <h2 className="text-sm font-semibold text-hospopilot-ink">Today&apos;s delivery spend</h2>
               </div>
-              <div className="flex items-center gap-4 flex-wrap text-xs">
-                {missedTasks.length > 0 && (
-                  <span className="flex items-center gap-1 text-red-600 font-semibold">
-                    <AlertTriangle className="h-3.5 w-3.5" />
-                    {missedTasks.length} task{missedTasks.length !== 1 ? 's' : ''} overdue
-                  </span>
-                )}
-                {trailFlagged > 0 && (
-                  <span className="flex items-center gap-1 text-amber-600 font-medium">
-                    ⚑ {trailFlagged} flagged
-                  </span>
-                )}
-                {nextTask && (
-                  <span className="text-hospopilot-ink/50">
-                    Next: <span className="font-medium text-hospopilot-ink">{nextTask.title}</span>
-                    {nextTask.scheduled_time && (
-                      <span className="ml-1 text-hospopilot-ink/40">@ {nextTask.scheduled_time.slice(0, 5)}</span>
-                    )}
-                  </span>
-                )}
-                {trailPct === 100 && (
-                  <span className="flex items-center gap-1 text-green-600 font-semibold">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> All tasks complete
-                  </span>
-                )}
-              </div>
-            </>
-          )}
-          {trailTotal === 0 && (
-            <p className="text-xs text-hospopilot-ink/40">Trail tasks will appear here once today&apos;s trail has been loaded.</p>
-          )}
-        </div>
-      </Link>
-
-      {/* Today's delivery spend */}
-      <Link href="/owner/trail" className="block">
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm px-5 py-4 flex items-center justify-between hover:border-hospopilot-mid/30 transition-colors">
-          <div>
-            <p className="text-xs font-semibold text-hospopilot-ink/40 uppercase tracking-widest mb-1">Today&apos;s delivery spend</p>
+              <ArrowRight className="h-4 w-4 text-hospopilot-ink/20" />
+            </div>
             <p className="text-2xl font-display font-bold text-hospopilot-ink">
               {todayDeliveries.length === 0 ? '—' : `£${todaySpend.toFixed(2)}`}
             </p>
-            {todayDeliveries.length > 0 && (
+            {todayDeliveries.length > 0 ? (
               <p className="text-xs text-hospopilot-ink/40 mt-1">
                 {todayDeliveries.length} deliver{todayDeliveries.length !== 1 ? 'ies' : 'y'} · {todayDeliveries.map(d => d.supplier).filter(Boolean).join(', ')}
               </p>
-            )}
-            {todayDeliveries.length === 0 && (
-              <p className="text-xs text-hospopilot-ink/40 mt-1">No deliveries logged today</p>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-sm font-medium text-hospopilot-mid mt-1">
+                Log a delivery <ArrowRight className="h-3.5 w-3.5" />
+              </span>
             )}
           </div>
-          <div className="flex items-center gap-2 text-hospopilot-ink/20">
-            <Truck className="h-6 w-6" />
-            <ArrowRight className="h-4 w-4" />
-          </div>
-        </div>
-      </Link>
+        </Link>
 
-      {/* Staff Training — FOH + BOH side by side */}
-      {(() => {
-        function CompliancePanel({ label, quizUrl, compliance, lastAttempt, colour }: {
-          label: string; quizUrl: string
-          compliance: { name: string; expiry: Date; status: 'valid' | 'expiring' | 'expired' }[]
-          lastAttempt: { completed_at: string } | null
-          colour: 'amber' | 'blue'
-        }) {
-          const valid = compliance.filter(s => s.status === 'valid')
-          const expiring = compliance.filter(s => s.status === 'expiring')
-          const expired = compliance.filter(s => s.status === 'expired')
-          const total = compliance.length
-          const pct = total > 0 ? Math.round((valid.length / total) * 100) : 0
-          const barColour = colour === 'amber' ? 'bg-amber-500' : 'bg-blue-500'
-          const iconColour = colour === 'amber' ? 'text-amber-600' : 'text-blue-600'
-          const bgLight = colour === 'amber' ? 'bg-amber-50' : 'bg-blue-50'
-          return (
-            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Users className={`h-4 w-4 ${iconColour}`} />
-                  <h2 className="text-sm font-semibold text-hospopilot-ink">{label}</h2>
+        {/* Staff Training — FOH + BOH */}
+        {(() => {
+          function CompliancePanel({ label, short, quizUrl, compliance, lastAttempt }: {
+            label: string; short: string; quizUrl: string
+            compliance: { name: string; expiry: Date; status: 'valid' | 'expiring' | 'expired' }[]
+            lastAttempt: { completed_at: string } | null
+          }) {
+            const valid = compliance.filter(s => s.status === 'valid')
+            const expiring = compliance.filter(s => s.status === 'expiring')
+            const expired = compliance.filter(s => s.status === 'expired')
+            const total = compliance.length
+            const pct = total > 0 ? Math.round((valid.length / total) * 100) : 0
+            return (
+              <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden h-full">
+                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-hospopilot-mid" />
+                    <h2 className="text-sm font-semibold text-hospopilot-ink">{label}</h2>
+                  </div>
+                  <Link href={quizUrl} className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">View →</Link>
                 </div>
-                <Link href={quizUrl} className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">View →</Link>
-              </div>
-              {total === 0 ? (
-                <div className="px-5 py-6 text-center">
-                  <p className="text-sm text-hospopilot-ink/40">No {label.toLowerCase()} staff trained yet</p>
-                  <Link href={quizUrl} className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
-                    Share quiz link <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-              ) : (
-                <>
-                  <div className="px-5 py-4 border-b border-gray-100">
-                    <div className="flex justify-between text-xs mb-1.5">
-                      <span className="text-hospopilot-ink/50 font-medium">{valid.length} of {total} fully trained</span>
-                      <span className={`font-bold ${pct === 100 ? 'text-green-600' : pct >= 70 ? 'text-amber-600' : 'text-red-600'}`}>{pct}%</span>
-                    </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className={`h-full ${barColour} rounded-full transition-all`} style={{ width: `${pct}%` }} />
-                    </div>
+                {total === 0 ? (
+                  <div className="px-4 py-6 text-center">
+                    <p className="text-sm text-hospopilot-ink/40">No {short} staff trained yet</p>
+                    <Link href={quizUrl} className="inline-flex items-center gap-1 text-sm text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
+                      Invite {short} staff to the quiz <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                ) : (
+                  <>
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <div className="flex justify-between text-xs mb-1.5">
+                        <span className="text-hospopilot-ink/50 font-medium">{valid.length} of {total} fully trained</span>
+                        <span className="font-bold text-hospopilot-ink/60">{pct}%</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-hospopilot-mid rounded-full transition-all" style={{ width: `${pct}%` }} />
+                      </div>
                     <div className="flex gap-4 mt-3 text-xs">
                       <span className="flex items-center gap-1 text-green-600"><CheckCircle2 className="h-3.5 w-3.5" /> {valid.length} valid</span>
                       {expiring.length > 0 && <span className="flex items-center gap-1 text-amber-600"><Clock className="h-3.5 w-3.5" /> {expiring.length} expiring</span>}
@@ -514,28 +508,26 @@ export default async function OwnerDashboard() {
             </div>
           )
         }
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <CompliancePanel
-              label="FOH Training"
-              quizUrl="/owner/staff-quiz?type=front_of_house&tab=compliance"
-              compliance={fohCompliance}
-              lastAttempt={lastFohQuiz}
-              colour="amber"
-            />
-            <CompliancePanel
-              label="BOH Training"
-              quizUrl="/owner/staff-quiz?type=kitchen&tab=compliance"
-              compliance={bohCompliance}
-              lastAttempt={lastBohQuiz}
-              colour="blue"
-            />
-          </div>
-        )
-      })()}
+          return (
+            <>
+              <CompliancePanel
+                label="FOH Training"
+                short="FOH"
+                quizUrl="/owner/staff-quiz?type=front_of_house&tab=compliance"
+                compliance={fohCompliance}
+                lastAttempt={lastFohQuiz}
+              />
+              <CompliancePanel
+                label="BOH Training"
+                short="BOH"
+                quizUrl="/owner/staff-quiz?type=kitchen&tab=compliance"
+                compliance={bohCompliance}
+                lastAttempt={lastBohQuiz}
+              />
+            </>
+          )
+        })()}
 
-      {/* Kitchen audit + Live menus row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Kitchen Audit */}
         {(() => {
           const auditScore = lastAudit ? Math.round((lastAudit.score / lastAudit.total) * 100) : null
@@ -545,8 +537,8 @@ export default async function OwnerDashboard() {
           const isDueSoon = nextDue ? !isOverdue && nextDue <= new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) : false
           const statusColour = lastAudit?.status === 'green' ? 'text-green-700' : lastAudit?.status === 'amber' ? 'text-amber-600' : lastAudit?.status === 'red' ? 'text-red-600' : 'text-gray-400'
           return (
-            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4 h-full">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <ClipboardCheck className="h-4 w-4 text-hospopilot-mid" />
                   <h2 className="text-sm font-semibold text-hospopilot-ink">Kitchen Audit</h2>
@@ -556,8 +548,8 @@ export default async function OwnerDashboard() {
               {!lastAudit ? (
                 <div className="text-center py-4">
                   <p className="text-sm text-hospopilot-ink/40">No audits completed yet</p>
-                  <Link href="/chef/audit/new" className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
-                    Start first audit <ArrowRight className="h-3 w-3" />
+                  <Link href="/chef/audit/new" className="inline-flex items-center gap-1 text-sm text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
+                    Run your first audit <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               ) : (
@@ -586,43 +578,42 @@ export default async function OwnerDashboard() {
         })()}
 
         {/* Published menus */}
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden h-full">
+          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <MenuSquare className="h-4 w-4 text-green-700" />
+              <MenuSquare className="h-4 w-4 text-hospopilot-mid" />
               <h2 className="text-sm font-semibold text-hospopilot-ink">Live menus</h2>
             </div>
             <Link href="/chef/menus" className="text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium">Manage →</Link>
           </div>
           <div className="divide-y divide-gray-50">
             {allMenus.length === 0 ? (
-              <div className="px-5 py-8 text-center">
-                <GlobeLock className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+              <div className="px-4 py-6 text-center">
                 <p className="text-sm text-hospopilot-ink/40">No menus created yet</p>
-                <Link href="/chef/menus/new" className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
-                  Create first menu <ArrowRight className="h-3 w-3" />
+                <Link href="/chef/menus/new" className="inline-flex items-center gap-1 text-sm text-hospopilot-mid hover:text-hospopilot-deep mt-2 font-medium">
+                  Create your first menu <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             ) : (
               allMenus.slice(0, 5).map(menu => (
-                <div key={menu.id} className="flex items-center justify-between px-5 py-3">
+                <div key={menu.id} className="flex items-center justify-between px-4 py-3">
                   <div className="flex items-center gap-3">
                     {menu.is_published
-                      ? <Globe className="h-4 w-4 text-green-600 shrink-0" />
+                      ? <Globe className="h-4 w-4 text-hospopilot-mid shrink-0" />
                       : <GlobeLock className="h-4 w-4 text-gray-300 shrink-0" />}
                     <div>
                       <p className="text-sm font-medium text-hospopilot-ink">{menu.name}</p>
                       <p className="text-xs text-hospopilot-ink/40">{DAYPART_LABELS[menu.daypart] ?? menu.daypart}</p>
                     </div>
                   </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${menu.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${menu.is_published ? 'bg-hospopilot-fresh/15 text-hospopilot-deep' : 'bg-gray-100 text-gray-500'}`}>
                     {menu.is_published ? 'Live' : 'Draft'}
                   </span>
                 </div>
               ))
             )}
             {publishedMenus.length === 0 && allMenus.length > 0 && (
-              <div className="px-5 py-3 bg-amber-50 border-t border-amber-100">
+              <div className="px-4 py-3 bg-amber-50 border-t border-amber-100">
                 <p className="text-xs text-amber-700 flex items-center gap-1.5">
                   <AlertTriangle className="h-3.5 w-3.5" />
                   No menus are currently published to customers

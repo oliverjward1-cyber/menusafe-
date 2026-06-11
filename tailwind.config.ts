@@ -28,6 +28,7 @@ const config: Config = {
           'gold':   '#D4A017',
           'cream':  '#F8F4E3',
           'ink':    '#1C2B24',
+          'red':    '#9B3B2E',
         },
       },
       fontFamily: {

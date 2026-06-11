@@ -22,7 +22,6 @@ import {
   Thermometer,
   Sparkles,
   Truck,
-  ShieldCheck,
   AlertOctagon,
   CreditCard,
   History,
@@ -212,8 +211,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
               ]}
             />
 
-            {/* BOH Daily Trail */}
-            <NavLink href="/owner/trail" label="BOH Daily Trail" icon={ListChecks} pathname={pathname} />
+            {/* Daily Trail */}
+            <NavLink href="/owner/trail" label="Daily Trail" icon={ListChecks} pathname={pathname} />
 
             {/* Trail History — owner, manager only */}
             {isOwnerOrManager && (
@@ -244,9 +243,6 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
           </NavSection>
         )}
-
-        {/* EHO Mode — all roles, in case management isn't on site during an inspection */}
-        <NavLink href="/owner/eho" label="EHO Mode" icon={ShieldCheck} pathname={pathname} />
 
         {/* Learning Hub — all roles */}
         <NavSection label="Learning Hub">
