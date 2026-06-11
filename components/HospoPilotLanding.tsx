@@ -48,7 +48,7 @@ export default function HospoPilotLanding() {
       </header>
 
       {/* ---------- HERO ---------- */}
-      <main className="py-7 md:py-9 lg:pb-10">
+      <main className="pt-7 md:pt-9 pb-4 md:pb-6">
         <div className="mx-auto w-full max-w-[1180px] px-6">
           {/* Hero copy + email capture — centered, full width */}
           <div className="max-w-[900px] mx-auto text-center">
@@ -84,8 +84,71 @@ export default function HospoPilotLanding() {
             </div>
           </div>
 
-          {/* Pointer down to the free EHO tool */}
-          <div className="mt-6 flex justify-center">
+        </div>
+      </main>
+
+      {/* ---------- EHO COMPLIANCE FLOW ---------- */}
+      <section className="border-t border-[#E3E9EC] pt-6 pb-10 md:pt-8 md:pb-14">
+        <div className="mx-auto w-full max-w-[1080px] px-6">
+          <div className="text-center max-w-[680px] mx-auto">
+            <span className="font-['IBM_Plex_Mono'] text-[13px] font-medium tracking-[0.14em] uppercase text-[#2D6A4F]">
+              EHO compliance
+            </span>
+            <h2 className="text-[clamp(26px,4vw,38px)] leading-[1.12] tracking-[-0.02em] font-bold text-[#1B4332] mt-3 text-balance">
+              Three steps to inspection-ready
+            </h2>
+          </div>
+
+          <div className="mt-9 flex flex-col md:flex-row items-stretch gap-0 text-center">
+            {/* Step 1 */}
+            <div className="flex-1 bg-white border border-[#E3E9EC] rounded-2xl p-6 md:p-7 flex flex-col justify-center shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.20)]">
+              <p className="text-[19px] font-bold text-[#1B4332] leading-[1.25] tracking-[-0.01em]">EHO inspection due?</p>
+            </div>
+
+            {/* Arrow 1→2 */}
+            <div className="flex items-center justify-center px-2 py-3 md:py-0" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="rotate-90 md:rotate-0 text-[#2D6A4F]">
+                <path d="M6 14h16M16 8l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+
+            {/* Step 2 */}
+            <div className="flex-1 bg-white border border-[#E3E9EC] rounded-2xl p-6 md:p-7 flex flex-col justify-center shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.20)]">
+              <p className="text-[19px] font-bold text-[#1B4332] leading-[1.25] tracking-[-0.01em]">Take a photo of your menu, upload to HospoPilot.</p>
+            </div>
+
+            {/* Arrow 2→3 */}
+            <div className="flex items-center justify-center px-2 py-3 md:py-0" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="rotate-90 md:rotate-0 text-[#2D6A4F]">
+                <path d="M6 14h16M16 8l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+
+            {/* Step 3 */}
+            <div className="flex-1 bg-[#1B4332] rounded-2xl p-6 md:p-7 flex flex-col justify-center shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.20)]">
+              <p className="text-[19px] font-bold text-white leading-[1.25] tracking-[-0.01em]">Every dish, every allergen — inspection-ready.</p>
+            </div>
+          </div>
+
+          <div className="text-center mt-9">
+            <a
+              href="/signup"
+              className="inline-flex items-center justify-center gap-[9px] bg-[#1B4332] text-white font-bold text-[15px] px-7 py-[14px] rounded-lg no-underline hover:bg-[#14342A] transition-colors"
+            >
+              Start your free trial
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- EHO READINESS QUIZ ---------- */}
+      <section className="border-t border-[#E3E9EC] py-10 md:py-14">
+        <div className="mx-auto w-full max-w-[480px] px-6">
+          {/* Pointer to the free EHO tool */}
+          <div className="flex justify-center mb-6">
             <a
               href="#eho"
               className="inline-flex items-center gap-2.5 rounded-full bg-[#E7F4EC] border-[1.5px] border-[#9FD6B6] text-[#136B43] font-bold text-[14px] pl-4 pr-[18px] py-2.5 shadow-[0_3px_14px_-3px_rgba(31,138,91,0.35)] hover:bg-[#DCEEE3] hover:border-[#1F8A5B] transition-colors no-underline"
@@ -100,67 +163,8 @@ export default function HospoPilotLanding() {
               </svg>
             </a>
           </div>
-
-          {/* Interactive EHO readiness check */}
-          <div id="eho" className="mt-6 max-w-[480px] mx-auto scroll-mt-24">
+          <div id="eho" className="scroll-mt-24">
             <EhoReadinessScore />
-          </div>
-        </div>
-      </main>
-
-      {/* ---------- EHO COMPLIANCE FLOW ---------- */}
-      <section className="border-t border-[#E3E9EC] py-10 md:py-14">
-        <div className="mx-auto w-full max-w-[1080px] px-6">
-          <div className="text-center max-w-[680px] mx-auto">
-            <span className="font-['IBM_Plex_Mono'] text-[13px] font-medium tracking-[0.14em] uppercase text-[#2D6A4F]">
-              EHO compliance
-            </span>
-            <h2 className="text-[clamp(26px,4vw,38px)] leading-[1.12] tracking-[-0.02em] font-bold text-[#1B4332] mt-3 text-balance">
-              Three steps to inspection-ready
-            </h2>
-          </div>
-
-          <div className="mt-9 flex flex-col md:flex-row items-stretch gap-0">
-            {/* Step 1 */}
-            <div className="flex-1 bg-white border border-[#E3E9EC] rounded-2xl p-6 md:p-7">
-              <p className="text-[19px] font-bold text-[#1B4332] leading-[1.25] tracking-[-0.01em]">EHO inspection due?</p>
-            </div>
-
-            {/* Arrow 1→2 */}
-            <div className="flex items-center justify-center px-2 py-3 md:py-0" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="rotate-90 md:rotate-0 text-[#2D6A4F]">
-                <path d="M6 14h16M16 8l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-
-            {/* Step 2 */}
-            <div className="flex-1 bg-white border border-[#E3E9EC] rounded-2xl p-6 md:p-7">
-              <p className="text-[19px] font-bold text-[#1B4332] leading-[1.25] tracking-[-0.01em]">Photograph your menu</p>
-            </div>
-
-            {/* Arrow 2→3 */}
-            <div className="flex items-center justify-center px-2 py-3 md:py-0" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="rotate-90 md:rotate-0 text-[#2D6A4F]">
-                <path d="M6 14h16M16 8l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-
-            {/* Step 3 */}
-            <div className="flex-1 bg-[#1B4332] rounded-2xl p-6 md:p-7">
-              <p className="text-[19px] font-bold text-white leading-[1.25] tracking-[-0.01em]">Allergens sorted.</p>
-            </div>
-          </div>
-
-          <div className="text-center mt-9">
-            <a
-              href="/signup"
-              className="inline-flex items-center justify-center gap-[9px] bg-[#1B4332] text-white font-bold text-[15px] px-7 py-[14px] rounded-lg no-underline hover:bg-[#14342A] transition-colors"
-            >
-              Start your free trial
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
           </div>
         </div>
       </section>
