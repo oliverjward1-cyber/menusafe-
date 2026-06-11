@@ -29,7 +29,6 @@ import {
   ChevronRight,
   ChefHat,
   UtensilsCrossed,
-  Inbox,
 } from 'lucide-react'
 import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
@@ -166,11 +165,6 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
         {/* History — owner/manager only */}
         {isOwnerOrManager && (
           <NavLink href="/owner/history" label="History" icon={History} pathname={pathname} />
-        )}
-
-        {/* Support inbox — developer only (platform-wide Gmail support account) */}
-        {isDeveloper && (
-          <NavLink href="/owner/support" label="Support Inbox" icon={Inbox} pathname={pathname} />
         )}
 
         {/* People — owner/manager only */}
