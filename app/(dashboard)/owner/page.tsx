@@ -264,7 +264,7 @@ export default async function OwnerDashboard() {
       </div>
 
       {/* Compliance hero */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-black/[0.12] shadow-sm p-6">
         <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
           {/* Score ring */}
           <div className="relative h-36 w-36 md:h-44 md:w-44 shrink-0">
@@ -325,7 +325,7 @@ export default async function OwnerDashboard() {
       </div>
 
       {/* This week's trail */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
+      <div className="bg-white rounded-2xl border border-black/[0.12] shadow-sm p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <History className="h-4 w-4 text-hospopilot-mid" />
@@ -346,7 +346,7 @@ export default async function OwnerDashboard() {
 
         {/* Today's trail */}
         <Link href="/owner/trail" className="block h-full">
-          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4 h-full hover:border-hospopilot-mid/30 transition-colors">
+          <div className="bg-white rounded-2xl border border-black/[0.12] shadow-sm p-4 h-full hover:border-hospopilot-mid/30 transition-colors">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <ListChecks className="h-4 w-4 text-hospopilot-mid" />
@@ -401,7 +401,7 @@ export default async function OwnerDashboard() {
 
         {/* Delivery spend */}
         <Link href="/owner/trail" className="block h-full">
-          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4 h-full hover:border-hospopilot-mid/30 transition-colors">
+          <div className="bg-white rounded-2xl border border-black/[0.12] shadow-sm p-4 h-full hover:border-hospopilot-mid/30 transition-colors">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Truck className="h-4 w-4 text-hospopilot-mid" />
@@ -437,7 +437,7 @@ export default async function OwnerDashboard() {
             const total = compliance.length
             const pct = total > 0 ? Math.round((valid.length / total) * 100) : 0
             return (
-              <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden h-full">
+              <div className="bg-white rounded-2xl border border-black/[0.12] shadow-sm overflow-hidden h-full">
                 <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-hospopilot-mid" />
@@ -537,7 +537,7 @@ export default async function OwnerDashboard() {
           const isDueSoon = nextDue ? !isOverdue && nextDue <= new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) : false
           const statusColour = lastAudit?.status === 'green' ? 'text-green-700' : lastAudit?.status === 'amber' ? 'text-amber-600' : lastAudit?.status === 'red' ? 'text-red-600' : 'text-gray-400'
           return (
-            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4 h-full">
+            <div className="bg-white rounded-2xl border border-black/[0.12] shadow-sm p-4 h-full">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <ClipboardCheck className="h-4 w-4 text-hospopilot-mid" />
@@ -578,7 +578,7 @@ export default async function OwnerDashboard() {
         })()}
 
         {/* Published menus */}
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden h-full">
+        <div className="bg-white rounded-2xl border border-black/[0.12] shadow-sm overflow-hidden h-full">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MenuSquare className="h-4 w-4 text-hospopilot-mid" />

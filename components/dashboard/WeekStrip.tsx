@@ -50,7 +50,7 @@ export function WeekStrip({ days }: { days: WeekDay[] }) {
             className={`${base} shadow-sm transition-shadow hover:shadow-md active:shadow-sm ${
               complete
                 ? 'border-hospopilot-fresh/50 bg-hospopilot-fresh/10'
-                : 'border-black/[0.06] bg-white'
+                : 'border-black/[0.12] bg-white'
             } ${day.isToday ? 'ring-2 ring-hospopilot-mid ring-offset-2 ring-offset-white' : ''}`}
           >
             <span className={`text-[11px] font-semibold ${day.isToday ? 'text-hospopilot-mid' : 'text-hospopilot-ink/40'}`}>
