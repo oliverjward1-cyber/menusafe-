@@ -108,45 +108,46 @@ export default function HospoPilotLanding() {
         </div>
       </main>
 
-      {/* ---------- WHAT HOSPOPILOT DOES (pain points) ---------- */}
+      {/* ---------- EHO COMPLIANCE FLOW ---------- */}
       <section className="border-t border-[#E3E9EC] py-10 md:py-14">
         <div className="mx-auto w-full max-w-[1080px] px-6">
           <div className="text-center max-w-[680px] mx-auto">
             <span className="font-['IBM_Plex_Mono'] text-[13px] font-medium tracking-[0.14em] uppercase text-[#2D6A4F]">
-              Peace of mind
+              EHO compliance
             </span>
             <h2 className="text-[clamp(26px,4vw,38px)] leading-[1.12] tracking-[-0.02em] font-bold text-[#1B4332] mt-3 text-balance">
-              What HospoPilot will do for you
+              Three steps to inspection-ready
             </h2>
-            <p className="text-[16px] text-[#3A474E] mt-3 max-w-[48ch] mx-auto">
-              The worries that keep you up at night — handled.
-            </p>
           </div>
 
-          <div className="mt-9 grid gap-4 md:grid-cols-3">
-            {/* EHO */}
-            <div className="bg-white border border-[#E3E9EC] rounded-2xl p-6">
-              <p className="text-[20px] font-bold text-[#1B4332] leading-[1.2] tracking-[-0.01em]">Dread the unannounced EHO knock?</p>
-              <div className="flex items-start gap-2.5 mt-4">
-                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" className="flex-none mt-0.5" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#E7F4EC" /><path d="M4.5 8.2l2.2 2.2 4.8-5" stroke="#1F8A5B" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                <p className="text-[14.5px] text-[#3A474E] leading-[1.5]">Every temp, clean and check — logged, timestamped and inspection-ready. Hand them everything in seconds.</p>
-              </div>
+          <div className="mt-9 flex flex-col md:flex-row items-stretch gap-0">
+            {/* Step 1 */}
+            <div className="flex-1 bg-white border border-[#E3E9EC] rounded-2xl p-6 md:p-7">
+              <p className="text-[19px] font-bold text-[#1B4332] leading-[1.25] tracking-[-0.01em]">Want to pass your EHO inspection?</p>
             </div>
-            {/* Allergens (highlight) */}
-            <div className="bg-[#1B4332] rounded-2xl p-6">
-              <p className="text-[20px] font-bold text-white leading-[1.2] tracking-[-0.01em]">Allergens keeping you up at night?</p>
-              <div className="flex items-start gap-2.5 mt-4">
-                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" className="flex-none mt-0.5" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#2E5E47" /><path d="M4.5 8.2l2.2 2.2 4.8-5" stroke="#9FD6B6" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                <p className="text-[14.5px] text-[#DCEEE3] leading-[1.5]">A live allergen matrix on every dish — accurate to your menu, updated instantly.</p>
-              </div>
+
+            {/* Arrow 1→2 */}
+            <div className="flex items-center justify-center px-2 py-3 md:py-0" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="rotate-90 md:rotate-0 text-[#2D6A4F]">
+                <path d="M6 14h16M16 8l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </div>
-            {/* GP */}
-            <div className="bg-white border border-[#E3E9EC] rounded-2xl p-6">
-              <p className="text-[20px] font-bold text-[#1B4332] leading-[1.2] tracking-[-0.01em]">Not sure where you&apos;re losing money?</p>
-              <div className="flex items-start gap-2.5 mt-4">
-                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" className="flex-none mt-0.5" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#E7F4EC" /><path d="M4.5 8.2l2.2 2.2 4.8-5" stroke="#1F8A5B" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                <p className="text-[14.5px] text-[#3A474E] leading-[1.5]">Live GP on every plate. We&apos;ll show you exactly where.</p>
-              </div>
+
+            {/* Step 2 */}
+            <div className="flex-1 bg-white border border-[#E3E9EC] rounded-2xl p-6 md:p-7">
+              <p className="text-[19px] font-bold text-[#1B4332] leading-[1.25] tracking-[-0.01em]">Photograph your menu</p>
+            </div>
+
+            {/* Arrow 2→3 */}
+            <div className="flex items-center justify-center px-2 py-3 md:py-0" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="rotate-90 md:rotate-0 text-[#2D6A4F]">
+                <path d="M6 14h16M16 8l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+
+            {/* Step 3 */}
+            <div className="flex-1 bg-[#1B4332] rounded-2xl p-6 md:p-7">
+              <p className="text-[19px] font-bold text-white leading-[1.25] tracking-[-0.01em]">Allergens sorted.</p>
             </div>
           </div>
 
