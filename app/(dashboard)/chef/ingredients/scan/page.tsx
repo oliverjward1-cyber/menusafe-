@@ -30,22 +30,56 @@ export default function ScanInvoicePage() {
   const [done, setDone] = useState(false)
   const [allergensVerified, setAllergensVerified] = useState(false)
 
+  async function compressImage(file: File): Promise<File> {
+    if (file.type === 'application/pdf') return file
+
+    const dataUrl: string = await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => resolve(e.target?.result as string)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image()
+      el.onload = () => resolve(el)
+      el.onerror = reject
+      el.src = dataUrl
+    })
+
+    const maxDim = 1800
+    const scale = Math.min(1, maxDim / Math.max(img.width, img.height))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(img.width * scale)
+    canvas.height = Math.round(img.height * scale)
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return file
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+    const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.8))
+    if (!blob || blob.size >= file.size) return file
+
+    return new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' })
+  }
+
   async function handleFile(file: File) {
     setFileName(file.name)
     setError('')
     setItems([])
     setDone(false)
 
+    const compressed = await compressImage(file)
+
     // Show image preview
     const reader = new FileReader()
     reader.onload = (e) => setPreview(e.target?.result as string)
-    reader.readAsDataURL(file)
+    reader.readAsDataURL(compressed)
 
     // Send to API
     setScanning(true)
     try {
       const fd = new FormData()
-      fd.append('invoice', file)
+      fd.append('invoice', compressed)
       const res = await fetch('/api/invoice', { method: 'POST', body: fd })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Scan failed'); setScanning(false); return }

@@ -1,28 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { getDevContext } from '@/lib/dev/context'
 import { saveGmailTokens } from '@/lib/gmail'
 
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 
 export async function GET(req: NextRequest) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_SITE_URL))
-
-  const devCtx = await getDevContext()
-  if (!devCtx?.isDeveloper) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const cookie = req.cookies.get('admin_auth')?.value
+  const correct = process.env.ADMIN_PASSWORD
+  if (!correct || cookie !== correct) {
+    return NextResponse.redirect(new URL('/admin/login', process.env.NEXT_PUBLIC_SITE_URL))
+  }
 
   const code = req.nextUrl.searchParams.get('code')
   const error = req.nextUrl.searchParams.get('error')
-  const redirectUrl = new URL('/owner/support', process.env.NEXT_PUBLIC_SITE_URL)
+  const redirectUrl = new URL('/admin', process.env.NEXT_PUBLIC_SITE_URL)
 
   if (error || !code) {
     redirectUrl.searchParams.set('error', error ?? 'missing_code')
     return NextResponse.redirect(redirectUrl)
   }
 
-  const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/gmail/callback`
+  const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL}/api/admin/gmail/callback`
 
   const tokenRes = await fetch(GOOGLE_TOKEN_URL, {
     method: 'POST',

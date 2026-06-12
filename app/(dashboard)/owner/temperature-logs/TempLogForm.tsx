@@ -11,11 +11,13 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
   const [recordedBy, setRecordedBy] = useState(staffName.split('@')[0] ?? '')
   const [notes, setNotes] = useState('')
   const [correctiveAction, setCorrectiveAction] = useState('')
+  const [error, setError] = useState('')
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!temperature || !item) return
     setSaving(true)
+    setError('')
     const res = await fetch('/api/compliance/temperature', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -36,11 +38,17 @@ export default function TempLogForm({ restaurantId, staffName }: { restaurantId:
       setNotes('')
       setCorrectiveAction('')
       router.refresh()
+    } else {
+      const data = await res.json().catch(() => null)
+      setError(data?.error ?? 'Failed to save — please try again.')
     }
   }
 
   return (
     <form onSubmit={submit} className="space-y-4">
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{error}</p>
+      )}
       {/* Check type toggle */}
       <div className="flex gap-2">
         <button

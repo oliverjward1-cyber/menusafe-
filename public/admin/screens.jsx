@@ -490,9 +490,153 @@ function SecurityScreen(props) {
   );
 }
 
+/* ============ SUPPORT ============ */
+function SupportScreen(props) {
+  var A = props.actions;
+  var _state = React.useState({ loading: true, connected: false, threads: [], email: null, error: null });
+  var state = _state[0], setState = _state[1];
+  var _sel = React.useState(null), selectedId = _sel[0], setSelectedId = _sel[1];
+  var _thread = React.useState({ loading: false, data: null });
+  var thread = _thread[0], setThread = _thread[1];
+  var _reply = React.useState(""), reply = _reply[0], setReply = _reply[1];
+  var _sending = React.useState(false), sending = _sending[0], setSending = _sending[1];
+
+  function loadThreads() {
+    setState(function (s) { return Object.assign({}, s, { loading: true, error: null }); });
+    fetch("/api/admin/support/threads")
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        setState({ loading: false, connected: !!data.connected, threads: data.threads || [], email: data.email || null, error: data.error || null });
+      })
+      .catch(function (err) {
+        setState({ loading: false, connected: false, threads: [], email: null, error: err.message });
+      });
+  }
+
+  React.useEffect(function () { loadThreads(); }, []);
+
+  React.useEffect(function () {
+    if (!selectedId) { setThread({ loading: false, data: null }); return; }
+    setThread({ loading: true, data: null });
+    fetch("/api/admin/support/threads/" + selectedId)
+      .then(function (r) { return r.json(); })
+      .then(function (data) { setThread({ loading: false, data: data }); })
+      .catch(function (err) { setThread({ loading: false, data: { error: err.message } }); });
+  }, [selectedId]);
+
+  function sendReply() {
+    if (!reply.trim() || !thread.data || !thread.data.messages) return;
+    var msgs = thread.data.messages;
+    var last = msgs[msgs.length - 1];
+    setSending(true);
+    fetch("/api/admin/support/reply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ threadId: selectedId, to: last.from, subject: last.subject, body: reply }),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        setSending(false);
+        if (data.error) { A.toast(data.error); return; }
+        A.toast("Reply sent");
+        setReply("");
+        setSelectedId(null);
+        loadThreads();
+      })
+      .catch(function (err) { setSending(false); A.toast(err.message); });
+  }
+
+  if (state.loading) {
+    return <div className="card table-card"><div className="empty"><Icon name="inbox" size={32} /><p>Loading inbox…</p></div></div>;
+  }
+
+  if (!state.connected) {
+    return (
+      <div className="card table-card">
+        <div className="empty">
+          <Icon name="inbox" size={32} />
+          <p>Gmail isn't connected yet.</p>
+          <a className="btn btn-primary btn-sm" href="/api/admin/gmail/connect">Connect Gmail</a>
+        </div>
+      </div>
+    );
+  }
+
+  if (selectedId) {
+    return (
+      <div className="card table-card">
+        <div className="table-tools">
+          <button className="btn btn-ghost btn-sm" onClick={function () { setSelectedId(null); }}>&larr; Back to inbox</button>
+        </div>
+        {thread.loading ? (
+          <div className="empty"><p>Loading conversation…</p></div>
+        ) : thread.data && thread.data.error ? (
+          <div className="empty"><p>{thread.data.error}</p></div>
+        ) : (
+          <div style={{ padding: "0 20px 20px" }}>
+            {(thread.data.messages || []).map(function (m, i) {
+              return (
+                <div key={i} style={{ borderBottom: "1px solid var(--border, #eee)", padding: "14px 0" }}>
+                  <div className="cell-strong">{m.from}</div>
+                  <div className="cell-sub">{m.subject} · {fmtDate(m.date)}</div>
+                  <div style={{ marginTop: 8, whiteSpace: "pre-wrap" }}>{m.body}</div>
+                </div>
+              );
+            })}
+            <div style={{ marginTop: 16 }}>
+              <textarea
+                className="input"
+                style={{ width: "100%", minHeight: 100, resize: "vertical" }}
+                placeholder="Write a reply…"
+                value={reply}
+                onChange={function (e) { setReply(e.target.value); }}
+              />
+              <button className="btn btn-primary btn-sm" style={{ marginTop: 8 }} disabled={sending || !reply.trim()} onClick={sendReply}>
+                {sending ? "Sending…" : "Send reply"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="card table-card">
+      <div className="table-tools">
+        <span className="spacer"></span>
+        {state.email ? <span className="cell-sub">Connected as {state.email}</span> : null}
+        <button className="btn btn-ghost btn-sm" onClick={loadThreads}><Icon name="refund" size={15} /> Refresh</button>
+      </div>
+      {state.threads.length === 0 ? (
+        <div className="empty"><Icon name="inbox" size={32} /><p>No support emails yet.</p></div>
+      ) : (
+        <div className="table-scroll">
+          <table className="tbl">
+            <thead><tr><th>From</th><th>Subject</th><th>Snippet</th><th>Date</th></tr></thead>
+            <tbody>
+              {state.threads.map(function (t) {
+                return (
+                  <tr key={t.id} onClick={function () { setSelectedId(t.id); }} style={{ cursor: "pointer" }}>
+                    <td><div className="cell-strong">{t.from}</div></td>
+                    <td>{t.subject}</td>
+                    <td className="cell-sub">{t.snippet}</td>
+                    <td>{fmtShort(t.date)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <div className="tbl-foot"><span>{state.threads.length} conversations</span></div>
+    </div>
+  );
+}
+
 Object.assign(window, {
   computeMetrics: computeMetrics, PLAN_COLORS: PLAN_COLORS,
   OverviewScreen: OverviewScreen, CustomersScreen: CustomersScreen,
   SubsScreen: SubsScreen, BillingScreen: BillingScreen, WaitlistScreen: WaitlistScreen,
-  SecurityScreen: SecurityScreen
+  SecurityScreen: SecurityScreen, SupportScreen: SupportScreen
 });

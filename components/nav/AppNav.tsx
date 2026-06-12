@@ -22,7 +22,6 @@ import {
   Thermometer,
   Sparkles,
   Truck,
-  ShieldCheck,
   AlertOctagon,
   CreditCard,
   History,
@@ -30,7 +29,7 @@ import {
   ChevronRight,
   ChefHat,
   UtensilsCrossed,
-  Inbox,
+  Camera,
 } from 'lucide-react'
 import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
@@ -169,11 +168,6 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
           <NavLink href="/owner/history" label="History" icon={History} pathname={pathname} />
         )}
 
-        {/* Support inbox — developer only (platform-wide Gmail support account) */}
-        {isDeveloper && (
-          <NavLink href="/owner/support" label="Support Inbox" icon={Inbox} pathname={pathname} />
-        )}
-
         {/* People — owner/manager only */}
         {isOwnerOrManager && (
           <NavSection label="People">
@@ -185,6 +179,9 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
         {/* Kitchen */}
         {(isOwnerOrManager || isHeadChef || role === 'chef') && (
           <NavSection label="Kitchen">
+
+            {/* Scan Invoice — quick access for all kitchen roles */}
+            <NavLink href="/chef/ingredients/scan" label="Scan Invoice" icon={Camera} pathname={pathname} />
 
             {/* Menus — owner, manager, head chef (build), kitchen chef (view & print) */}
             <CollapsibleNavSection
@@ -212,8 +209,8 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
               ]}
             />
 
-            {/* BOH Daily Trail */}
-            <NavLink href="/owner/trail" label="BOH Daily Trail" icon={ListChecks} pathname={pathname} />
+            {/* Daily Trail */}
+            <NavLink href="/owner/trail" label="Daily Trail" icon={ListChecks} pathname={pathname} />
 
             {/* Trail History — owner, manager only */}
             {isOwnerOrManager && (
@@ -244,9 +241,6 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
             <NavLink href="/owner/incidents" label="Incidents" icon={AlertOctagon} pathname={pathname} />
           </NavSection>
         )}
-
-        {/* EHO Mode — all roles, in case management isn't on site during an inspection */}
-        <NavLink href="/owner/eho" label="EHO Mode" icon={ShieldCheck} pathname={pathname} />
 
         {/* Learning Hub — all roles */}
         <NavSection label="Learning Hub">

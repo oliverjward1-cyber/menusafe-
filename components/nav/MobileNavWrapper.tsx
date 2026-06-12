@@ -70,7 +70,15 @@ export function MobileNavWrapper({ nav, children, extra }: Props) {
       {/* Page body — desktop: sidebar + main side by side */}
       <div className="flex flex-row flex-1">
         <div className="hidden md:block">{nav}</div>
-        <main className="flex-1 min-w-0">
+        <main
+          className="flex-1 min-w-0"
+          style={{
+            backgroundColor: '#F8FAFB',
+            backgroundImage:
+              'radial-gradient(#E2E8EC 1px, transparent 1px), linear-gradient(to right, #ECF0F2 1px, transparent 1px), linear-gradient(to bottom, #ECF0F2 1px, transparent 1px)',
+            backgroundSize: '22px 22px, 88px 88px, 88px 88px',
+          }}
+        >
           <div className="p-4 md:p-6 max-w-5xl mx-auto">{children}</div>
         </main>
       </div>
