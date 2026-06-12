@@ -56,7 +56,7 @@ export default function ScanInvoicePage() {
     if (!ctx) return file
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
 
-    const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.8))
+    const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92))
     if (!blob || blob.size >= file.size) return file
 
     return new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' })
@@ -327,7 +327,18 @@ export default function ScanInvoicePage() {
                             onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
                             className="w-20 rounded-lg border border-transparent hover:border-gray-200 focus:border-green-400 px-2 py-1 text-sm focus:outline-none bg-transparent focus:bg-white"
                           />
+                          {!item.priceVerified && (
+                            <span
+                              title="Couldn't confirm this from the invoice total — please check it against the invoice"
+                              className="inline-flex items-center justify-center h-4 w-4 rounded-full bg-amber-100 text-amber-600 shrink-0"
+                            >
+                              <AlertTriangle className="h-2.5 w-2.5" />
+                            </span>
+                          )}
                         </div>
+                        {item.priceVerified && item.totalPrice ? (
+                          <p className="text-[11px] text-gray-400 mt-0.5">£{item.totalPrice.toFixed(2)} ÷ {item.quantity} {item.unitType}</p>
+                        ) : null}
                       </td>
                       <td className="px-4 py-3">
                         <select value={item.unitType}

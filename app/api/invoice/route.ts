@@ -12,6 +12,7 @@ export interface InvoiceItem {
   unitType: 'kg' | 'g' | 'litre' | 'ml' | 'each'
   quantity: number
   totalPrice?: number
+  priceVerified?: boolean
   kcalPer100g?: number | null
   allergenCerealsGluten?: boolean
   allergenCrustaceans?: boolean
@@ -29,48 +30,114 @@ export interface InvoiceItem {
   allergenMolluscs?: boolean
 }
 
+const ALLERGEN_FIELD_MAP: Record<string, keyof InvoiceItem> = {
+  cereals_gluten: 'allergenCerealsGluten',
+  crustaceans: 'allergenCrustaceans',
+  eggs: 'allergenEggs',
+  fish: 'allergenFish',
+  peanuts: 'allergenPeanuts',
+  nuts: 'allergenNuts',
+  soya: 'allergenSoya',
+  milk: 'allergenMilk',
+  celery: 'allergenCelery',
+  mustard: 'allergenMustard',
+  sesame: 'allergenSesame',
+  sulphites: 'allergenSulphites',
+  lupin: 'allergenLupin',
+  molluscs: 'allergenMolluscs',
+}
+
+const UNIT_TYPES = new Set(['kg', 'g', 'litre', 'ml', 'each'])
+
 const PROMPT = `You are helping a UK restaurant chef digitise their supplier delivery invoice.
 
 Carefully read the invoice image and extract every ingredient or food product line item.
 
-For each item return:
-- name: clean readable ingredient name (e.g. "Chicken Breast", "Cheddar Cheese", "Double Cream")
-- unitPrice: the price PER UNIT in GBP as a number (e.g. if it says £15.00 for 2kg, the unitPrice is 7.50 per kg)
-- unitType: one of exactly: kg, g, litre, ml, each
-- quantity: how many units were ordered
-- totalPrice: the line total in GBP if shown
-- kcalPer100g: estimated kilocalories per 100g based on your knowledge of this ingredient (integer or null if unknown)
-- allergenCerealsGluten: true if contains wheat/rye/barley/oats/spelt etc, else false
-- allergenCrustaceans: true if contains prawns/crab/lobster/crayfish etc, else false
-- allergenEggs: true if contains eggs, else false
-- allergenFish: true if contains fish, else false
-- allergenPeanuts: true if contains peanuts, else false
-- allergenNuts: true if contains tree nuts (almonds/walnuts/cashews/pistachios etc), else false
-- allergenSoya: true if contains soya/soy, else false
-- allergenMilk: true if contains milk/dairy/cream/butter/cheese/lactose, else false
-- allergenCelery: true if contains celery or celeriac, else false
-- allergenMustard: true if contains mustard, else false
-- allergenSesame: true if contains sesame seeds or sesame oil, else false
-- allergenSulphites: true if contains sulphur dioxide or sulphites (>10ppm), else false
-- allergenLupin: true if contains lupin flour or seeds, else false
-- allergenMolluscs: true if contains mussels/oysters/squid/octopus/snails etc, else false
+ACCURACY ON NUMBERS IS CRITICAL — these prices are used for food costing and profit margins. For every line, read the QUANTITY and LINE TOTAL exactly as printed, digit by digit. Do not estimate or do mental maths — transcribe what is printed.
 
-Rules:
-- Convert all prices to per-unit (per kg, per litre, per each etc)
-- If an item is sold by the case or box, set unitType to "each" and unitPrice to price per item
-- Ignore delivery charges, VAT summaries, totals, and non-food items
-- Clean up supplier shortcodes (e.g. "CHKN BRST" → "Chicken Breast", "DBL CRM" → "Double Cream")
-- Use title case for names
-- Always include all allergen fields (true or false) and kcalPer100g for every item
+For each item return:
+- name: clean readable ingredient name (e.g. "Chicken Breast", "Cheddar Cheese", "Double Cream"). Clean up supplier shortcodes (e.g. "CHKN BRST" → "Chicken Breast", "DBL CRM" → "Double Cream"). Use title case.
+- quantity: the order quantity exactly as printed in the Qty/Quantity/Ord column — a plain number (e.g. 5, 2, 0.5)
+- unitType: one of exactly: kg, g, litre, ml, each
+- totalPrice: the LINE TOTAL in GBP exactly as printed for this row — usually the rightmost money column, labelled "Total", "Net", "Amount" or "Value". Read every digit and decimal point carefully.
+- unitPrice: price per unit in GBP (totalPrice ÷ quantity) — only used as a fallback if quantity or totalPrice can't be read
+- kcalPer100g: estimated kilocalories per 100g based on your knowledge of this ingredient (integer, or null if unknown)
+- allergens: array of zero or more of these exact strings for allergens present in this ingredient: "cereals_gluten", "crustaceans", "eggs", "fish", "peanuts", "nuts", "soya", "milk", "celery", "mustard", "sesame", "sulphites", "lupin", "molluscs". Empty array [] if none apply.
+
+How to set quantity / unitType / totalPrice:
+- If sold in packs, cases or boxes (e.g. "Ketchup 2x 5L", "Eggs 6x15"), set unitType to "each", quantity to the NUMBER OF PACKS/CASES ordered, and totalPrice to the line total. (unitPrice becomes price-per-case, which is what matters for costing.)
+- If sold loose by weight or volume (e.g. "Onions 10kg"), set unitType to kg/g/litre/ml and quantity to the total weight/volume ordered.
+- Sanity check: for food ingredients, totalPrice ÷ quantity is almost always between £0.05 and £100. If your figures fall way outside that, re-check for a misread decimal point (e.g. £1.50 vs £15.00) or a misread quantity before finalising.
+- Ignore delivery charges, VAT summary lines, grand totals, discounts and non-food items.
 
 Return ONLY a valid JSON array with no other text, markdown or explanation.
-Example format:
+Example:
 [
-  {"name": "Chicken Breast", "unitPrice": 7.50, "unitType": "kg", "quantity": 5, "totalPrice": 37.50, "kcalPer100g": 165, "allergenCerealsGluten": false, "allergenCrustaceans": false, "allergenEggs": false, "allergenFish": false, "allergenPeanuts": false, "allergenNuts": false, "allergenSoya": false, "allergenMilk": false, "allergenCelery": false, "allergenMustard": false, "allergenSesame": false, "allergenSulphites": false, "allergenLupin": false, "allergenMolluscs": false},
-  {"name": "Cheddar Cheese", "unitPrice": 8.00, "unitType": "kg", "quantity": 2, "totalPrice": 16.00, "kcalPer100g": 402, "allergenCerealsGluten": false, "allergenCrustaceans": false, "allergenEggs": false, "allergenFish": false, "allergenPeanuts": false, "allergenNuts": false, "allergenSoya": false, "allergenMilk": true, "allergenCelery": false, "allergenMustard": false, "allergenSesame": false, "allergenSulphites": false, "allergenLupin": false, "allergenMolluscs": false}
+  {"name": "Chicken Breast", "quantity": 5, "unitType": "kg", "totalPrice": 37.50, "unitPrice": 7.50, "kcalPer100g": 165, "allergens": []},
+  {"name": "Cheddar Cheese", "quantity": 2, "unitType": "kg", "totalPrice": 16.00, "unitPrice": 8.00, "kcalPer100g": 402, "allergens": ["milk"]},
+  {"name": "Tomato Ketchup", "quantity": 2, "unitType": "each", "totalPrice": 9.00, "unitPrice": 4.50, "kcalPer100g": 100, "allergens": []}
 ]
 
 If you cannot read the invoice or find no items, return an empty array: []`
+
+// Recover individual item objects even if the response array got cut off mid-stream
+function parseItems(raw: string): unknown[] {
+  const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+  try {
+    const parsed = JSON.parse(cleaned)
+    if (Array.isArray(parsed)) return parsed
+  } catch {
+    // fall through to lenient recovery
+  }
+  const matches = cleaned.match(/\{[^{}]*\}/g)
+  if (!matches) return []
+  const recovered: unknown[] = []
+  for (const m of matches) {
+    try { recovered.push(JSON.parse(m)) } catch { /* skip malformed fragment */ }
+  }
+  return recovered
+}
+
+function normaliseItem(raw: any): InvoiceItem | null {
+  if (!raw || typeof raw.name !== 'string' || !raw.name.trim()) return null
+
+  const unitType = UNIT_TYPES.has(raw.unitType) ? raw.unitType : 'each'
+  const quantity = Number(raw.quantity)
+  const totalPrice = Number(raw.totalPrice)
+  const modelUnitPrice = Number(raw.unitPrice)
+
+  let unitPrice = Number.isFinite(modelUnitPrice) ? modelUnitPrice : 0
+  let priceVerified = false
+
+  // Prefer code-computed division (totalPrice ÷ quantity) over the model's
+  // own arithmetic — this is the single biggest source of wrong prices.
+  if (Number.isFinite(totalPrice) && totalPrice > 0 && Number.isFinite(quantity) && quantity > 0) {
+    unitPrice = Math.round((totalPrice / quantity) * 10000) / 10000
+    priceVerified = true
+  }
+
+  const item: InvoiceItem = {
+    name: raw.name.trim(),
+    quantity: Number.isFinite(quantity) ? quantity : 0,
+    unitType,
+    totalPrice: Number.isFinite(totalPrice) ? totalPrice : undefined,
+    unitPrice,
+    priceVerified,
+    kcalPer100g: typeof raw.kcalPer100g === 'number' ? raw.kcalPer100g : null,
+  }
+
+  for (const field of Object.values(ALLERGEN_FIELD_MAP)) {
+    ;(item as any)[field] = false
+  }
+  if (Array.isArray(raw.allergens)) {
+    for (const a of raw.allergens) {
+      const field = ALLERGEN_FIELD_MAP[a]
+      if (field) (item as any)[field] = true
+    }
+  }
+
+  return item
+}
 
 export async function POST(req: NextRequest) {
   const { createClient } = await import('@/lib/supabase/server')
@@ -107,7 +174,7 @@ export async function POST(req: NextRequest) {
 
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [
         {
           role: 'user',
@@ -127,17 +194,15 @@ export async function POST(req: NextRequest) {
 
     const responseText = message.content[0].type === 'text' ? message.content[0].text : ''
 
-    let items: InvoiceItem[] = []
-    try {
-      const cleaned = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      items = JSON.parse(cleaned)
-      if (!Array.isArray(items)) items = []
-    } catch {
+    const rawItems = parseItems(responseText)
+    if (rawItems.length === 0 && responseText.trim() !== '[]') {
       return NextResponse.json(
         { error: 'Could not read invoice. Please try a clearer photo.' },
         { status: 422 }
       )
     }
+
+    const items = rawItems.map(normaliseItem).filter((i): i is InvoiceItem => i !== null)
 
     await logAiUsage({ endpoint: 'invoice', restaurantId: null, model: 'claude-haiku-4-5-20251001', inputTokens: message.usage.input_tokens, outputTokens: message.usage.output_tokens })
     return NextResponse.json({ items })
