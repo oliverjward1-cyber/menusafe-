@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       acquisition_campaign: utmCampaign || null,
       referred_by: referralCode || null,
       referral_code: require('crypto').randomBytes(4).toString('hex').toUpperCase(),
+      plan: 'multi',
     })
     .select('id, slug')
     .single()

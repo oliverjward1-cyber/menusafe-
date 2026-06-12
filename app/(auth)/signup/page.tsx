@@ -71,6 +71,7 @@ export default function SignupPage() {
             acquisition_campaign: utmCampaign || null,
             referred_by: referralCode || null,
             referral_code: Math.random().toString(36).slice(2, 10).toUpperCase(),
+            plan: 'multi',
           })
           .select('id')
           .single()
