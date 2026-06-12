@@ -81,12 +81,13 @@ export default function SignupPage() {
 
         restaurantId = restaurant.id
       } else {
-        // Join existing restaurant by code (slug)
+        // Join existing restaurant by code (slug) or name
+        const code = restaurantCode.toLowerCase().trim()
         const { data: restaurant, error: restaurantError } = await supabase
           .from('restaurants')
           .select('id')
-          .eq('slug', restaurantCode.toLowerCase().trim())
-          .single()
+          .or(`slug.eq.${code},name.ilike.${code}`)
+          .maybeSingle()
 
         if (restaurantError || !restaurant) {
           throw new Error('Restaurant code not found. Please check with your owner.')
