@@ -29,6 +29,7 @@ import {
   ChevronRight,
   ChefHat,
   UtensilsCrossed,
+  Camera,
 } from 'lucide-react'
 import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
@@ -178,6 +179,9 @@ function AppNavInner({ restaurantName, restaurantSlug, role: dbRole, isDeveloper
         {/* Kitchen */}
         {(isOwnerOrManager || isHeadChef || role === 'chef') && (
           <NavSection label="Kitchen">
+
+            {/* Scan Invoice — quick access for all kitchen roles */}
+            <NavLink href="/chef/ingredients/scan" label="Scan Invoice" icon={Camera} pathname={pathname} />
 
             {/* Menus — owner, manager, head chef (build), kitchen chef (view & print) */}
             <CollapsibleNavSection
