@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { HospoPilotLogo } from '@/components/HospoPilotLogo'
 
@@ -11,6 +12,7 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [ready, setReady] = useState(false)
+  const [linkError, setLinkError] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -25,7 +27,17 @@ export default function ResetPasswordPage() {
       if (session) setReady(true)
     })
 
-    return () => subscription.unsubscribe()
+    // If nothing established a session after a few seconds, the link is invalid/expired
+    const timeout = setTimeout(() => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) setLinkError(true)
+      })
+    }, 4000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
   }, [])
 
   async function handleReset(e: React.FormEvent) {
@@ -57,7 +69,26 @@ export default function ResetPasswordPage() {
           <HospoPilotLogo className="scale-110" />
         </div>
         <div className="bg-white rounded-2xl border border-[#E3E9EC] shadow-[0_2px_5px_rgba(20,40,30,0.05),0_12px_30px_-12px_rgba(20,40,30,0.18)] p-8">
-          {!ready ? (
+          {linkError ? (
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-[#1B4332] mb-2">Link expired</h2>
+              <p className="text-[#677077] text-sm mb-6">
+                This password reset link is invalid or has expired. Please request a new one.
+              </p>
+              <Link
+                href="/forgot-password"
+                className="block w-full py-2.5 bg-hospopilot-mid hover:bg-hospopilot-deep text-white font-semibold rounded-lg transition-colors text-center"
+              >
+                Request new link
+              </Link>
+              <Link
+                href="/login"
+                className="mt-4 block text-center text-sm text-[#677077] hover:text-[#1B4332]"
+              >
+                Back to login
+              </Link>
+            </div>
+          ) : !ready ? (
             <p className="text-[#677077] text-sm text-center">Loading…</p>
           ) : (
             <>
@@ -101,6 +132,12 @@ export default function ResetPasswordPage() {
                   {loading ? 'Saving…' : 'Set new password'}
                 </button>
               </form>
+              <Link
+                href="/login"
+                className="mt-4 block text-center text-sm text-[#677077] hover:text-[#1B4332]"
+              >
+                Back to login
+              </Link>
             </>
           )}
         </div>
