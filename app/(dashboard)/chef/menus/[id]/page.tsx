@@ -17,7 +17,7 @@ export default async function MenuEditPage({ params }: Props) {
 
   const { data: menu } = await supabase
     .from('menus')
-    .select('id, name, description, daypart, is_published')
+    .select('id, name, description, daypart, is_published, service_start, service_end')
     .eq('id', params.id)
     .single()
 
@@ -40,7 +40,7 @@ export default async function MenuEditPage({ params }: Props) {
   // Recipes already in this menu, ordered by position
   const { data: menuRecipes } = await supabase
     .from('menu_recipes')
-    .select('recipe_id, position')
+    .select('recipe_id, position, display_category')
     .eq('menu_id', params.id)
     .order('position', { ascending: true })
 
@@ -53,6 +53,11 @@ export default async function MenuEditPage({ params }: Props) {
     : null
 
   const selectedIds = (menuRecipes ?? []).map(r => r.recipe_id)
+  const initialCategoryOverrides = Object.fromEntries(
+    (menuRecipes ?? [])
+      .filter(r => r.display_category)
+      .map(r => [r.recipe_id, r.display_category as string])
+  )
 
   return (
     <div className="space-y-5 max-w-4xl">
@@ -61,7 +66,7 @@ export default async function MenuEditPage({ params }: Props) {
           <Link href="/chef/menus" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
             <ChevronLeft className="h-4 w-4" /> Back
           </Link>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">{menu.name}</h1>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">{menu.name}</h1>
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -90,9 +95,12 @@ export default async function MenuEditPage({ params }: Props) {
         menuName={menu.name}
         menuDescription={menu.description}
         menuDaypart={menu.daypart}
+        menuServiceStart={menu.service_start ?? null}
+        menuServiceEnd={menu.service_end ?? null}
         isPublished={menu.is_published}
         allRecipes={(allRecipes ?? []) as any}
         initialSelectedIds={selectedIds}
+        initialCategoryOverrides={initialCategoryOverrides}
         menuUrl={menuUrl}
       />
     </div>

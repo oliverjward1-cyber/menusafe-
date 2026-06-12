@@ -2,9 +2,10 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
-import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye } from 'lucide-react'
+import { Plus, BookOpen, Globe, GlobeLock, Pencil, QrCode, Eye, Clock, ExternalLink, Printer } from 'lucide-react'
 import { PublishToggle } from './PublishToggle'
 import { DuplicateMenuButton } from './DuplicateMenuButton'
+import { DeleteMenuButton } from './DeleteMenuButton'
 
 const DAYPART_LABELS: Record<string, string> = {
   'all-day': 'All day',
@@ -19,10 +20,11 @@ export default async function MenusPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: profile } = user
-    ? await supabase.from('profiles').select('restaurant_id').eq('id', user.id).single()
+    ? await supabase.from('profiles').select('restaurant_id, role').eq('id', user.id).single()
     : { data: null }
 
   const rid = profile?.restaurant_id ?? cookies().get('msafe_rid')?.value
+  const canEdit = ['owner', 'manager', 'head_chef'].includes(profile?.role ?? '')
 
   const { data: restaurant } = rid
     ? await supabase.from('restaurants').select('slug').eq('id', rid).single()
@@ -31,7 +33,7 @@ export default async function MenusPage() {
   const { data: menus } = rid
     ? await supabase
         .from('menus')
-        .select('id, name, description, daypart, is_published, created_at, menu_recipes(count)')
+        .select('id, name, description, daypart, is_published, service_start, service_end, created_at, menu_recipes(count)')
         .eq('restaurant_id', rid)
         .order('created_at', { ascending: false })
     : { data: [] }
@@ -42,15 +44,17 @@ export default async function MenusPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-semibold text-mise-ink">Menus</h1>
-          <p className="text-mise-ink/50 mt-1">{menus?.length ?? 0} menu{menus?.length !== 1 ? 's' : ''}</p>
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Menus</h1>
+          <p className="text-hospopilot-ink/50 mt-1">{menus?.length ?? 0} menu{menus?.length !== 1 ? 's' : ''}</p>
         </div>
-        <Link
-          href="/chef/menus/new"
-          className="inline-flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
-        >
-          <Plus className="h-4 w-4" /> Create menu
-        </Link>
+        {canEdit && (
+          <Link
+            href="/chef/menus/new"
+            className="inline-flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" /> Create menu
+          </Link>
+        )}
       </div>
 
       {menuUrl && (
@@ -61,12 +65,22 @@ export default async function MenusPage() {
               <p className="text-sm font-mono text-green-800 break-all">{menuUrl}</p>
               <p className="text-xs text-gray-400 mt-1">Share this link or display the QR code on your tables. Customers see all published menus.</p>
             </div>
-            <Link
-              href={`/chef/menus/qr`}
-              className="shrink-0 inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-            >
-              <QrCode className="h-4 w-4" /> QR code
-            </Link>
+            <div className="flex items-center gap-2 shrink-0">
+              <a
+                href={menuUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-hospopilot-mid text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-hospopilot-deep transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" /> Preview live menu
+              </a>
+              <Link
+                href={`/chef/menus/qr`}
+                className="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                <QrCode className="h-4 w-4" /> QR code
+              </Link>
+            </div>
           </div>
         </Card>
       )}
@@ -75,7 +89,7 @@ export default async function MenusPage() {
         <Card>
           <div className="text-center py-10">
             <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-200" />
-            <h2 className="text-base font-semibold text-mise-ink mb-1">No menus yet</h2>
+            <h2 className="text-base font-semibold text-hospopilot-ink mb-1">No menus yet</h2>
             <p className="text-sm text-gray-500 mb-4">
               Create a menu, add your recipes, then publish it for customers to view.
             </p>
@@ -97,7 +111,7 @@ export default async function MenusPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="text-base font-semibold text-mise-ink">{menu.name}</h2>
+                        <h2 className="text-base font-semibold text-hospopilot-ink">{menu.name}</h2>
                         <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
                           {DAYPART_LABELS[menu.daypart] ?? menu.daypart}
                         </span>
@@ -106,22 +120,32 @@ export default async function MenusPage() {
                             <Globe className="h-3 w-3" /> Published
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 text-mise-ink/50">
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 text-hospopilot-ink/50">
                             <GlobeLock className="h-3 w-3" /> Draft
                           </span>
                         )}
                       </div>
                       {menu.description && (
-                        <p className="text-sm text-mise-ink/50 mt-0.5">{menu.description}</p>
+                        <p className="text-sm text-hospopilot-ink/50 mt-0.5">{menu.description}</p>
                       )}
-                      <p className="text-xs text-gray-400 mt-1">{count} dish{count !== 1 ? 'es' : ''}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <p className="text-xs text-gray-400">{count} dish{count !== 1 ? 'es' : ''}</p>
+                        {(menu.service_start || menu.service_end) && (
+                          <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                            <Clock className="h-3 w-3" />
+                            {menu.service_start ?? '—'} – {menu.service_end ?? '—'}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <Link
-                      href={`/chef/menus/${menu.id}`}
-                      className="shrink-0 inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      <Pencil className="h-3.5 w-3.5" /> Edit
-                    </Link>
+                    {canEdit && (
+                      <Link
+                        href={`/chef/menus/${menu.id}`}
+                        className="shrink-0 inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        <Pencil className="h-3.5 w-3.5" /> Edit
+                      </Link>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Link
@@ -130,8 +154,17 @@ export default async function MenusPage() {
                     >
                       <Eye className="h-3.5 w-3.5" /> Preview
                     </Link>
-                    <DuplicateMenuButton menuId={menu.id} />
-                    <PublishToggle menuId={menu.id} isPublished={menu.is_published} />
+                    <Link
+                      href={`/chef/menus/${menu.id}/preview`}
+                      className="inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      <Printer className="h-3.5 w-3.5" /> Print
+                    </Link>
+                    {canEdit && (<>
+                      <DuplicateMenuButton menuId={menu.id} />
+                      <PublishToggle menuId={menu.id} isPublished={menu.is_published} />
+                      <DeleteMenuButton menuId={menu.id} menuName={menu.name} />
+                    </>)}
                   </div>
                 </div>
               </Card>

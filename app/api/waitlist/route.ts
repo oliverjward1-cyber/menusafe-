@@ -1,30 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { NextResponse } from 'next/server'
 
-export async function POST(req: NextRequest) {
-  const { name, email, restaurant } = await req.json()
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-  if (!name || !email || !restaurant) {
-    return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+export async function POST(request: Request) {
+  let body: { email?: unknown }
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) {
-    return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
+  const email = typeof body.email === 'string' ? body.email.trim() : ''
+
+  // Basic server-side validation — never trust the client.
+  if (!email || email.length > 254 || !EMAIL_RE.test(email)) {
+    return NextResponse.json({ error: 'Please provide a valid email address' }, { status: 400 })
   }
 
-  const adminSupabase = createAdminClient()
-  const { error } = await adminSupabase.from('waitlist').insert({
-    name: String(name).slice(0, 200),
-    email: String(email).slice(0, 200).toLowerCase(),
-    restaurant_name: String(restaurant).slice(0, 200),
-  })
-
-  if (error) {
-    // Duplicate email — treat as success so we don't leak info
-    if (error.code === '23505') return NextResponse.json({ ok: true })
-    return NextResponse.json({ error: 'Failed to save' }, { status: 500 })
-  }
+  // TODO: wire up the email provider / storage here.
+  // e.g. add to a waitlist table, or send to Resend / Mailchimp / a sheet via Zapier.
+  // For now this is a stub that simply acknowledges the submission.
+  console.log('[waitlist] new signup:', email)
 
   return NextResponse.json({ ok: true })
 }

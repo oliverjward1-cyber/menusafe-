@@ -2,7 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ClipboardCheck, Plus, CheckCircle2, AlertTriangle, XCircle, ChevronRight } from 'lucide-react'
+import { ClipboardCheck, Plus, CheckCircle2, AlertTriangle, XCircle, ChevronRight, ShieldCheck, PoundSterling } from 'lucide-react'
+import { AUDIT_TYPE_LABELS, AUDIT_TYPE_DESCRIPTIONS, type AuditType } from '@/lib/constants/auditQuestions'
 
 function StatusBadge({ status }: { status: string }) {
   if (status === 'green') return (
@@ -33,38 +34,56 @@ export default async function AuditListPage() {
 
   const { data: audits } = await supabase
     .from('kitchen_audits')
-    .select('id, completed_by, score, total, status, completed_at')
+    .select('id, completed_by, score, total, status, completed_at, audit_type')
     .eq('restaurant_id', restaurantId)
     .order('completed_at', { ascending: false })
 
+  const AUDIT_TYPE_ICON: Record<AuditType, any> = {
+    general: ClipboardCheck,
+    allergen: ShieldCheck,
+    gp_leaky_pipe: PoundSterling,
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <ClipboardCheck className="h-5 w-5 text-green-700" />
-            <h1 className="text-2xl font-display font-semibold text-mise-ink">Kitchen Audits</h1>
-          </div>
-          <p className="text-sm text-mise-ink/50 mt-0.5">Weekly EHO-readiness checklist</p>
+      <div>
+        <div className="flex items-center gap-2">
+          <ClipboardCheck className="h-5 w-5 text-green-700" />
+          <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Kitchen Audits</h1>
         </div>
-        <Link
-          href="/chef/audit/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-mise-gold hover:bg-yellow-600 text-white text-sm font-semibold rounded-xl transition-colors"
-        >
-          <Plus className="h-4 w-4" /> Start audit
-        </Link>
+        <p className="text-sm text-hospopilot-ink/50 mt-0.5">Run a focused audit and build your compliance record</p>
+      </div>
+
+      <div className="grid sm:grid-cols-3 gap-3">
+        {(Object.keys(AUDIT_TYPE_LABELS) as AuditType[]).map(type => {
+          const Icon = AUDIT_TYPE_ICON[type]
+          return (
+            <Link
+              key={type}
+              href={`/chef/audit/new?type=${type}`}
+              className="flex flex-col gap-2 p-4 bg-white border border-black/[0.06] rounded-2xl shadow-sm hover:border-hospopilot-gold transition-colors"
+            >
+              <div className="h-9 w-9 rounded-xl bg-hospopilot-gold/10 flex items-center justify-center">
+                <Icon className="h-4 w-4 text-hospopilot-gold" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-hospopilot-ink">{AUDIT_TYPE_LABELS[type]}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{AUDIT_TYPE_DESCRIPTIONS[type]}</p>
+              </div>
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-hospopilot-mid mt-auto">
+                <Plus className="h-3.5 w-3.5" /> Start audit
+              </span>
+            </Link>
+          )
+        })}
       </div>
 
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
         {!audits || audits.length === 0 ? (
           <div className="py-16 text-center">
             <ClipboardCheck className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-mise-ink/50">No audits completed yet</p>
-            <p className="text-xs text-gray-400 mt-1">Complete your first weekly kitchen audit to start building your compliance record</p>
-            <Link href="/chef/audit/new"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-mise-mid hover:text-mise-deep mt-3">
-              Start first audit →
-            </Link>
+            <p className="text-sm font-medium text-hospopilot-ink/50">No audits completed yet</p>
+            <p className="text-xs text-gray-400 mt-1">Pick an audit type above to get started</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
@@ -82,7 +101,10 @@ export default async function AuditListPage() {
                       {pct}%
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-mise-ink">{audit.completed_by}</p>
+                      <p className="text-sm font-medium text-hospopilot-ink">
+                        {AUDIT_TYPE_LABELS[(audit.audit_type ?? 'general') as AuditType]}
+                        <span className="text-gray-400 font-normal"> · {audit.completed_by}</span>
+                      </p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {new Date(audit.completed_at).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                         {' · '}{audit.score}/{audit.total} passed
@@ -91,7 +113,7 @@ export default async function AuditListPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <StatusBadge status={audit.status} />
-                    <ChevronRight className="h-4 w-4 text-mise-ink/20" />
+                    <ChevronRight className="h-4 w-4 text-hospopilot-ink/20" />
                   </div>
                 </Link>
               )

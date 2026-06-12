@@ -42,7 +42,7 @@ export function RemindButton({ staffName, restaurantName, quizUrl }: Props) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1 text-xs text-mise-mid hover:text-mise-deep font-medium"
+        className="inline-flex items-center gap-1 text-xs text-hospopilot-mid hover:text-hospopilot-deep font-medium"
       >
         <Mail className="h-3.5 w-3.5" /> Send reminder
       </button>
@@ -55,12 +55,12 @@ export function RemindButton({ staffName, restaurantName, quizUrl }: Props) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="staff@email.com"
-        className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-mise-gold w-44"
+        className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-hospopilot-gold w-44"
       />
       <button
         onClick={handleSend}
         disabled={loading || !email}
-        className="inline-flex items-center gap-1 text-xs bg-mise-mid text-white px-2.5 py-1.5 rounded-lg disabled:opacity-50"
+        className="inline-flex items-center gap-1 text-xs bg-hospopilot-mid text-white px-2.5 py-1.5 rounded-lg disabled:opacity-50"
       >
         {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Send'}
       </button>

@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { InviteChef } from '../InviteChef'
 import { ResendInviteButton } from './ResendInviteButton'
+import { ChevronRight } from 'lucide-react'
 
 function RoleBadge({ role }: { role: string | null }) {
   if (role === 'owner') {
@@ -11,10 +13,16 @@ function RoleBadge({ role }: { role: string | null }) {
       </span>
     )
   }
-  if (role === 'chef') {
+  const labels: Record<string, string> = {
+    manager: 'Manager',
+    head_chef: 'Head Chef',
+    chef: 'Kitchen Staff',
+    foh: 'Front of House',
+  }
+  if (role && labels[role]) {
     return (
       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-        Chef
+        {labels[role]}
       </span>
     )
   }
@@ -63,46 +71,49 @@ export default async function TeamPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">Team</h1>
-        <p className="text-sm text-mise-ink/50 mt-0.5">{restaurant?.name}</p>
+        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Team</h1>
+        <p className="text-sm text-hospopilot-ink/50 mt-0.5">{restaurant?.name}</p>
       </div>
 
       {/* Members */}
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-mise-ink">Members</h2>
-          <p className="text-xs text-mise-ink/40 mt-0.5">{members?.length ?? 0} people with access</p>
+          <h2 className="text-sm font-semibold text-hospopilot-ink">Members</h2>
+          <p className="text-xs text-hospopilot-ink/40 mt-0.5">{members?.length ?? 0} people with access</p>
         </div>
         <div className="divide-y divide-gray-50">
           {(!members || members.length === 0) ? (
             <div className="px-5 py-8 text-center">
-              <p className="text-sm text-mise-ink/40">No team members found</p>
+              <p className="text-sm text-hospopilot-ink/40">No team members found</p>
             </div>
           ) : (
             members.map(member => (
-              <div key={member.id} className="flex items-center justify-between px-5 py-3.5">
+              <Link key={member.id} href={`/owner/team/${member.id}`} className="flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-mise-mid/10 flex items-center justify-center shrink-0">
-                    <span className="text-xs font-semibold text-mise-mid">
+                  <div className="h-8 w-8 rounded-full bg-hospopilot-mid/10 flex items-center justify-center shrink-0">
+                    <span className="text-xs font-semibold text-hospopilot-mid">
                       {(member.full_name ?? '?')[0].toUpperCase()}
                     </span>
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-mise-ink">
+                      <p className="text-sm font-medium text-hospopilot-ink">
                         {member.full_name ?? 'Unknown'}
                       </p>
                       {member.id === user.id && (
-                        <span className="text-xs text-mise-ink/40">(you)</span>
+                        <span className="text-xs text-hospopilot-ink/40">(you)</span>
                       )}
                     </div>
-                    <p className="text-xs text-mise-ink/40">
+                    <p className="text-xs text-hospopilot-ink/40">
                       Joined {new Date(member.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
                 </div>
-                <RoleBadge role={member.role} />
-              </div>
+                <div className="flex items-center gap-2">
+                  <RoleBadge role={member.role} />
+                  <ChevronRight className="h-4 w-4 text-gray-300" />
+                </div>
+              </Link>
             ))
           )}
         </div>
@@ -112,8 +123,8 @@ export default async function TeamPage() {
       {pendingInvites && pendingInvites.length > 0 && (
         <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
-            <h2 className="text-sm font-semibold text-mise-ink">Pending invites</h2>
-            <p className="text-xs text-mise-ink/40 mt-0.5">{pendingInvites.length} invite{pendingInvites.length !== 1 ? 's' : ''} awaiting acceptance</p>
+            <h2 className="text-sm font-semibold text-hospopilot-ink">Pending invites</h2>
+            <p className="text-xs text-hospopilot-ink/40 mt-0.5">{pendingInvites.length} invite{pendingInvites.length !== 1 ? 's' : ''} awaiting acceptance</p>
           </div>
           <div className="divide-y divide-gray-50">
             {pendingInvites.map(invite => (
@@ -125,9 +136,9 @@ export default async function TeamPage() {
                     </span>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-mise-ink truncate">{invite.email}</p>
+                    <p className="text-sm font-medium text-hospopilot-ink truncate">{invite.email}</p>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <p className="text-xs text-mise-ink/40">
+                      <p className="text-xs text-hospopilot-ink/40">
                         Sent {new Date(invite.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                       </p>
                       <span className="text-xs text-amber-600 font-medium">
@@ -148,8 +159,8 @@ export default async function TeamPage() {
 
       {/* Invite someone */}
       <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5">
-        <h2 className="text-sm font-semibold text-mise-ink mb-1">Invite someone</h2>
-        <p className="text-xs text-mise-ink/50 mb-4">
+        <h2 className="text-sm font-semibold text-hospopilot-ink mb-1">Invite someone</h2>
+        <p className="text-xs text-hospopilot-ink/50 mb-4">
           Invite a head chef to manage recipes, ingredients, and kitchen audits.
         </p>
         <InviteChef />

@@ -1,4 +1,4 @@
-/* mise admin — screens + customer drawer (exported to window) */
+/* HospoPilot admin — screens + customer drawer (exported to window) */
 
 var PLAN_COLORS = { core: "#52B788", plus: "#2D6A4F", multi: "#D4A017" };
 
@@ -490,117 +490,146 @@ function SecurityScreen(props) {
   );
 }
 
-/* ============ AI COSTS ============ */
-function AiCostsScreen(props) {
-  var D = props.data;
-  var U = D.AI_USAGE || { totalCostUsd: 0, totalCalls: 0, byEndpoint: [], dailyCost: [], model: 'claude-haiku-4-5-20251001', inputCostPerM: 0.80, outputCostPerM: 4.00 };
+/* ============ SUPPORT ============ */
+function SupportScreen(props) {
+  var A = props.actions;
+  var _state = React.useState({ loading: true, connected: false, threads: [], email: null, error: null });
+  var state = _state[0], setState = _state[1];
+  var _sel = React.useState(null), selectedId = _sel[0], setSelectedId = _sel[1];
+  var _thread = React.useState({ loading: false, data: null });
+  var thread = _thread[0], setThread = _thread[1];
+  var _reply = React.useState(""), reply = _reply[0], setReply = _reply[1];
+  var _sending = React.useState(false), sending = _sending[0], setSending = _sending[1];
 
-  var ENDPOINT_LABELS = {
-    'invoice': 'Invoice scanner',
-    'ai-describe': 'Recipe AI describe',
-    'allergen-import': 'Allergen sheet import',
-    'menu-import': 'Menu photo import',
-    'categorise': 'Ingredient categoriser',
-  };
+  function loadThreads() {
+    setState(function (s) { return Object.assign({}, s, { loading: true, error: null }); });
+    fetch("/api/admin/support/threads")
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        setState({ loading: false, connected: !!data.connected, threads: data.threads || [], email: data.email || null, error: data.error || null });
+      })
+      .catch(function (err) {
+        setState({ loading: false, connected: false, threads: [], email: null, error: err.message });
+      });
+  }
 
-  var maxDaily = Math.max.apply(null, U.dailyCost.map(function (d) { return d.cost; }).concat([0.001]));
+  React.useEffect(function () { loadThreads(); }, []);
 
-  return (
-    <div className="space-y" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* KPI row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-        <div className="card" style={{ padding: "20px 24px" }}>
-          <div className="cell-sub" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>30-day spend</div>
-          <div style={{ fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display)", color: U.totalCostUsd > 10 ? "var(--bad)" : U.totalCostUsd > 2 ? "var(--warn)" : "var(--good)" }}>
-            ${U.totalCostUsd.toFixed(4)}
-          </div>
-          <div className="cell-sub" style={{ marginTop: 4 }}>USD · Anthropic API</div>
-        </div>
-        <div className="card" style={{ padding: "20px 24px" }}>
-          <div className="cell-sub" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Total AI calls</div>
-          <div style={{ fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display)" }}>{U.totalCalls}</div>
-          <div className="cell-sub" style={{ marginTop: 4 }}>last 30 days</div>
-        </div>
-        <div className="card" style={{ padding: "20px 24px" }}>
-          <div className="cell-sub" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Avg cost/call</div>
-          <div style={{ fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display)" }}>
-            {U.totalCalls > 0 ? ("$" + (U.totalCostUsd / U.totalCalls).toFixed(5)) : "—"}
-          </div>
-          <div className="cell-sub" style={{ marginTop: 4 }}>USD</div>
+  React.useEffect(function () {
+    if (!selectedId) { setThread({ loading: false, data: null }); return; }
+    setThread({ loading: true, data: null });
+    fetch("/api/admin/support/threads/" + selectedId)
+      .then(function (r) { return r.json(); })
+      .then(function (data) { setThread({ loading: false, data: data }); })
+      .catch(function (err) { setThread({ loading: false, data: { error: err.message } }); });
+  }, [selectedId]);
+
+  function sendReply() {
+    if (!reply.trim() || !thread.data || !thread.data.messages) return;
+    var msgs = thread.data.messages;
+    var last = msgs[msgs.length - 1];
+    setSending(true);
+    fetch("/api/admin/support/reply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ threadId: selectedId, to: last.from, subject: last.subject, body: reply }),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        setSending(false);
+        if (data.error) { A.toast(data.error); return; }
+        A.toast("Reply sent");
+        setReply("");
+        setSelectedId(null);
+        loadThreads();
+      })
+      .catch(function (err) { setSending(false); A.toast(err.message); });
+  }
+
+  if (state.loading) {
+    return <div className="card table-card"><div className="empty"><Icon name="inbox" size={32} /><p>Loading inbox…</p></div></div>;
+  }
+
+  if (!state.connected) {
+    return (
+      <div className="card table-card">
+        <div className="empty">
+          <Icon name="inbox" size={32} />
+          <p>Gmail isn't connected yet.</p>
+          <a className="btn btn-primary btn-sm" href="/api/admin/gmail/connect">Connect Gmail</a>
         </div>
       </div>
+    );
+  }
 
-      {/* Daily cost bar chart */}
-      <div className="card">
-        <div className="card-head"><h3>Daily cost — last 14 days</h3><span className="sub">{U.model}</span></div>
-        <div className="card-body">
-          {U.dailyCost.length === 0 ? (
-            <p className="cell-sub" style={{ textAlign: "center", padding: "24px 0" }}>No AI calls recorded yet</p>
-          ) : (
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 80 }}>
-              {U.dailyCost.map(function (d) {
-                var pct = maxDaily > 0 ? (d.cost / maxDaily) * 100 : 0;
-                return (
-                  <div key={d.date} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                    <div title={"$" + d.cost.toFixed(5)} style={{ width: "100%", height: Math.max(pct * 0.6, d.cost > 0 ? 3 : 0) + "px", background: d.cost > 0 ? "var(--accent)" : "var(--hairline-2)", borderRadius: 3, transition: "height .2s" }}></div>
-                    <div style={{ fontSize: 9, color: "var(--ink-faint)", whiteSpace: "nowrap" }}>{d.date}</div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+  if (selectedId) {
+    return (
+      <div className="card table-card">
+        <div className="table-tools">
+          <button className="btn btn-ghost btn-sm" onClick={function () { setSelectedId(null); }}>&larr; Back to inbox</button>
         </div>
-      </div>
-
-      {/* By endpoint */}
-      <div className="card">
-        <div className="card-head"><h3>Cost by feature</h3><span className="sub">last 30 days</span></div>
-        {U.byEndpoint.length === 0 ? (
-          <div className="card-body"><p className="cell-sub" style={{ textAlign: "center", padding: "16px 0" }}>No AI calls yet — costs will appear here after first use</p></div>
+        {thread.loading ? (
+          <div className="empty"><p>Loading conversation…</p></div>
+        ) : thread.data && thread.data.error ? (
+          <div className="empty"><p>{thread.data.error}</p></div>
         ) : (
-          <div className="table-wrap">
-            <table className="table">
-              <thead><tr>
-                <th>Feature</th>
-                <th className="tnum">Calls</th>
-                <th className="tnum">Input tokens</th>
-                <th className="tnum">Output tokens</th>
-                <th className="tnum">Cost (USD)</th>
-                <th className="tnum">Avg/call</th>
-              </tr></thead>
-              <tbody>
-                {U.byEndpoint.sort(function (a, b) { return b.cost - a.cost; }).map(function (ep) {
-                  return (
-                    <tr key={ep.endpoint}>
-                      <td><span style={{ fontWeight: 500 }}>{ENDPOINT_LABELS[ep.endpoint] || ep.endpoint}</span></td>
-                      <td className="tnum">{ep.calls}</td>
-                      <td className="tnum">{ep.inputTokens.toLocaleString()}</td>
-                      <td className="tnum">{ep.outputTokens.toLocaleString()}</td>
-                      <td className="tnum" style={{ fontWeight: 600 }}>${ep.cost.toFixed(4)}</td>
-                      <td className="tnum cell-sub">${(ep.cost / ep.calls).toFixed(5)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div style={{ padding: "0 20px 20px" }}>
+            {(thread.data.messages || []).map(function (m, i) {
+              return (
+                <div key={i} style={{ borderBottom: "1px solid var(--border, #eee)", padding: "14px 0" }}>
+                  <div className="cell-strong">{m.from}</div>
+                  <div className="cell-sub">{m.subject} · {fmtDate(m.date)}</div>
+                  <div style={{ marginTop: 8, whiteSpace: "pre-wrap" }}>{m.body}</div>
+                </div>
+              );
+            })}
+            <div style={{ marginTop: 16 }}>
+              <textarea
+                className="input"
+                style={{ width: "100%", minHeight: 100, resize: "vertical" }}
+                placeholder="Write a reply…"
+                value={reply}
+                onChange={function (e) { setReply(e.target.value); }}
+              />
+              <button className="btn btn-primary btn-sm" style={{ marginTop: 8 }} disabled={sending || !reply.trim()} onClick={sendReply}>
+                {sending ? "Sending…" : "Send reply"}
+              </button>
+            </div>
           </div>
         )}
       </div>
+    );
+  }
 
-      {/* Pricing reference */}
-      <div className="card">
-        <div className="card-head"><h3>Pricing reference</h3><span className="sub">Anthropic {U.model}</span></div>
-        <div className="card-body" style={{ display: "flex", gap: 24 }}>
-          <div>
-            <div className="cell-sub" style={{ fontSize: 11, marginBottom: 4 }}>Input tokens</div>
-            <div style={{ fontWeight: 600 }}>${U.inputCostPerM} <span className="cell-sub">/ million</span></div>
-          </div>
-          <div>
-            <div className="cell-sub" style={{ fontSize: 11, marginBottom: 4 }}>Output tokens</div>
-            <div style={{ fontWeight: 600 }}>${U.outputCostPerM} <span className="cell-sub">/ million</span></div>
-          </div>
-        </div>
+  return (
+    <div className="card table-card">
+      <div className="table-tools">
+        <span className="spacer"></span>
+        {state.email ? <span className="cell-sub">Connected as {state.email}</span> : null}
+        <button className="btn btn-ghost btn-sm" onClick={loadThreads}><Icon name="refund" size={15} /> Refresh</button>
       </div>
+      {state.threads.length === 0 ? (
+        <div className="empty"><Icon name="inbox" size={32} /><p>No support emails yet.</p></div>
+      ) : (
+        <div className="table-scroll">
+          <table className="tbl">
+            <thead><tr><th>From</th><th>Subject</th><th>Snippet</th><th>Date</th></tr></thead>
+            <tbody>
+              {state.threads.map(function (t) {
+                return (
+                  <tr key={t.id} onClick={function () { setSelectedId(t.id); }} style={{ cursor: "pointer" }}>
+                    <td><div className="cell-strong">{t.from}</div></td>
+                    <td>{t.subject}</td>
+                    <td className="cell-sub">{t.snippet}</td>
+                    <td>{fmtShort(t.date)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <div className="tbl-foot"><span>{state.threads.length} conversations</span></div>
     </div>
   );
 }
@@ -609,5 +638,5 @@ Object.assign(window, {
   computeMetrics: computeMetrics, PLAN_COLORS: PLAN_COLORS,
   OverviewScreen: OverviewScreen, CustomersScreen: CustomersScreen,
   SubsScreen: SubsScreen, BillingScreen: BillingScreen, WaitlistScreen: WaitlistScreen,
-  SecurityScreen: SecurityScreen, AiCostsScreen: AiCostsScreen
+  SecurityScreen: SecurityScreen, SupportScreen: SupportScreen
 });

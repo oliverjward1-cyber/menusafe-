@@ -5,12 +5,14 @@ import { AllergenBadge } from '@/components/allergen/AllergenBadge'
 import { DishCard } from './DishCard'
 import { MenuTabs } from './MenuTabs'
 import type { Metadata } from 'next'
-import { UtensilsCrossed } from 'lucide-react'
+import { UtensilsCrossed, ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 
 type AllergenKey = (typeof ALLERGENS)[number]['key']
 
 interface Props {
   params: { slug: string }
+  searchParams: { from?: string }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -27,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function PublicMenuPage({ params }: Props) {
+export default async function PublicMenuPage({ params, searchParams }: Props) {
   const supabase = createClient()
 
   const { data: restaurant } = await supabase
@@ -41,7 +43,7 @@ export default async function PublicMenuPage({ params }: Props) {
   // Get all published menus for this restaurant
   const { data: publishedMenus } = await supabase
     .from('menus')
-    .select('id, name, description, daypart')
+    .select('id, name, description, daypart, service_start, service_end')
     .eq('restaurant_id', restaurant.id)
     .eq('is_published', true)
     .order('created_at')
@@ -143,12 +145,21 @@ export default async function PublicMenuPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
+      {searchParams.from === 'dashboard' && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5">
+          <div className="max-w-2xl mx-auto">
+            <Link href="/owner" className="inline-flex items-center gap-1 text-sm font-medium text-amber-700 hover:text-amber-900 transition-colors">
+              <ChevronLeft className="h-4 w-4" /> Back to dashboard
+            </Link>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="bg-gray-900 text-white px-6 py-8">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center gap-2 mb-2">
             <UtensilsCrossed className="h-5 w-5 text-green-400" />
-            <span className="text-sm font-medium text-green-400">mise</span>
+            <span className="text-sm font-medium text-green-400">HospoPilot</span>
           </div>
           <h1 className="text-3xl font-bold">{restaurant.name}</h1>
           <p className="text-gray-400 mt-1 text-sm">
@@ -164,6 +175,8 @@ export default async function PublicMenuPage({ params }: Props) {
           name: menu.name,
           description: menu.description,
           daypart: menu.daypart,
+          serviceStart: (menu as any).service_start ?? null,
+          serviceEnd: (menu as any).service_end ?? null,
           categories: Object.entries(groupByCategory(menu.recipes)).map(([cat, dishes]) => ({
             name: cat,
             dishes: dishes.map(dish => ({
@@ -258,7 +271,7 @@ export default async function PublicMenuPage({ params }: Props) {
             ))}
           </div>
           <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-            This allergen information is provided by {restaurant.name} in good faith. mise is a
+            This allergen information is provided by {restaurant.name} in good faith. HospoPilot is a
             management tool — the accuracy of allergen data is the sole responsibility of the
             restaurant operator. Always speak to staff before ordering if you have an allergy.
           </p>

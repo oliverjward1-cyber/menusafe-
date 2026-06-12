@@ -1,4 +1,4 @@
-/* mise admin — app shell, routing, actions, tweaks */
+/* HospoPilot admin — app shell, routing, actions, tweaks */
 
 var NAV = [
   { id: "overview",  label: "Overview",      icon: "overview" },
@@ -7,19 +7,19 @@ var NAV = [
   { id: "billing",   label: "Billing",       icon: "billing" },
   { id: "waitlist",  label: "Waitlist",      icon: "waitlist" },
   { id: "security",  label: "Security",      icon: "alert" },
-  { id: "aicosts",   label: "AI Costs",       icon: "billing" }
+  { id: "support",   label: "Support",       icon: "inbox" }
 ];
 var TITLES = {
   overview:  ["Overview", "How the business is doing today"],
-  customers: ["Customers", "Every restaurant on mise"],
+  customers: ["Customers", "Every restaurant on HospoPilot"],
   subs:      ["Subscriptions & plans", "Who's on what, and your plan mix"],
   billing:   ["Billing", "Payments, invoices & refunds"],
   waitlist:  ["Waitlist", "Early-access signups to invite"],
   security:  ["Security & sessions", "Login activity, suspicious access and plan enforcement"],
-  aicosts:   ["AI Costs", "Anthropic API usage and spend — last 30 days"]
+  support:   ["Support inbox", "Customer emails sent to your support address"]
 };
 
-var MiseMark = (
+var HospoPilotMark = (
   <svg className="brand-mark" viewBox="0 0 44 44" fill="none" aria-hidden="true">
     <rect x="0" y="0" width="19.5" height="19.5" rx="4" fill="#52B788" opacity=".55"/>
     <rect x="24.5" y="0" width="19.5" height="19.5" rx="4" fill="#52B788" opacity=".55"/>
@@ -38,7 +38,7 @@ var TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 function App() {
   var tw = useTweaks(TWEAK_DEFAULTS), t = tw[0], setTweak = tw[1];
   var _r = React.useState("overview"), route = _r[0], setRoute = _r[1];
-  var _d = React.useState(window.MISE_DATA), D = _d[0], setD = _d[1];
+  var _d = React.useState(window.HOSPOPILOT_DATA), D = _d[0], setD = _d[1];
   var _sel = React.useState(null), selId = _sel[0], setSel = _sel[1];
   var _mod = React.useState(null), modal = _mod[0], setModal = _mod[1];
   var _toasts = React.useState([]), toasts = _toasts[0], setToasts = _toasts[1];
@@ -74,7 +74,7 @@ function App() {
     }));
     var blob = new Blob([lines.join("\n")], { type: "text/csv" });
     var url = URL.createObjectURL(blob), a = document.createElement("a");
-    a.href = url; a.download = "mise-" + name + ".csv"; document.body.appendChild(a); a.click();
+    a.href = url; a.download = "hospopilot-" + name + ".csv"; document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
     pushToast("Exported " + rows.length + " rows to CSV");
   }
@@ -122,7 +122,7 @@ function App() {
     if (route === "billing") return <BillingScreen data={D} actions={A} />;
     if (route === "waitlist") return <WaitlistScreen data={D} actions={A} />;
     if (route === "security") return <SecurityScreen data={D} actions={A} />;
-    if (route === "aicosts") return <AiCostsScreen data={D} actions={A} />;
+    if (route === "support") return <SupportScreen data={D} actions={A} />;
     return null;
   }
 
@@ -132,7 +132,7 @@ function App() {
     <div className={"app" + (navOpen ? " nav-open" : "")} data-nav={t.nav === "top" ? "top" : "side"} data-density={t.density}>
       {/* sidebar */}
       <aside className="sidebar">
-        <div className="brand">{MiseMark}<span className="brand-name">mise</span><span className="brand-tag">Admin</span></div>
+        <div className="brand">{HospoPilotMark}<span className="brand-name">HospoPilot</span><span className="brand-tag">Admin</span></div>
         <div className="nav-group-label">Manage</div>
         <NavItems />
         <div className="sidebar-foot">
@@ -144,7 +144,7 @@ function App() {
       <div className="main">
         {/* top nav variant */}
         <div className="topnav">
-          <div className="brand">{MiseMark}<span className="brand-name">mise</span></div>
+          <div className="brand">{HospoPilotMark}<span className="brand-name">HospoPilot</span></div>
           <div className="topnav-tabs"><NavItems /></div>
           <div className="topnav-right"><span className="avatar">AW</span></div>
         </div>

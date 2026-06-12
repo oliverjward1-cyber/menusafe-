@@ -1,4 +1,4 @@
-/* mise admin — customer drawer + action modals (exported to window) */
+/* HospoPilot admin — customer drawer + action modals (exported to window) */
 
 function CustomerDrawer(props) {
   var c = props.cust, D = props.data, A = props.actions;

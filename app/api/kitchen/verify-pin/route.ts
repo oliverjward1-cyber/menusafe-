@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { signStaffToken, staffCookieOptions } from '@/lib/staff-session'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 // In-memory rate limiter: max 10 attempts per slug per 15 min window
 const attempts = new Map<string, { count: number; resetAt: number }>()
@@ -18,6 +19,8 @@ function isRateLimited(slug: string): boolean {
 }
 
 export async function POST(request: Request) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const { slug, pin } = await request.json()
   if (!slug || !pin) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
 

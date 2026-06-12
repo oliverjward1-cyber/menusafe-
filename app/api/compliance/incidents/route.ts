@@ -3,12 +3,15 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { getStaffRestaurantId, escapeHtml } from '@/lib/staff-session'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 function getResend() { return new Resend(process.env.RESEND_API_KEY) }
 
 export async function POST(request: Request) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const body = await request.json()
-  const { restaurantId, type, severity, title, description, affectedPerson, actionTaken, reportedBy, source } = body
+  const { restaurantId, type, severity, title, description, affectedPerson, actionTaken, reportedBy, source, photoUrl } = body
 
   const adminSupabase = createAdminClient()
 
@@ -31,9 +34,31 @@ export async function POST(request: Request) {
     affected_person: affectedPerson || null,
     action_taken: actionTaken || null,
     reported_by: reportedBy,
+    photo_url: photoUrl || null,
   }).select().single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Auto-create corrective action for medium/high/critical incidents
+  if (severity !== 'low') {
+    try {
+      const dueDays = severity === 'critical' ? 1 : severity === 'high' ? 3 : 7
+      const dueDate = new Date()
+      dueDate.setDate(dueDate.getDate() + dueDays)
+
+      await adminSupabase.from('corrective_actions').insert({
+        restaurant_id: restaurantId,
+        title: `Investigate & resolve: ${title}`,
+        description: `Auto-created from ${severity} incident. ${description ?? ''}`.trim(),
+        due_date: dueDate.toISOString().split('T')[0],
+        source_type: 'incident',
+        source_id: incident.id,
+        status: 'open',
+      })
+    } catch {
+      // Non-blocking
+    }
+  }
 
   // Notify owner by email for medium/high/critical incidents
   if (severity !== 'low') {
@@ -64,7 +89,7 @@ export async function POST(request: Request) {
           const safeRestaurantName = escapeHtml(restaurant?.name ?? '')
 
           await getResend().emails.send({
-            from: 'mise <alerts@mise.kitchen>',
+            from: 'HospoPilot <support@hospopilot.co.uk>',
             to: ownerEmail,
             subject: `${severityEmoji} Incident reported at ${safeRestaurantName}`,
             html: `
@@ -84,7 +109,7 @@ export async function POST(request: Request) {
                   ${severity === 'critical' ? '<br/><strong style="color:#991b1b">This is a critical incident — please respond immediately.</strong>' : ''}
                 </p>
 
-                <a href="https://mise.kitchen/owner/incidents"
+                <a href="https://www.hospopilot.co.uk/owner/incidents"
                    style="display: inline-block; background: #991b1b; color: white; padding: 12px 24px;
                           border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
                   View incident log →

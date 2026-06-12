@@ -24,7 +24,7 @@ export default function StaffLearn() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-mise-ink px-5 py-4 flex items-center gap-3">
+      <div className="bg-hospopilot-ink px-5 py-4 flex items-center gap-3">
         <button onClick={() => router.back()} className="text-white/50 hover:text-white"><ArrowLeft className="h-5 w-5" /></button>
         <div>
           <p className="text-white font-semibold flex items-center gap-2"><BookOpen className="h-4 w-4" /> Allergen learning</p>
@@ -35,12 +35,12 @@ export default function StaffLearn() {
       <div className="px-4 py-5 max-w-lg mx-auto space-y-3">
         {/* Progress */}
         <div className="bg-white rounded-2xl border border-black/[0.06] p-4 shadow-sm">
-          <div className="flex justify-between text-xs text-mise-ink/50 mb-2">
+          <div className="flex justify-between text-xs text-hospopilot-ink/50 mb-2">
             <span>Your progress</span>
-            <span className="font-semibold text-mise-ink">{completedCount}/14 modules</span>
+            <span className="font-semibold text-hospopilot-ink">{completedCount}/14 modules</span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2">
-            <div className="bg-mise-deep h-2 rounded-full transition-all" style={{ width: `${(completedCount / 14) * 100}%` }} />
+            <div className="bg-hospopilot-deep h-2 rounded-full transition-all" style={{ width: `${(completedCount / 14) * 100}%` }} />
           </div>
           {completedCount === 14 && (
             <p className="text-green-600 text-xs font-semibold mt-2 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> All modules complete!</p>
@@ -56,12 +56,12 @@ export default function StaffLearn() {
               {mod.emoji}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-mise-ink text-sm">{mod.name}</p>
-              <p className="text-xs text-mise-ink/40 mt-0.5 truncate">{mod.tagline}</p>
+              <p className="font-semibold text-hospopilot-ink text-sm">{mod.name}</p>
+              <p className="text-xs text-hospopilot-ink/40 mt-0.5 truncate">{mod.tagline}</p>
             </div>
             {completed.has(mod.slug)
               ? <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-              : <ChevronRight className="h-4 w-4 text-mise-ink/20 flex-shrink-0" />}
+              : <ChevronRight className="h-4 w-4 text-hospopilot-ink/20 flex-shrink-0" />}
           </button>
         ))}
       </div>

@@ -64,12 +64,12 @@ export default function CleaningTaskList({
             >
               {done
                 ? <CheckCircle2 className="h-5 w-5 text-green-600" />
-                : <Circle className="h-5 w-5 text-mise-ink/20 hover:text-mise-mid transition-colors" />
+                : <Circle className="h-5 w-5 text-hospopilot-ink/20 hover:text-hospopilot-mid transition-colors" />
               }
             </button>
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-medium ${done ? 'text-mise-ink/40 line-through' : 'text-mise-ink'}`}>{task.name}</p>
-              {task.area && <p className="text-xs text-mise-ink/40">{task.area}</p>}
+              <p className={`text-sm font-medium ${done ? 'text-hospopilot-ink/40 line-through' : 'text-hospopilot-ink'}`}>{task.name}</p>
+              {task.area && <p className="text-xs text-hospopilot-ink/40">{task.area}</p>}
               {last && !done && (
                 <p className="text-xs text-amber-600 flex items-center gap-1 mt-0.5">
                   <Clock className="h-3 w-3" />
@@ -89,12 +89,12 @@ export default function CleaningTaskList({
                   value={name}
                   onChange={e => setName(e.target.value)}
                   placeholder="Your name"
-                  className="border border-black/[0.08] rounded-lg px-2.5 py-1.5 text-xs w-32 focus:outline-none focus:ring-2 focus:ring-mise-mid/30"
+                  className="border border-black/[0.08] rounded-lg px-2.5 py-1.5 text-xs w-32 focus:outline-none focus:ring-2 focus:ring-hospopilot-mid/30"
                 />
                 <button
                   onClick={() => signOff(task)}
                   disabled={signingOff === task.id || !name.trim()}
-                  className="bg-mise-deep text-white rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                  className="bg-hospopilot-deep text-white rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
                 >
                   {signingOff === task.id ? '…' : 'Sign off'}
                 </button>
@@ -104,7 +104,7 @@ export default function CleaningTaskList({
             {!activeTask && !done && (
               <button
                 onClick={() => setActiveTask(task.id)}
-                className="text-xs font-semibold text-mise-mid hover:text-mise-deep transition-colors flex-shrink-0"
+                className="text-xs font-semibold text-hospopilot-mid hover:text-hospopilot-deep transition-colors flex-shrink-0"
               >
                 Sign off
               </button>

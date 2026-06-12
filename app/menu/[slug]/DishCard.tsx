@@ -57,7 +57,8 @@ export function DishCard({ name, description, sellPrice, dishAllergens, ingredie
             <p className="text-xs text-gray-500 mb-1.5">Contains:</p>
             <div className="flex flex-wrap gap-1.5">
               {dishAllergens.map((key) => {
-                const a = ALLERGENS.find((x) => x.key === key)!
+                const a = ALLERGENS.find((x) => x.key === key)
+                if (!a) return null
                 return (
                   <span key={key} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-medium border border-amber-200">
                     {a.shortLabel}
@@ -77,7 +78,8 @@ export function DishCard({ name, description, sellPrice, dishAllergens, ingredie
             <p className="text-xs text-gray-400 mb-1">May contain:</p>
             <div className="flex flex-wrap gap-1.5">
               {mayContain.map((key) => {
-                const a = ALLERGENS.find((x) => x.key === key)!
+                const a = ALLERGENS.find((x) => x.key === key)
+                if (!a) return null
                 return (
                   <span key={key} className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 text-xs border border-orange-200">
                     {a.shortLabel}
@@ -131,7 +133,8 @@ export function DishCard({ name, description, sellPrice, dishAllergens, ingredie
                           {ing.allergens.length > 0 ? (
                             <div className="flex flex-wrap gap-1 justify-end">
                               {ing.allergens.map((key) => {
-                                const a = ALLERGENS.find((x) => x.key === key)!
+                                const a = ALLERGENS.find((x) => x.key === key)
+                                if (!a) return null
                                 return (
                                   <span key={key} className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-medium border border-amber-200">
                                     {a.shortLabel}
@@ -154,7 +157,8 @@ export function DishCard({ name, description, sellPrice, dishAllergens, ingredie
                 {dishAllergens.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {dishAllergens.map((key) => {
-                      const a = ALLERGENS.find((x) => x.key === key)!
+                      const a = ALLERGENS.find((x) => x.key === key)
+                      if (!a) return null
                       return (
                         <span key={key} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-medium border border-amber-200" title={a.description}>
                           {a.label}
@@ -175,7 +179,8 @@ export function DishCard({ name, description, sellPrice, dishAllergens, ingredie
                   <p className="text-xs text-gray-500 mb-2">Made in a kitchen where the following allergens are present:</p>
                   <div className="flex flex-wrap gap-2">
                     {mayContain.map((key) => {
-                      const a = ALLERGENS.find((x) => x.key === key)!
+                      const a = ALLERGENS.find((x) => x.key === key)
+                      if (!a) return null
                       return (
                         <span key={key} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 text-orange-800 text-sm font-medium border border-orange-200">
                           {a.label}

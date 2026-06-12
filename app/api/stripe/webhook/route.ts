@@ -1,90 +1,98 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { stripe, getPlanByPriceId } from '@/lib/stripe'
+import { NextResponse } from 'next/server'
+import { headers } from 'next/headers'
 import Stripe from 'stripe'
+import { stripe } from '@/lib/stripe/client'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
 
-export async function POST(req: NextRequest) {
-  const body = await req.text()
-  const sig = req.headers.get('stripe-signature')
-  const secret = process.env.STRIPE_WEBHOOK_SECRET!
+function planFromSubscription(sub: Stripe.Subscription): string | null {
+  const meta = sub.metadata?.plan
+  if (meta === 'compliance' || meta === 'compliance_kitchen') return meta
+  return null
+}
+
+async function syncSubscription(sub: Stripe.Subscription) {
+  const restaurantId = sub.metadata?.restaurant_id
+  if (!restaurantId) return
+
+  const admin = createAdminClient()
+  const plan = planFromSubscription(sub)
+  const currentPeriodEnd = (sub.items.data[0] as unknown as { current_period_end?: number })?.current_period_end ?? sub.start_date
+
+  await admin.from('restaurants').update({
+    stripe_subscription_id: sub.id,
+    subscription_status: sub.status,
+    ...(plan ? { plan } : {}),
+    subscription_ends_at: new Date(currentPeriodEnd * 1000).toISOString(),
+  }).eq('id', restaurantId)
+}
+
+export async function POST(request: Request) {
+  const body = await request.text()
+  const signature = headers().get('stripe-signature')
+
+  if (!signature) {
+    return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
+  }
 
   let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(body, sig!, secret)
-  } catch {
+    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  const adminSupabase = createAdminClient()
+  const admin = createAdminClient()
 
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session
-      if (session.mode !== 'subscription') break
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session
+        const restaurantId = session.client_reference_id
+        if (restaurantId && session.customer) {
+          await admin.from('restaurants').update({
+            stripe_customer_id: typeof session.customer === 'string' ? session.customer : session.customer.id,
+          }).eq('id', restaurantId)
+        }
+        if (session.subscription) {
+          const subId = typeof session.subscription === 'string' ? session.subscription : session.subscription.id
+          const sub = await stripe.subscriptions.retrieve(subId)
+          await syncSubscription(sub)
+        }
+        break
+      }
 
-      const sub = await stripe.subscriptions.retrieve(session.subscription as string)
-      const restaurantId = sub.metadata?.restaurant_id
-      const plan = sub.metadata?.plan
-      if (!restaurantId) break
+      case 'customer.subscription.updated':
+      case 'customer.subscription.deleted': {
+        const sub = event.data.object as Stripe.Subscription
+        await syncSubscription(sub)
+        break
+      }
 
-      const priceId = sub.items.data[0]?.price.id
-      const resolvedPlan = plan ?? getPlanByPriceId(priceId ?? '') ?? 'core'
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        const subId = invoice.subscription
+        if (subId) {
+          const id = typeof subId === 'string' ? subId : subId.id
+          const sub = await stripe.subscriptions.retrieve(id)
+          const restaurantId = sub.metadata?.restaurant_id
+          if (restaurantId) {
+            await admin.from('restaurants').update({
+              subscription_status: sub.status,
+            }).eq('id', restaurantId)
+          }
+        }
+        break
+      }
 
-      await adminSupabase.from('restaurants').update({
-        stripe_subscription_id: sub.id,
-        subscription_status: sub.status,
-        plan: resolvedPlan,
-        trial_ends_at: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
-        current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-      }).eq('id', restaurantId)
-      break
+      default:
+        break
     }
-
-    case 'customer.subscription.updated': {
-      const sub = event.data.object as Stripe.Subscription
-      const restaurantId = sub.metadata?.restaurant_id
-      if (!restaurantId) break
-
-      const priceId = sub.items.data[0]?.price.id
-      const plan = sub.metadata?.plan ?? getPlanByPriceId(priceId ?? '') ?? 'core'
-
-      await adminSupabase.from('restaurants').update({
-        subscription_status: sub.status,
-        plan,
-        trial_ends_at: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
-        current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-      }).eq('id', restaurantId)
-      break
-    }
-
-    case 'customer.subscription.deleted': {
-      const sub = event.data.object as Stripe.Subscription
-      const restaurantId = sub.metadata?.restaurant_id
-      if (!restaurantId) break
-
-      await adminSupabase.from('restaurants').update({
-        subscription_status: 'canceled',
-        stripe_subscription_id: null,
-      }).eq('id', restaurantId)
-      break
-    }
-
-    case 'invoice.payment_failed': {
-      const invoice = event.data.object as Stripe.Invoice
-      const subId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id
-      if (!subId) break
-
-      const sub = await stripe.subscriptions.retrieve(subId)
-      const restaurantId = sub.metadata?.restaurant_id
-      if (!restaurantId) break
-
-      await adminSupabase.from('restaurants').update({
-        subscription_status: 'past_due',
-      }).eq('id', restaurantId)
-      break
-    }
+  } catch (err) {
+    console.error('Webhook handler error:', err)
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 })
   }
 
   return NextResponse.json({ received: true })

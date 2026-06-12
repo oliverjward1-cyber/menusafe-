@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { ArrowLeft, AlertOctagon, Plus, CheckCircle2 } from 'lucide-react'
 import IncidentForm from './IncidentForm'
 import ResolveButton from './ResolveButton'
+import CorrectiveActions from './CorrectiveActions'
+import PrintButton from '@/components/ui/PrintButton'
 
 const TYPE_LABELS: Record<string, { label: string; emoji: string }> = {
   allergen_reaction: { label: 'Allergen reaction', emoji: '⚠️' },
@@ -37,6 +39,12 @@ export default async function IncidentsPage() {
     .eq('restaurant_id', rid)
     .order('occurred_at', { ascending: false })
 
+  const { data: correctiveActions } = await supabase
+    .from('corrective_actions')
+    .select('*')
+    .eq('restaurant_id', rid)
+    .order('created_at', { ascending: false })
+
   const allIncidents = incidents ?? []
   const open = allIncidents.filter(i => !i.resolved)
   const resolved = allIncidents.filter(i => i.resolved)
@@ -45,24 +53,28 @@ export default async function IncidentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/owner" className="text-mise-ink/40 hover:text-mise-ink transition-colors">
+          <Link href="/owner" className="text-hospopilot-ink/40 hover:text-hospopilot-ink transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-display font-semibold text-mise-ink flex items-center gap-2">
+            <h1 className="text-2xl font-display font-semibold text-hospopilot-ink flex items-center gap-2">
               <AlertOctagon className="h-6 w-6 text-red-500" />
               Incident Log
             </h1>
-            <p className="text-sm text-mise-ink/50 mt-0.5">
+            <p className="text-sm text-hospopilot-ink/50 mt-0.5">
               {open.length > 0 ? `${open.length} open incident${open.length !== 1 ? 's' : ''}` : 'No open incidents'}
             </p>
           </div>
         </div>
+        <PrintButton label="Print log" />
       </div>
 
+      {/* Corrective Actions */}
+      <div className="no-print"><CorrectiveActions initial={correctiveActions ?? []} /></div>
+
       {/* Report new incident */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-mise-ink mb-4 flex items-center gap-2">
+      <div className="bg-white rounded-2xl border border-black/[0.06] p-5 shadow-sm no-print">
+        <h2 className="text-base font-semibold text-hospopilot-ink mb-4 flex items-center gap-2">
           <Plus className="h-4 w-4 text-red-500" /> Report an incident
         </h2>
         <IncidentForm restaurantId={rid} reportedBy={user.email?.split('@')[0] ?? ''} />
@@ -71,7 +83,7 @@ export default async function IncidentsPage() {
       {/* Open incidents */}
       {open.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-mise-ink/60 uppercase tracking-widest px-1">Open</h2>
+          <h2 className="text-sm font-semibold text-hospopilot-ink/60 uppercase tracking-widest px-1">Open</h2>
           {open.map(incident => {
             const t = TYPE_LABELS[incident.type] ?? TYPE_LABELS.other
             return (
@@ -80,20 +92,20 @@ export default async function IncidentsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-base">{t.emoji}</span>
-                      <span className="font-semibold text-mise-ink">{incident.title}</span>
+                      <span className="font-semibold text-hospopilot-ink">{incident.title}</span>
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-xs ${SEVERITY_STYLES[incident.severity]}`}>
                         {incident.severity}
                       </span>
-                      <span className="text-xs text-mise-ink/40 bg-mise-cream px-2 py-0.5 rounded-full">{t.label}</span>
+                      <span className="text-xs text-hospopilot-ink/40 bg-hospopilot-cream px-2 py-0.5 rounded-full">{t.label}</span>
                     </div>
-                    <p className="text-sm text-mise-ink/70 mt-2">{incident.description}</p>
+                    <p className="text-sm text-hospopilot-ink/70 mt-2">{incident.description}</p>
                     {incident.affected_person && (
-                      <p className="text-xs text-mise-ink/50 mt-1">Person affected: {incident.affected_person}</p>
+                      <p className="text-xs text-hospopilot-ink/50 mt-1">Person affected: {incident.affected_person}</p>
                     )}
                     {incident.action_taken && (
                       <p className="text-xs text-green-700 mt-1">Action taken: {incident.action_taken}</p>
                     )}
-                    <p className="text-xs text-mise-ink/40 mt-2">
+                    <p className="text-xs text-hospopilot-ink/40 mt-2">
                       Reported by {incident.reported_by} · {new Date(incident.occurred_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
@@ -108,16 +120,16 @@ export default async function IncidentsPage() {
       {/* Resolved incidents */}
       {resolved.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-mise-ink/60 uppercase tracking-widest px-1">Resolved</h2>
+          <h2 className="text-sm font-semibold text-hospopilot-ink/60 uppercase tracking-widest px-1">Resolved</h2>
           {resolved.map(incident => {
             const t = TYPE_LABELS[incident.type] ?? TYPE_LABELS.other
             return (
               <div key={incident.id} className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-5 opacity-60">
                 <div className="flex items-center gap-2 flex-wrap">
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  <span className="font-medium text-mise-ink">{incident.title}</span>
-                  <span className="text-xs text-mise-ink/40 bg-mise-cream px-2 py-0.5 rounded-full">{t.label}</span>
-                  <span className="text-xs text-mise-ink/40">
+                  <span className="font-medium text-hospopilot-ink">{incident.title}</span>
+                  <span className="text-xs text-hospopilot-ink/40 bg-hospopilot-cream px-2 py-0.5 rounded-full">{t.label}</span>
+                  <span className="text-xs text-hospopilot-ink/40">
                     {new Date(incident.occurred_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </span>
                 </div>
@@ -128,7 +140,7 @@ export default async function IncidentsPage() {
       )}
 
       {allIncidents.length === 0 && (
-        <div className="text-center py-12 text-mise-ink/40 text-sm">
+        <div className="text-center py-12 text-hospopilot-ink/40 text-sm">
           No incidents recorded. Use the form above to log any issues.
         </div>
       )}

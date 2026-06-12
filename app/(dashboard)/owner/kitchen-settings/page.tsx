@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import KitchenSettingsForm from './KitchenSettingsForm'
+import SeedDemoDataButton from './SeedDemoDataButton'
 
 export default async function KitchenSettingsPage() {
   const supabase = createClient()
@@ -19,14 +20,15 @@ export default async function KitchenSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-semibold text-mise-ink">Kitchen portal</h1>
-        <p className="text-mise-ink/50 mt-1">Set the staff PIN and get the link for your kitchen team</p>
+        <h1 className="text-2xl font-display font-semibold text-hospopilot-ink">Kitchen portal</h1>
+        <p className="text-hospopilot-ink/50 mt-1">Set the staff PIN and get the link for your kitchen team</p>
       </div>
       <KitchenSettingsForm
         restaurantId={restaurant.id}
         restaurantSlug={restaurant.slug}
         currentPin={restaurant.staff_pin ?? null}
       />
+      <SeedDemoDataButton />
     </div>
   )
 }

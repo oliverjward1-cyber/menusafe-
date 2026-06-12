@@ -48,16 +48,16 @@ export default function AllergenQuiz({
   return (
     <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-black/[0.04] flex items-center justify-between">
-        <h2 className="text-base font-semibold text-mise-ink">Knowledge check</h2>
+        <h2 className="text-base font-semibold text-hospopilot-ink">Knowledge check</h2>
         {previousScore !== null && !submitted && (
-          <span className="text-xs text-mise-ink/40">Previous best: {previousScore}%</span>
+          <span className="text-xs text-hospopilot-ink/40">Previous best: {previousScore}%</span>
         )}
       </div>
 
       <div className="p-5 space-y-6">
         {quiz.map((q, qi) => (
           <div key={qi}>
-            <p className="text-sm font-medium text-mise-ink mb-3">
+            <p className="text-sm font-medium text-hospopilot-ink mb-3">
               {qi + 1}. {q.q}
             </p>
             <div className="space-y-2">
@@ -82,8 +82,8 @@ export default function AllergenQuiz({
                         : isWrong
                         ? 'bg-red-50 border-red-400 text-red-700'
                         : isSelected
-                        ? 'bg-mise-mid/10 border-mise-mid text-mise-ink font-medium'
-                        : 'bg-mise-cream/40 border-black/[0.06] text-mise-ink/70 hover:bg-mise-cream hover:border-mise-mid/30'
+                        ? 'bg-hospopilot-mid/10 border-hospopilot-mid text-hospopilot-ink font-medium'
+                        : 'bg-hospopilot-cream/40 border-black/[0.06] text-hospopilot-ink/70 hover:bg-hospopilot-cream hover:border-hospopilot-mid/30'
                     }`}
                   >
                     <span className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function AllergenQuiz({
           <button
             onClick={submit}
             disabled={!allAnswered || saving}
-            className="w-full bg-mise-deep text-white rounded-xl py-3 text-sm font-semibold hover:bg-mise-deep/90 disabled:opacity-40 transition-colors"
+            className="w-full bg-hospopilot-deep text-white rounded-xl py-3 text-sm font-semibold hover:bg-hospopilot-deep/90 disabled:opacity-40 transition-colors"
           >
             {saving ? 'Saving…' : 'Submit answers'}
           </button>
@@ -115,19 +115,19 @@ export default function AllergenQuiz({
               <p className={`text-sm font-medium mt-1 ${passed ? 'text-green-700' : 'text-red-600'}`}>
                 {passed ? '✓ Module passed!' : '✗ Not quite — review the content and try again'}
               </p>
-              <p className="text-xs text-mise-ink/40 mt-1">{correctCount} of {quiz.length} correct</p>
+              <p className="text-xs text-hospopilot-ink/40 mt-1">{correctCount} of {quiz.length} correct</p>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={reset}
-                className="flex items-center gap-1.5 flex-1 justify-center border border-black/[0.08] text-mise-ink/70 rounded-xl py-2.5 text-sm font-medium hover:bg-mise-cream transition-colors"
+                className="flex items-center gap-1.5 flex-1 justify-center border border-black/[0.08] text-hospopilot-ink/70 rounded-xl py-2.5 text-sm font-medium hover:bg-hospopilot-cream transition-colors"
               >
                 <RotateCcw className="h-3.5 w-3.5" /> Retake
               </button>
               {nextSlug && (
                 <button
                   onClick={() => router.push(`/owner/learn/${nextSlug}`)}
-                  className="flex items-center gap-1.5 flex-1 justify-center bg-mise-deep text-white rounded-xl py-2.5 text-sm font-semibold hover:bg-mise-deep/90 transition-colors"
+                  className="flex items-center gap-1.5 flex-1 justify-center bg-hospopilot-deep text-white rounded-xl py-2.5 text-sm font-semibold hover:bg-hospopilot-deep/90 transition-colors"
                 >
                   Next module <ArrowRight className="h-3.5 w-3.5" />
                 </button>
@@ -135,7 +135,7 @@ export default function AllergenQuiz({
               {!nextSlug && passed && (
                 <button
                   onClick={() => router.push('/owner/learn')}
-                  className="flex items-center gap-1.5 flex-1 justify-center bg-mise-deep text-white rounded-xl py-2.5 text-sm font-semibold hover:bg-mise-deep/90 transition-colors"
+                  className="flex items-center gap-1.5 flex-1 justify-center bg-hospopilot-deep text-white rounded-xl py-2.5 text-sm font-semibold hover:bg-hospopilot-deep/90 transition-colors"
                 >
                   <CheckCircle2 className="h-3.5 w-3.5" /> All done!
                 </button>

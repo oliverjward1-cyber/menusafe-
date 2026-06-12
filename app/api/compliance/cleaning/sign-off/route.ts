@@ -2,8 +2,11 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { getStaffRestaurantId } from '@/lib/staff-session'
+import { blockIfImpersonating } from '@/lib/dev/guard'
 
 export async function POST(request: Request) {
+  const blocked = await blockIfImpersonating()
+  if (blocked) return blocked
   const body = await request.json()
   const { restaurantId, taskId, taskName, signedBy, source } = body
 

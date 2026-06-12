@@ -1,52 +1,72 @@
-# mise — site & admin
+# HospoPilot
 
-Two static front-ends for **mise** (allergens · menus · training for UK restaurants).
-No build step, no framework install — just open or serve the folder.
+Allergen compliance, recipe costing, menus, and staff training for UK independent restaurants.
 
-| Page | URL | What it is |
-|------|-----|------------|
-| Landing page | `index.html` | Public marketing site |
-| Admin dashboard | `admin.html` | Internal back office (overview, customers, subscriptions, billing, waitlist) |
+Built with **Next.js 14** (App Router) + TypeScript, **Tailwind CSS**, **Supabase** (Postgres + auth), **Resend** (transactional email), and the **Anthropic API** (menu/allergen import and AI descriptions).
 
 ## Run locally
-Serve the folder (needed so the admin's module files load):
+
+```bash
+npm install
+npm run dev
+```
+
+Then visit http://localhost:3000.
+
+Scripts:
+
+| Command | What it does |
+|---------|--------------|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run start` | Run the production build |
+| `npm run lint` | Lint with `next lint` |
+
+## Environment variables
+
+Create `.env.local` with:
 
 ```
-python3 -m http.server
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Site
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Transactional email (Resend)
+RESEND_API_KEY=
+
+# AI (Anthropic)
+ANTHROPIC_API_KEY=
+
+# Admin dashboard
+ADMIN_PASSWORD=
+
+# Protects scheduled (cron) endpoints — digest, temperature checks
+CRON_SECRET=
 ```
-
-Then visit http://localhost:8000 (landing) and http://localhost:8000/admin.html (admin).
-
-> Opening `index.html` straight from disk works for the landing page, but the admin
-> dashboard should be **served** (as above) so its script files load correctly.
-
-## Deploy (GitHub Pages)
-1. Push this folder to a repo.
-2. **Settings → Pages → Source: Deploy from a branch**, pick your branch + `/root`.
-3. Landing = your Pages URL; admin = `<pages-url>/admin.html`.
 
 ## Structure
-```
-index.html              landing page
-styles.css, app.js      landing assets
-tweaks-*.jsx            landing "Tweaks" panel (optional)
-admin.html              admin dashboard entry
-admin/
-  admin.css             dashboard styles
-  data.js               sample data (replace with live data later)
-  components.jsx        shared UI (KPIs, tables, drawer, modals, charts)
-  screens.jsx           the 5 screens
-  drawer.jsx            customer drawer + action modals
-  app.jsx               app shell, routing, actions, tweaks
-  tweaks-panel.jsx      tweaks controls
-```
 
-## Notes
-- The admin dashboard uses **sample data** in `admin/data.js` — swap it for real data when ready.
-- Plan names/prices (Core £49 / Plus £79 / Multi-site £129) are **placeholders**.
-- Fonts load from Google Fonts; React/Babel load from a CDN — an internet connection is required.
+```
+app/
+  (auth)/            login, signup, password reset
+  (dashboard)/       owner + chef dashboards (recipes, menus, compliance, training)
+  kitchen/[slug]/    staff kitchen portal (PIN login)
+  menu/[slug]/       public QR allergen menu
+  admin/             internal back office (route renders the dashboard below)
+  api/               route handlers (compliance, email, AI import, cron jobs)
+components/          shared UI, nav, marketing landing, allergen widgets
+lib/                 Supabase clients, constants, utils
+public/admin/        admin dashboard front-end (React via CDN, served at /admin)
+supabase/migrations/ database schema
+```
 
 ## Brand quick reference
-- Name **mise** (always lowercase), 2×2 grid mark with one gold tile
-- Deep green `#1B4332` · gold `#D4A017` · cream `#F8F4E3`
+
+- Name **HospoPilot**, rounded dark-green square with a gold star mark; two-tone "Hospo**Pilot**" wordmark
+- Palette (Tailwind `hospopilot-*` tokens): deep green `#1B4332` · mid `#2D6A4F` · fresh `#52B788` · gold `#D4A017` · cream `#F8F4E3` · ink `#1C2B24`
 - Display serif: Cormorant Garamond · UI/body: Hanken Grotesk
+- Transactional email sends from `support@hospopilot.co.uk`

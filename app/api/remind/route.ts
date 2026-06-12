@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   const resolvedUrl = quizUrl.startsWith('/') ? `${ALLOWED_ORIGIN}${quizUrl}` : quizUrl
 
   await resend.emails.send({
-    from: 'mise <noreply@mise.app>',
+    from: 'HospoPilot <support@hospopilot.co.uk>',
     to: staffEmail,
     subject: `${escapeHtml(restaurantName)} — Your allergen training is due for renewal`,
     html: buildReminderEmail(escapeHtml(staffName), escapeHtml(restaurantName), resolvedUrl),
@@ -58,7 +58,7 @@ function buildReminderEmail(staffName: string, restaurantName: string, quizUrl: 
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,sans-serif;">
   <table width="100%" style="padding:40px 0;background:#f4f4f4;"><tr><td align="center">
   <table width="600" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
-    <tr><td style="background:#1a3d2b;padding:32px 40px;text-align:center;"><h1 style="margin:0;color:#fff;font-size:28px;font-weight:700;">mise</h1></td></tr>
+    <tr><td style="background:#1a3d2b;padding:32px 40px;text-align:center;"><h1 style="margin:0;color:#fff;font-size:28px;font-weight:700;">HospoPilot</h1></td></tr>
     <tr><td style="padding:40px 40px 32px;">
       <h2 style="margin:0 0 16px;color:#1a1a1a;font-size:22px;">Hi ${staffName},</h2>
       <p style="margin:0 0 16px;color:#444;font-size:16px;line-height:1.6;">Your allergen training certificate at <strong>${restaurantName}</strong> is due for renewal. UK food safety regulations require staff allergen training to be kept up to date.</p>
@@ -68,7 +68,7 @@ function buildReminderEmail(staffName: string, restaurantName: string, quizUrl: 
       </td></tr></table>
     </td></tr>
     <tr><td style="padding:24px 40px;border-top:1px solid #eee;background:#fafafa;">
-      <p style="margin:0;color:#999;font-size:13px;text-align:center;">This reminder was sent by your employer via mise. If you have questions, speak to your manager.</p>
+      <p style="margin:0;color:#999;font-size:13px;text-align:center;">This reminder was sent by your employer via HospoPilot. If you have questions, speak to your manager.</p>
     </td></tr>
   </table></td></tr></table></body></html>`
 }
